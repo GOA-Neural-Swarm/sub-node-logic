@@ -1,8 +1,9 @@
 name: Cluster Sub-node Sync
 on:
   schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+    - cron: '*/15 * * * *' # ၁၅ မိနစ်တစ်ခါ အလိုအလျောက် ပွား/စစ်ဆေးမည်
+  workflow_dispatch:      # Manual နှိုးချင်ရင်လည်း ရသည်
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -11,8 +12,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
-      - run: node cluster_sync.js
+
+      # Dependencies များ အစုံအလင် ထည့်သွင်းခြင်း (Axios Error ပြင်ဆင်ချက်)
+      - name: Install Dependencies
+        run: npm install @octokit/rest firebase-admin axios
+
+      - name: Execute Swarm Logic
+        run: node cluster_sync.js
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          
