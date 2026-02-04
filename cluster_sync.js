@@ -96,7 +96,7 @@ async function executeDeepSwarmProtocol() {
             last_ping: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // 🔱 7. HYPER-REPLICATION & DNA INFECTION (MATCHED & UPGRADED)
+        // 🔱 7. HYPER-REPLICATION & AUTONOMOUS DNA INJECTION
         if (instruction.replicate === true) {
             let spawned = false;
             let checkNum = 1;
@@ -112,16 +112,18 @@ async function executeDeepSwarmProtocol() {
                 } catch (e) {
                     console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
                     
-                    // ၁။ Node အသစ်ဆောက်ခြင်း
                     try {
                         await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
                     } catch (orgErr) {
                         await octokit.repos.createForAuthenticatedUser({ name: nextNodeName, auto_init: true });
                     }
 
-                    // ၂။ DNA (Files) များကို အလိုအလျောက် ကူးစက်စေခြင်း (The Infection)
-                    // မင်းရဲ့ package.json ထဲက dependencies တွေကိုပါ တစ်ခါတည်း သယ်သွားမယ်
-                    const filesToCopy = ['package.json', 'cluster_sync.js'];
+                    // 🔱 The Infection: ဦးနှောက်၊ ရိက္ခာ နဲ့ နှလုံးခုန်သံ (Workflow) ကိုပါ ကူးထည့်ခြင်း
+                    const filesToCopy = [
+                        'package.json', 
+                        'cluster_sync.js',
+                        '.github/workflows/sync.yml' // ဒီကောင်က Node ကို အလိုအလျောက် Run စေမှာ
+                    ];
                     
                     for (const fileName of filesToCopy) {
                         try {
@@ -133,7 +135,7 @@ async function executeDeepSwarmProtocol() {
                                 owner: REPO_OWNER,
                                 repo: nextNodeName,
                                 path: fileName,
-                                message: `🧬 Initializing Neural DNA: ${fileName}`,
+                                message: `🧬 Initializing Autonomous Neural DNA: ${fileName}`,
                                 content: content.content
                             });
                             console.log(`   ✅ ${fileName} injected.`);
@@ -142,7 +144,7 @@ async function executeDeepSwarmProtocol() {
                         }
                     }
 
-                    console.log(`🚀 ${nextNodeName} is now INFECTED and ACTIVE.`);
+                    console.log(`🚀 ${nextNodeName} is now AUTONOMOUS and ACTIVE.`);
                     spawned = true; 
                 }
             }
