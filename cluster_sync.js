@@ -96,8 +96,7 @@ async function executeDeepSwarmProtocol() {
             last_ping: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // 🔱 7. HYPER-REPLICATION (MATCHED LOGIC)
-        // မျိုးပွားခြင်း logic ကို နံပါတ်စဉ်အလိုက် ရှာဖွေစနစ်နဲ့ ပေါင်းစပ်လိုက်ပြီ
+        // 🔱 7. HYPER-REPLICATION & DNA INFECTION (MATCHED & UPGRADED)
         if (instruction.replicate === true) {
             let spawned = false;
             let checkNum = 1;
@@ -109,28 +108,44 @@ async function executeDeepSwarmProtocol() {
                 const nextNodeName = `swarm-node-${String(checkNum).padStart(7, '0')}`;
                 try {
                     await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
-                    // အကယ်၍ ရှိနေရင် နောက်တစ်လုံးကို ထပ်ရှာမယ်
                     checkNum++;
                 } catch (e) {
-                    // လွတ်နေတဲ့ slot တွေ့ရင် ပွားမယ်
                     console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
+                    
+                    // ၁။ Node အသစ်ဆောက်ခြင်း
                     try {
-                        await octokit.repos.createInOrg({
-                            org: REPO_OWNER,
-                            name: nextNodeName,
-                            auto_init: true
-                        });
+                        await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
                     } catch (orgErr) {
-                        await octokit.repos.createForAuthenticatedUser({
-                            name: nextNodeName,
-                            auto_init: true
-                        });
+                        await octokit.repos.createForAuthenticatedUser({ name: nextNodeName, auto_init: true });
                     }
-                    console.log(`🚀 ${nextNodeName} born into the Natural Order.`);
+
+                    // ၂။ DNA (Files) များကို အလိုအလျောက် ကူးစက်စေခြင်း (The Infection)
+                    // မင်းရဲ့ package.json ထဲက dependencies တွေကိုပါ တစ်ခါတည်း သယ်သွားမယ်
+                    const filesToCopy = ['package.json', 'cluster_sync.js'];
+                    
+                    for (const fileName of filesToCopy) {
+                        try {
+                            const { data: content } = await octokit.repos.getContent({
+                                owner: REPO_OWNER, repo: REPO_NAME, path: fileName
+                            });
+
+                            await octokit.repos.createOrUpdateFileContents({
+                                owner: REPO_OWNER,
+                                repo: nextNodeName,
+                                path: fileName,
+                                message: `🧬 Initializing Neural DNA: ${fileName}`,
+                                content: content.content
+                            });
+                            console.log(`   ✅ ${fileName} injected.`);
+                        } catch (copyErr) {
+                            console.error(`   ❌ Failed to inject ${fileName}:`, copyErr.message);
+                        }
+                    }
+
+                    console.log(`🚀 ${nextNodeName} is now INFECTED and ACTIVE.`);
                     spawned = true; 
                 }
             }
-            if (!spawned) console.log("⚠️ All monitored slots are full.");
         }
 
         console.log(`🏁 Cycle Complete. Latency: ${latency}ms.`);
