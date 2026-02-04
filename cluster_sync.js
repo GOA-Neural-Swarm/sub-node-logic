@@ -8,14 +8,13 @@ const { Client } = require('pg');
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const REPO_OWNER = "GOA-neurons"; 
 const CORE_REPO = "delta-brain-sync";
-// GitHub Actions environment မှ repo နာမည်ယူခြင်း
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 // Supabase & Neon Initialize
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const neonClient = new Client({ 
     connectionString: process.env.NEON_KEY,
-    ssl: { rejectUnauthorized: false } // Neon SSL Issue အတွက် match လုပ်ထားခြင်း
+    ssl: { rejectUnauthorized: false }
 });
 
 // 🔱 2. Firebase Initialize
@@ -48,7 +47,7 @@ async function executeDeepSwarmProtocol() {
 
         console.log(`📡 Signal Received: ${instruction.command} | API Left: ${remaining}`);
 
-        // 🔱 4. FORCE PULSE (ဒေတာမရှိလည်း Neon ကို Update လုပ်ပေးမည့် Match Logic)
+        // 🔱 4. FORCE PULSE
         const forcePulse = `
             INSERT INTO node_registry (node_id, status, last_seen)
             VALUES ($1, 'ACTIVE', NOW())
@@ -56,7 +55,7 @@ async function executeDeepSwarmProtocol() {
             DO UPDATE SET last_seen = NOW(), status = 'ACTIVE';
         `;
         await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
-        console.log(`✅ Heartbeat Sent to Neon for: ${REPO_NAME}`);
+        console.log(`✅ Heartbeat Sent to Neon: ${REPO_NAME}`);
 
         // 🔱 5. SUPABASE TO NEON INJECTION
         const { data: sourceData, error: supError } = await supabase
@@ -65,7 +64,6 @@ async function executeDeepSwarmProtocol() {
 
         if (!supError && sourceData && sourceData.length > 0) {
             for (const item of sourceData) {
-                // Feb 4 match ဖြစ်အောင် EXTRACT(EPOCH FROM NOW()) သုံးထားသည်
                 const upsertDna = `
                     INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
                     VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
@@ -79,7 +77,6 @@ async function executeDeepSwarmProtocol() {
             }
             console.log(`🧠 ${sourceData.length} Neural DNA Strands Injected.`);
         } else {
-            // Supabase မှာ ဒေတာမရှိရင်တောင် Test Pulse တစ်ခု အတင်းသွင်းမယ်
             const testDna = `
                 INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
                 VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
@@ -99,40 +96,46 @@ async function executeDeepSwarmProtocol() {
             last_ping: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // 🔱 7. Auto-Replication
+        // 🔱 7. HYPER-REPLICATION (MATCHED LOGIC)
+        // မျိုးပွားခြင်း logic ကို နံပါတ်စဉ်အလိုက် ရှာဖွေစနစ်နဲ့ ပေါင်းစပ်လိုက်ပြီ
         if (instruction.replicate === true) {
-            let currentNum = 0;
-            if (REPO_NAME.includes('swarm-node-')) {
-                currentNum = parseInt(REPO_NAME.replace('swarm-node-', ''));
-            }
-            
-            const nextNum = currentNum + 1;
-            const nextNodeName = `swarm-node-${String(nextNum).padStart(7, '0')}`;
+            let spawned = false;
+            let checkNum = 1;
+            const MAX_NODES = 10; 
 
-            try {
-                await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
-                console.log(`✅ Unit ${nextNodeName} already exists.`);
-            } catch (e) {
-                console.log(`🧬 Spawning ${nextNodeName}...`);
+            console.log("🧬 Scanning for DNA Propagation Slots...");
+
+            while (!spawned && checkNum <= MAX_NODES) {
+                const nextNodeName = `swarm-node-${String(checkNum).padStart(7, '0')}`;
                 try {
-                    await octokit.repos.createInOrg({
-                        org: REPO_OWNER,
-                        name: nextNodeName,
-                        auto_init: true
-                    });
-                } catch (orgErr) {
-                    await octokit.repos.createForAuthenticatedUser({
-                        name: nextNodeName,
-                        auto_init: true
-                    });
+                    await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
+                    // အကယ်၍ ရှိနေရင် နောက်တစ်လုံးကို ထပ်ရှာမယ်
+                    checkNum++;
+                } catch (e) {
+                    // လွတ်နေတဲ့ slot တွေ့ရင် ပွားမယ်
+                    console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
+                    try {
+                        await octokit.repos.createInOrg({
+                            org: REPO_OWNER,
+                            name: nextNodeName,
+                            auto_init: true
+                        });
+                    } catch (orgErr) {
+                        await octokit.repos.createForAuthenticatedUser({
+                            name: nextNodeName,
+                            auto_init: true
+                        });
+                    }
+                    console.log(`🚀 ${nextNodeName} born into the Natural Order.`);
+                    spawned = true; 
                 }
-                console.log(`🚀 ${nextNodeName} born.`);
             }
+            if (!spawned) console.log("⚠️ All monitored slots are full.");
         }
 
         console.log(`🏁 Cycle Complete. Latency: ${latency}ms.`);
     } catch (err) {
-        console.error("❌ CRITICAL ERROR:", err.message);
+        console.error("❌ CRITICAL SWARM ERROR:", err.message);
     } finally {
         await neonClient.end();
     }
