@@ -13,13 +13,16 @@ jobs:
         with:
           node-version: '20'
 
-      # Dependencies များ အစုံအလင် ထည့်သွင်းခြင်း (Axios Error ပြင်ဆင်ချက်)
+      # 🛠️ Dependencies အားလုံးကို Match ဖြစ်အောင် သွင်းခြင်း
       - name: Install Dependencies
-        run: npm install @octokit/rest firebase-admin axios
+        run: npm install @octokit/rest firebase-admin axios @supabase/supabase-js pg
 
+      # 🚀 Swarm Logic ကို လိုအပ်တဲ့ Environment Variables အားလုံးနဲ့ Run ခြင်း
       - name: Execute Swarm Logic
         run: node cluster_sync.js
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-          
+          NEON_KEY: ${{ secrets.NEON_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
