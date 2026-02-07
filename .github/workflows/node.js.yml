@@ -1,15 +1,26 @@
 name: Cluster Sub-node Sync
+
 on:
   schedule:
     - cron: '*/15 * * * *' # ၁၅ မိနစ်တစ်ခါ အလိုအလျောက် ပွား/စစ်ဆေးမည်
   workflow_dispatch:      # Manual နှိုးချင်ရင်လည်း ရသည်
 
+# 🛠️ Permissions အဆင့်မြှင့်တင်ခြင်း - GitHub ဆီ ဖိုင်ရေးခွင့် အပြည့်အဝပေးသည်
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -21,8 +32,13 @@ jobs:
       - name: Execute Swarm Logic
         run: node cluster_sync.js
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          # Database & Firebase Keys
           NEON_KEY: ${{ secrets.NEON_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+
+          # GitHub Authentication Tokens (PAT သို့မဟုတ် GITHUB_TOKEN)
+          # cluster_sync.js ထဲက ခေါ်ထားတဲ့ variable name နဲ့ ကိုက်အောင် နှစ်မျိုးလုံးပေးထားပါတယ်
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
