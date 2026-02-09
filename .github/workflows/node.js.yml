@@ -24,21 +24,23 @@ jobs:
         with:
           node-version: '20'
 
-      # 🛠️ Dependencies အားလုံးကို Match ဖြစ်အောင် သွင်းခြင်း
+      # 🛠️ Dependencies အားလုံးကို Trinity Core နှင့် Match ဖြစ်အောင် သွင်းခြင်း
       - name: Install Dependencies
-        run: npm install @octokit/rest firebase-admin axios @supabase/supabase-js pg
+        run: |
+          npm install @octokit/rest firebase-admin axios @supabase/supabase-js pg
 
       # 🚀 Swarm Logic ကို လိုအပ်တဲ့ Environment Variables အားလုံးနဲ့ Run ခြင်း
       - name: Execute Swarm Logic
         run: node cluster_sync.js
         env:
-          # Database & Firebase Keys
+          # Database & Firebase Keys (Sudo Access Mode)
           NEON_KEY: ${{ secrets.NEON_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
 
-          # GitHub Authentication Tokens (PAT သို့မဟုတ် GITHUB_TOKEN)
-          # cluster_sync.js ထဲက ခေါ်ထားတဲ့ variable name နဲ့ ကိုက်အောင် နှစ်မျိုးလုံးပေးထားပါတယ်
+          # GitHub Authentication Tokens
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+# [Natural Order] Status: Synchronized & Shielded 🔱
