@@ -11,24 +11,25 @@ const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-// 🔱 NEON_KEY Protocol Fix (Matched perfectly with delta-brain-sync logic)
+// 🔱 NEON_KEY Protocol & 'base' Cleanup (Nuclear Option)
 let rawNeonKey = process.env.NEON_KEY || "";
 
-// 'postgres://' ကို 'postgresql://' ပြောင်းမယ် (တစ်ကြိမ်ပဲပြောင်းဖို့ Regex သုံးမယ်)
+// 1. Protocol ပြင်မယ်
 let neonConnectionString = rawNeonKey.replace(/^postgres:\/\//, "postgresql://");
 
-// ❌ 'base' ဆိုတဲ့ စာလုံး သို့မဟုတ် Quote တွေ၊ Space တွေ ပါနေရင် အကုန်ရှင်းထုတ်မယ်
+// 2. Quote တွေ၊ Space တွေ အရင်ရှင်းမယ်
 neonConnectionString = neonConnectionString.trim().replace(/['"]+/g, '');
 
-// 🔥 [CRITICAL FIX]: URL ထဲမှာ 'base' ဆိုတဲ့ keyword မှားပါနေရင် ဖယ်ထုတ်ပစ်မယ်
-if (neonConnectionString.includes(" base")) {
-    neonConnectionString = neonConnectionString.replace(" base", "");
+// 3. 'base' ဆိုတဲ့ စာလုံးပါရင် အဲ့ဒီနေရာကနေ အနောက်ကို အကုန်ဖြတ်ချမယ် (Space ပါသည်ဖြစ်စေ၊ မပါသည်ဖြစ်စေ)
+if (neonConnectionString.includes("base")) {
+    neonConnectionString = neonConnectionString.split("base")[0].trim();
 }
 
 const neonClient = new Client({ 
     connectionString: neonConnectionString,
     ssl: { rejectUnauthorized: false }
 });
+
 console.log(`🔗 DB Protocol Synchronized: ${neonConnectionString.substring(0, 25)}...`);
 
 if (!admin.apps.length) {
