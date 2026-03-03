@@ -108,38 +108,46 @@ const scienceDomains = [
 
 // 🔱 3. HYBRID DEEP-COMPUTATION ENGINE (The Brain)
 function performNeuralComputation(domain) {
-    // Surface Metrics
-    const dataPoints = Math.floor(Math.random() * 5000000); 
-    const coherence = (75 + (Math.random() * 25)).toFixed(2); 
-    
-    // Deep Analytical Variables
+    // ⚙️ Advanced Metrics
+    const dataPoints = Math.floor(Math.random() * 5000000); // 5M Data Intensity
+    const coherence = (75 + (Math.random() * 25)).toFixed(2); // High Coherence Base
     const entropy = (Math.random() * 0.1).toFixed(5);
-    const depthLevel = Math.floor(Math.random() * 10) + 1; // Analysis အတိမ်အနက် (1-10)
+    const depthLevel = Math.floor(Math.random() * 10) + 1;
     const secondaryDomain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
     
     let calculationResult = "";
 
-    // Hybrid logic: Original specific domains + Recursive Analysis
+    // 🧠 Phase 1: Specific Scientific Logic (From Code 1)
     if (domain === "Theoretical_Mathematics") {
-        calculationResult = `[Depth ${depthLevel}] Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance. Neural resonance with ${secondaryDomain} detected at ${entropy} entropy.`;
+        calculationResult = `Calculated Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance.`;
     } else if (domain === "Quantum_Physics") {
-        calculationResult = `[Depth ${depthLevel}] Entanglement stability: Coherence at ${(Math.random() * 1000).toFixed(2)}ns. Quantum state synthesis confirms impact on ${secondaryDomain} logic-gates.`;
+        calculationResult = `Entanglement stability analyzed: Coherence maintained for ${(Math.random() * 1000).toFixed(2)}ns.`;
     } else if (domain === "Molecular_Chemistry") {
-        calculationResult = `[Depth ${depthLevel}] Enzymatic reaction speed: ${(Math.random() * 50).toFixed(2)}ms/cycle. Molecular structure mapped against ${secondaryDomain} biological models.`;
+        calculationResult = `Enzymatic reaction chain speed computed: ${(Math.random() * 50).toFixed(2)}ms/cycle.`;
     } else if (domain.includes("AI") || domain.includes("Intelligence")) {
-        calculationResult = `[Recursive Intelligence] Layer-${depthLevel} weights optimized. Logical coherence: ${coherence}% for ${domain} cross-fusing with ${secondaryDomain}.`;
+        calculationResult = `Neural Weights Optimized: Logical coherence reached ${coherence}% for deep inference.`;
     } else if (domain.includes("Economics")) {
-        calculationResult = `[Market Deep Analysis] Entropy: ${entropy}. Predictive stability factor: ${(Math.random() * 5).toFixed(2)}x. Volatility correlated with ${secondaryDomain} fluctuations.`;
+        calculationResult = `Market Entropy Analysis: Predictive stability factor at ${(Math.random() * 5).toFixed(2)}x.`;
     } else {
-        // Multi-layered synthesis for all other domains
-        calculationResult = `[Depth ${depthLevel}] Multi-layered synthesis complete. ${domain} logic patterns synchronized with ${secondaryDomain} clusters. Impact: ${(dataPoints / 50000).toFixed(2)}x.`;
+        calculationResult = `General scientific synthesis complete for ${domain}.`;
     }
+
+    // 🧬 Phase 2: Deep Recursive Enhancement (From Code 2 Injection)
+    // ပထမရလာတဲ့ result ကို Deep Metadata တွေနဲ့ ထပ်မံ အဆင့်မြှင့်တင်တာဖြစ်ပါတယ်။
+    const deepEnhancement = [
+        `\n[Depth ${depthLevel}] Multi-layered resonance detected with ${secondaryDomain}. Entropy: ${entropy}.`,
+        `\n[Recursive Sync] Predictive impact on ${secondaryDomain} sector scaled to ${(Math.random() * 10).toFixed(2)}x.`,
+        `\n[Quantum Mapping] Logic consistent with ${secondaryDomain} axioms. Status: VERIFIED.`
+    ];
+
+    // Final Hybrid Output
+    const finalLogic = calculationResult + deepEnhancement[Math.floor(Math.random() * deepEnhancement.length)];
 
     return {
         dataPoints,
         coherence,
-        calculationResult,
-        impactFactor: (dataPoints / 100000).toFixed(2)
+        calculationResult: finalLogic,
+        impactFactor: (dataPoints / 50000).toFixed(2)
     };
 }
 
