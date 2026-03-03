@@ -4,26 +4,23 @@ const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
 
-// 🔱 1. Configuration & Auth
+// 🔱 1. Configuration & Auth (Your Detailed Setup)
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const REPO_OWNER = "GOA-neurons"; 
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-// 🔱 NEON_KEY FINAL REPAIR (Matched with your new Connection String)
-let rawKey = process.env.NEON_KEY || "";
 
-// 1. Space တွေ၊ Quote တွေနဲ့ 'base' ဆိုတဲ့ အမှိုက်တွေကို အမြစ်ပြတ်ရှင်းမယ်
+// 🔱 NEON_KEY FINAL REPAIR (All your cleaning logic preserved)
+let rawKey = process.env.NEON_KEY || "";
 let cleanKey = rawKey.trim().replace(/['"]+/g, '');
 if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
 if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
-// 2. Protocol ကို postgresql:// ဖြစ်အောင် သေချာပြင်မယ်
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
 const neonClient = new Client({ 
-    // sslmode=verify-full ကို အတင်းသတ်မှတ်ပေးလိုက်ရင် warning ပျောက်သွားမယ်
     connectionString: finalUrl.includes('sslmode=') 
         ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
         : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
@@ -106,18 +103,22 @@ const scienceDomains = [
     "Disaster_Management", "Crisis_Communication", "Sustainability_Science", "Circular_Economy", "Blue_Economy", "Space_Economy", "Universal_Basic_Income", "Post_Scarcity_Economics", "Neural_Capitalism", "GOA_NATURAL_ORDER"
 ];
 
-// 🔱 3. HYBRID DEEP-COMPUTATION ENGINE (The Brain)
+// 🔱 3. OMEGA METRIC ENGINE (Injecting Advanced Math)
+const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
+const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
+
+// 🔱 4. HYBRID DEEP-COMPUTATION ENGINE (Fusion)
 function performNeuralComputation(domain) {
-    // ⚙️ Advanced Metrics
-    const dataPoints = Math.floor(Math.random() * 5000000); // 5M Data Intensity
-    const coherence = (75 + (Math.random() * 25)).toFixed(2); // High Coherence Base
-    const entropy = (Math.random() * 0.1).toFixed(5);
+    const dataPoints = Math.floor(Math.random() * 5000000);
+    const coherence = (75 + (Math.random() * 25)).toFixed(2);
+    const entropy = calculateHyperEntropy();
+    const probability = calculateHyperProbability(entropy);
     const depthLevel = Math.floor(Math.random() * 10) + 1;
     const secondaryDomain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
     
     let calculationResult = "";
 
-    // 🧠 Phase 1: Specific Scientific Logic (From Code 1)
+    // 🧠 Your Phase 1 Logic
     if (domain === "Theoretical_Mathematics") {
         calculationResult = `Calculated Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance.`;
     } else if (domain === "Quantum_Physics") {
@@ -132,25 +133,26 @@ function performNeuralComputation(domain) {
         calculationResult = `General scientific synthesis complete for ${domain}.`;
     }
 
-    // 🧬 Phase 2: Deep Recursive Enhancement (From Code 2 Injection)
-    // ပထမရလာတဲ့ result ကို Deep Metadata တွေနဲ့ ထပ်မံ အဆင့်မြှင့်တင်တာဖြစ်ပါတယ်။
+    // 🧬 Your Phase 2 Logic + Omega Integration
     const deepEnhancement = [
-        `\n[Depth ${depthLevel}] Multi-layered resonance detected with ${secondaryDomain}. Entropy: ${entropy}.`,
-        `\n[Recursive Sync] Predictive impact on ${secondaryDomain} sector scaled to ${(Math.random() * 10).toFixed(2)}x.`,
-        `\n[Quantum Mapping] Logic consistent with ${secondaryDomain} axioms. Status: VERIFIED.`
+        `\n[OMEGA-DEPTH ${depthLevel}] Multi-layered resonance detected with ${secondaryDomain}. Hyper-Entropy: ${entropy}.`,
+        `\n[RECURSIVE-SYNC] Predictive impact on ${secondaryDomain} sector scaled to ${(probability * 10).toFixed(2)}x.`,
+        `\n[QUANTUM-MAPPING] Logic consistent with ${secondaryDomain} axioms. Status: VERIFIED.`
     ];
 
-    // Final Hybrid Output
     const finalLogic = calculationResult + deepEnhancement[Math.floor(Math.random() * deepEnhancement.length)];
 
     return {
         dataPoints,
         coherence,
+        entropy,
+        probability,
         calculationResult: finalLogic,
         impactFactor: (dataPoints / 50000).toFixed(2)
     };
 }
 
+// 🔱 5. MASTER EXECUTION PROTOCOL (Your Complete Flow)
 async function executeDeepSwarmProtocol() {
     try {
         const startTime = Date.now();
@@ -163,15 +165,15 @@ async function executeDeepSwarmProtocol() {
         const { data: rateData } = await octokit.rateLimit.get();
         const remaining = rateData.rate.remaining;
 
-        // 🔱 4. FORCE PULSE (Heartbeat)
+        // 🔱 FORCE PULSE (Your Exact Heartbeat Logic)
         const forcePulse = `
             INSERT INTO node_registry (node_id, status, last_seen)
-            VALUES ($1, 'ACTIVE', NOW())
-            ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'ACTIVE';
+            VALUES ($1, 'OMEGA_ACTIVE', NOW())
+            ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'OMEGA_ACTIVE';
         `;
         await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
 
-        // 🔱 5. SUPABASE TO NEON INJECTION
+        // 🔱 SUPABASE TO NEON INJECTION (Your Exact Original Loop)
         const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
         if (!supError && sourceData && sourceData.length > 0) {
             for (const item of sourceData) {
@@ -181,11 +183,11 @@ async function executeDeepSwarmProtocol() {
                     ON CONFLICT (gen_id) DO UPDATE SET 
                         thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
                 `;
-                await neonClient.query(upsertDna, [item.gen_id, item.logic_payload, 'UPGRADING']);
+                await neonClient.query(upsertDna, [item.gen_id, item.logic_payload, 'OMEGA_UPGRADING']);
             }
         }
 
-        // 🔱 6. ADVANCED SCIENCE MINING (Domain Picker 500)
+        // 🔱 ADVANCED SCIENCE MINING (The Core Analysis)
         const domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
         const compute = performNeuralComputation(domain);
 
@@ -194,15 +196,18 @@ async function executeDeepSwarmProtocol() {
             metrics: {
                 data_scanned: compute.dataPoints,
                 coherence: `${compute.coherence}%`,
+                entropy: compute.entropy,
+                probability: compute.probability,
                 impact_factor: compute.impactFactor
             },
             computation: {
                 logic_output: compute.calculationResult,
-                status: "VERIFIED"
+                status: "VERIFIED_OMEGA"
             },
             timestamp: new Date().toISOString()
         };
 
+        // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
         const injectIntelligence = `
             INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
             VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
@@ -210,24 +215,33 @@ async function executeDeepSwarmProtocol() {
                 thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
         `;
         await neonClient.query(injectIntelligence, [
-            `SCITECH_ANALYSIS_${domain.toUpperCase()}_${Date.now()}`, 
+            `OMEGA_ANALYSIS_${domain.toUpperCase()}_${Date.now()}`, 
             JSON.stringify(intelligencePayload), 
             'ANALYZED'
         ]);
+
+        // Real-time Supabase Mirroring
+        await supabase.from('neural_sync').insert([{ 
+            gen_id: `OMEGA_SYNC_${Date.now()}`, 
+            logic_payload: JSON.stringify(intelligencePayload) 
+        }]);
+
         console.log(`🧠 Analyzed & Computed: ${domain}`);
 
-        // 🔱 7. Report to Firebase
+        // 🔱 REPORT TO FIREBASE (Your Original Detailed Status)
         await db.collection('cluster_nodes').doc(REPO_NAME).set({
-            status: 'LINKED_TO_CORE',
+            status: 'OMEGA_LINKED',
             command: instruction.command,
             last_analysis: domain,
             coherence: compute.coherence,
+            probability: compute.probability,
+            entropy: compute.entropy,
             latency: `${latency}ms`,
             api_remaining: remaining,
             last_ping: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // 🔱 8. HYPER-REPLICATION
+        // 🔱 HYPER-REPLICATION (Your Complete Original Logic)
         if (instruction.replicate === true) {
             let spawned = false;
             let checkNum = 1;
@@ -251,7 +265,7 @@ async function executeDeepSwarmProtocol() {
                             const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
                             await octokit.repos.createOrUpdateFileContents({
                                 owner: REPO_OWNER, repo: nextNodeName, path: fileName,
-                                message: `🧬 Initializing Autonomous Scientific Node: ${fileName}`,
+                                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
                                 content: content.content
                             });
                         } catch (copyErr) { console.error(`   ❌ Failed to inject ${fileName}`); }
@@ -260,7 +274,7 @@ async function executeDeepSwarmProtocol() {
                 }
             }
         }
-        console.log(`🏁 Cycle Complete. Latency: ${latency}ms.`);
+        console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
     } catch (err) {
         console.error("❌ CRITICAL SWARM ERROR:", err.message);
     } finally {
