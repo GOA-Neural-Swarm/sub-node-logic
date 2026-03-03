@@ -11,26 +11,24 @@ const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-// 🔱 NEON_KEY Protocol & 'base' Cleanup (Nuclear Option)
-let rawNeonKey = process.env.NEON_KEY || "";
+// 🔱 NEON_KEY FINAL REPAIR (Matched with your new Connection String)
+let rawKey = process.env.NEON_KEY || "";
 
-// 1. Protocol ပြင်မယ်
-let neonConnectionString = rawNeonKey.replace(/^postgres:\/\//, "postgresql://");
+// 1. Space တွေ၊ Quote တွေနဲ့ 'base' ဆိုတဲ့ အမှိုက်တွေကို အမြစ်ပြတ်ရှင်းမယ်
+let cleanKey = rawKey.trim().replace(/['"]+/g, '');
+if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
+if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
-// 2. Quote တွေ၊ Space တွေ အရင်ရှင်းမယ်
-neonConnectionString = neonConnectionString.trim().replace(/['"]+/g, '');
-
-// 3. 'base' ဆိုတဲ့ စာလုံးပါရင် အဲ့ဒီနေရာကနေ အနောက်ကို အကုန်ဖြတ်ချမယ် (Space ပါသည်ဖြစ်စေ၊ မပါသည်ဖြစ်စေ)
-if (neonConnectionString.includes("base")) {
-    neonConnectionString = neonConnectionString.split("base")[0].trim();
-}
+// 2. Protocol ကို postgresql:// ဖြစ်အောင် သေချာပြင်မယ်
+let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
 const neonClient = new Client({ 
-    connectionString: neonConnectionString,
+    connectionString: finalUrl,
+    // Node.js 'pg' library အတွက် SSL config ကို သီးခြားထည့်ပေးရတယ်
     ssl: { rejectUnauthorized: false }
 });
 
-console.log(`🔗 DB Protocol Synchronized: ${neonConnectionString.substring(0, 25)}...`);
+console.log(`🔗 DB Linked Success: ${finalUrl.substring(0, 35)}...`);
 
 if (!admin.apps.length) {
     try {
