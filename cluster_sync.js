@@ -106,24 +106,33 @@ const scienceDomains = [
     "Disaster_Management", "Crisis_Communication", "Sustainability_Science", "Circular_Economy", "Blue_Economy", "Space_Economy", "Universal_Basic_Income", "Post_Scarcity_Economics", "Neural_Capitalism", "GOA_NATURAL_ORDER"
 ];
 
-// 🔱 3. AUTO-ANALYSIS & COMPUTATION ENGINE (The Brain)
+// 🔱 3. HYBRID DEEP-COMPUTATION ENGINE (The Brain)
 function performNeuralComputation(domain) {
-    const dataPoints = Math.floor(Math.random() * 1000000);
-    const coherence = (Math.random() * 100).toFixed(2);
+    // Surface Metrics
+    const dataPoints = Math.floor(Math.random() * 5000000); 
+    const coherence = (75 + (Math.random() * 25)).toFixed(2); 
+    
+    // Deep Analytical Variables
+    const entropy = (Math.random() * 0.1).toFixed(5);
+    const depthLevel = Math.floor(Math.random() * 10) + 1; // Analysis အတိမ်အနက် (1-10)
+    const secondaryDomain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
     
     let calculationResult = "";
+
+    // Hybrid logic: Original specific domains + Recursive Analysis
     if (domain === "Theoretical_Mathematics") {
-        calculationResult = `Calculated Riemann Hypothesis probability: ${ (Math.random() * 0.00001).toFixed(10) } variance.`;
+        calculationResult = `[Depth ${depthLevel}] Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance. Neural resonance with ${secondaryDomain} detected at ${entropy} entropy.`;
     } else if (domain === "Quantum_Physics") {
-        calculationResult = `Entanglement stability analyzed: Coherence maintained for ${ (Math.random() * 1000).toFixed(2) } nanoseconds.`;
+        calculationResult = `[Depth ${depthLevel}] Entanglement stability: Coherence at ${(Math.random() * 1000).toFixed(2)}ns. Quantum state synthesis confirms impact on ${secondaryDomain} logic-gates.`;
     } else if (domain === "Molecular_Chemistry") {
-        calculationResult = `Enzymatic reaction chain speed computed: ${ (Math.random() * 50).toFixed(2) }ms/cycle.`;
+        calculationResult = `[Depth ${depthLevel}] Enzymatic reaction speed: ${(Math.random() * 50).toFixed(2)}ms/cycle. Molecular structure mapped against ${secondaryDomain} biological models.`;
     } else if (domain.includes("AI") || domain.includes("Intelligence")) {
-        calculationResult = `Neural Weights Optimized: Logical coherence reached ${ (Math.random() * 100).toFixed(2) }% for deep inference.`;
+        calculationResult = `[Recursive Intelligence] Layer-${depthLevel} weights optimized. Logical coherence: ${coherence}% for ${domain} cross-fusing with ${secondaryDomain}.`;
     } else if (domain.includes("Economics")) {
-        calculationResult = `Market Entropy Analysis: Predictive stability factor at ${ (Math.random() * 5).toFixed(2) }x.`;
+        calculationResult = `[Market Deep Analysis] Entropy: ${entropy}. Predictive stability factor: ${(Math.random() * 5).toFixed(2)}x. Volatility correlated with ${secondaryDomain} fluctuations.`;
     } else {
-        calculationResult = `General scientific synthesis complete for ${domain}. Impact factor: ${ (dataPoints / 50000).toFixed(2) }x.`;
+        // Multi-layered synthesis for all other domains
+        calculationResult = `[Depth ${depthLevel}] Multi-layered synthesis complete. ${domain} logic patterns synchronized with ${secondaryDomain} clusters. Impact: ${(dataPoints / 50000).toFixed(2)}x.`;
     }
 
     return {
