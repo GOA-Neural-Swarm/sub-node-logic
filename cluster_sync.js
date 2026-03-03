@@ -11,10 +11,19 @@ const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+// 🔱 NEON_KEY Protocol Fix
+let rawNeonKey = process.env.NEON_KEY || "";
+let neonConnectionString = rawNeonKey.startsWith("postgres://") 
+    ? rawNeonKey.replace("postgres://", "postgresql://") 
+    : rawNeonKey;
+
+neonConnectionString = neonConnectionString.trim().replace(/['"]+/g, '');
+
 const neonClient = new Client({ 
-    connectionString: process.env.NEON_KEY,
+    connectionString: neonConnectionString,
     ssl: { rejectUnauthorized: false }
 });
+console.log(`🔗 DB Protocol Synchronized: ${neonConnectionString.substring(0, 20)}...`);
 
 if (!admin.apps.length) {
     try {
