@@ -169,7 +169,12 @@ async function manageSwarm(decision, power) {
 
 // 🔱 7. Main Supreme Execution (Trinity + Self-Evolution)
 async function executeAutonomousTrinity() {
-    const neon = new Client({ connectionString: process.env.NEON_KEY + (process.env.NEON_KEY.includes('?') ? '&' : '?') + "sslmode=verify-full" });
+    // 🔱 NEON_KEY FIX
+let k = (process.env.NEON_KEY || "").trim().split("base")[0].replace(/['"]+/g, '');
+const neon = new Client({ 
+    connectionString: k + (k.includes('?') ? '&' : '?') + "sslmode=require",
+    ssl: { rejectUnauthorized: false }
+});
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
     try {
