@@ -23,8 +23,10 @@ if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
 const neonClient = new Client({ 
-    connectionString: finalUrl,
-    // Node.js 'pg' library အတွက် SSL config ကို သီးခြားထည့်ပေးရတယ်
+    // sslmode=verify-full ကို အတင်းသတ်မှတ်ပေးလိုက်ရင် warning ပျောက်သွားမယ်
+    connectionString: finalUrl.includes('sslmode=') 
+        ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
+        : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
     ssl: { rejectUnauthorized: false }
 });
 
