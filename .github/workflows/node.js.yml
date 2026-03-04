@@ -2,7 +2,7 @@ name: Cluster Sub-node Sync
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # ၁၅ မိနစ်တစ်ခါ Run မည်
+    - cron: '*/30 * * * *' # Rate Limit နှင့် Lock file error ကင်းဝေးစေရန် ၃၀ မိနစ်တစ်ခါ ပြောင်းထားသည်
   workflow_dispatch:      # Manual Run ရန်
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+          # ❌ cache: 'npm' ကို ဖြုတ်ထားသည် (Dependencies lock file not found error ကို ဖြေရှင်းရန်)
 
       - name: Install Dependencies
         run: |
@@ -39,7 +39,7 @@ jobs:
       - name: Execute Swarm Logic
         run: node cluster_sync.js
         env:
-          # Database & Firebase Keys
+          # Database & Firebase Keys (Sudo Access Mode)
           NEON_KEY: ${{ secrets.NEON_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
