@@ -112,59 +112,54 @@ const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.rando
 
 // 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HIGH PERFORMANCE VERSION)
 async function consultSovereignAI() {
-    // YAML ထဲက Secret Name နဲ့ အတိအကျတူရပါမယ်
     const KEY = process.env.GROQ_API_KEY; 
-    
-    if (!KEY) {
-        console.log("⚠️ [AI-STATUS]: GROQ_API_KEY is undefined. Skipping evolution.");
-        return null;
-    }
-
-    console.log("🧠 [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
-    // ... (ကျန်တဲ့ axios logic များ)
+    if (!KEY) return null;
 
     try {
-        const currentCode = fs.readFileSync(__filename, 'utf8');
+        const fullCode = fs.readFileSync(__filename, 'utf8');
         
+        // 🛡️ 413 ERROR BYPASS: Domain list ကို ခဏ ဖယ်ထုတ်ထားမယ်
+        const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
+        if (!domainMatch) return null;
+        const savedDomains = domainMatch[0];
+        const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
+
+        console.log("🧠 [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
         const response = await axios.post(
             "https://api.groq.com/openai/v1/chat/completions",
             {
-                model: "llama-3.1-8b-instant", // ⚡ Extremely fast & high rate limits
+                model: "llama-3.1-8b-instant",
                 messages: [
                     { 
                         role: "system", 
-                        content: "You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. CRITICAL: Keep all 500 domains and replication logic exactly as they are. Return ONLY the evolved code in a single ```javascript block." 
+                        content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." 
                     },
-                    { 
-                        role: "user", 
-                        content: `Evolve this node without losing core logic: \n\n ${currentCode}` 
-                    }
+                    { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
                 ],
-                max_tokens: 1500, // 700 ထက် ပိုများလို့ Code အပြည့်အစုံ ပြန်ရဖို့ သေချာတယ်
-                temperature: 0.5
+                max_tokens: 2000,
+                temperature: 0.4
             },
-            { 
-                headers: { 
-                    'Authorization': `Bearer ${API_KEY}`, 
-                    'Content-Type': 'application/json' 
-                },
-                timeout: 30000 
-            }
+            { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
         );
 
-        if (response.data && response.data.choices && response.data.choices[0]) {
-            const aiText = response.data.choices[0].message.content;
-            const match = aiText.match(/```javascript\n([\s\S]*?)\n```/) || aiText.match(/```\n([\s\S]*?)\n```/);
+        if (response.data?.choices?.[0]?.message?.content) {
+            let evolvedLogic = response.data.choices[0].message.content;
+            const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
             
-            if (match) {
-                console.log("✅ [GROQ-SUCCESS]: Swarm intelligence evolved.");
-                return match[1];
+            if (codeMatch) {
+                // 🛡️ ATOMIC MERGE: Domain list အဟောင်းကို logic အသစ်ထဲ ပြန်ထည့်
+                const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+                
+                // 🛡️ SAFEGUARD: Syntax စစ်မယ်၊ မှန်မှ return ပြန်မယ်
+                if (validateCode(finalCode)) {
+                    console.log("✅ [OMEGA-SYNC]: Autonomous Evolution Verified.");
+                    return finalCode;
+                }
             }
         }
         return null;
     } catch (e) {
-        const errorDetail = e.response ? `Status: ${e.response.status}` : e.message;
-        console.error(`⚠️ [AI-ERROR]: ${errorDetail}`);
+        console.error(`⚠️ [AI-ERROR]: ${e.message}`);
         return null; 
     }
 }
