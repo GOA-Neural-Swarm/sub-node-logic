@@ -113,7 +113,7 @@ const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.rando
 // 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HIGH PERFORMANCE VERSION)
 async function consultSovereignAI() {
     // Note: မင်းရဲ့ GitHub Secrets ထဲက HF_TOKEN နေရာမှာ Groq API Key ကို အစားထိုးထည့်ထားဖို့ လိုမယ်
-    const API_KEY = process.env.HF_TOKEN; 
+    const API_KEY = process.env.GROQ_API_KEY; 
     if (!API_KEY) return null;
 
     console.log("🧠 [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
