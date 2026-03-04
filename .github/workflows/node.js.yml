@@ -46,7 +46,7 @@ jobs:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
 
           # AI Evolution Token (ဒါထည့်မှ AI က code ပြင်ပေးမှာပါ)
-          HF_TOKEN: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
           # GitHub Authentication Tokens
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
