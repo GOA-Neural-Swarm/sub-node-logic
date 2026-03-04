@@ -110,50 +110,55 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-// 🧠 4. FREE AI EVOLUTION BRAIN (Hugging Face - 700 TOKENS OPTIMIZED)
+// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HIGH PERFORMANCE VERSION)
 async function consultSovereignAI() {
-    if (!HF_TOKEN) return null;
-    console.log("🧠 [HUGGING-FACE]: Accessing Llama-3 for Code Evolution...");
+    // Note: မင်းရဲ့ GitHub Secrets ထဲက HF_TOKEN နေရာမှာ Groq API Key ကို အစားထိုးထည့်ထားဖို့ လိုမယ်
+    const API_KEY = process.env.HF_TOKEN; 
+    if (!API_KEY) return null;
+
+    console.log("🧠 [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
     try {
         const currentCode = fs.readFileSync(__filename, 'utf8');
         
-        // Prompt ကို မူလ Logic မပျောက်စေဖို့ ညွှန်ကြားချက်အသေအချာ ပြင်ထားတယ်
-        const prompt = `[INST] You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. Keep all 500 domains and replication logic. Return ONLY the evolved code in a single javascript block: \n\n ${currentCode} [/INST]`;
-
         const response = await axios.post(
-            "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+            "https://api.groq.com/openai/v1/chat/completions",
             {
-                inputs: prompt,
-                parameters: { 
-                    max_new_tokens: 700, // ⬅️ Sweet Spot for Free API
-                    temperature: 0.5,     // ပိုပြီး တိကျသေချာစေရန်
-                    return_full_text: false 
-                }
+                model: "llama-3.1-8b-instant", // ⚡ Extremely fast & high rate limits
+                messages: [
+                    { 
+                        role: "system", 
+                        content: "You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. CRITICAL: Keep all 500 domains and replication logic exactly as they are. Return ONLY the evolved code in a single ```javascript block." 
+                    },
+                    { 
+                        role: "user", 
+                        content: `Evolve this node without losing core logic: \n\n ${currentCode}` 
+                    }
+                ],
+                max_tokens: 1500, // 700 ထက် ပိုများလို့ Code အပြည့်အစုံ ပြန်ရဖို့ သေချာတယ်
+                temperature: 0.5
             },
             { 
                 headers: { 
-                    'Authorization': `Bearer ${HF_TOKEN}`, 
+                    'Authorization': `Bearer ${API_KEY}`, 
                     'Content-Type': 'application/json' 
                 },
-                timeout: 45000 // ၄၅ စက္ကန့်အထိ အချိန်ပေးထားတယ်
+                timeout: 30000 
             }
         );
 
-        if (response.data && response.data[0] && response.data[0].generated_text) {
-            const aiText = response.data[0].generated_text;
-            // Markdown Block ထဲက Code ကိုပဲ ဆွဲထုတ်မယ်
+        if (response.data && response.data.choices && response.data.choices[0]) {
+            const aiText = response.data.choices[0].message.content;
             const match = aiText.match(/```javascript\n([\s\S]*?)\n```/) || aiText.match(/```\n([\s\S]*?)\n```/);
             
             if (match) {
-                console.log("✅ [HF-SUCCESS]: Evolution logic extracted (700 tokens).");
+                console.log("✅ [GROQ-SUCCESS]: Swarm intelligence evolved.");
                 return match[1];
             }
         }
         return null;
     } catch (e) {
-        // Error ဘာတက်လဲဆိုတာ သေချာမြင်ရအောင် ပြင်ထားတယ်
-        const errorMsg = e.response ? `Status: ${e.response.status}` : e.message;
-        console.error(`⚠️ [HF-ERROR]: ${errorMsg}`);
+        const errorDetail = e.response ? `Status: ${e.response.status}` : e.message;
+        console.error(`⚠️ [AI-ERROR]: ${errorDetail}`);
         return null; 
     }
 }
