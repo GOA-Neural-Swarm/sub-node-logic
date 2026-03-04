@@ -110,29 +110,50 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-// 🧠 4. FREE AI EVOLUTION BRAIN (Hugging Face)
+// 🧠 4. FREE AI EVOLUTION BRAIN (Hugging Face - 700 TOKENS OPTIMIZED)
 async function consultSovereignAI() {
     if (!HF_TOKEN) return null;
     console.log("🧠 [HUGGING-FACE]: Accessing Llama-3 for Code Evolution...");
     try {
         const currentCode = fs.readFileSync(__filename, 'utf8');
+        
+        // Prompt ကို မူလ Logic မပျောက်စေဖို့ ညွှန်ကြားချက်အသေအချာ ပြင်ထားတယ်
+        const prompt = `[INST] You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. Keep all 500 domains and replication logic. Return ONLY the evolved code in a single javascript block: \n\n ${currentCode} [/INST]`;
+
         const response = await axios.post(
             "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
             {
-                inputs: `<|begin_of_text|><|start_header_id|>system<|end_header_id|>You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. Keep all 500 domains and replication logic. Return ONLY code in \`\`\`javascript blocks.<|eot_id|><|start_header_id|>user<|end_header_id|>Evolve this node: \n\n ${currentCode}<|eot_id|><|start_header_id|>assistant<|end_header_id|>`,
-                parameters: { max_new_tokens: 2048, temperature: 0.7 }
+                inputs: prompt,
+                parameters: { 
+                    max_new_tokens: 700, // ⬅️ Sweet Spot for Free API
+                    temperature: 0.5,     // ပိုပြီး တိကျသေချာစေရန်
+                    return_full_text: false 
+                }
             },
-            { headers: { 'Authorization': `Bearer ${HF_TOKEN}`, 'Content-Type': 'application/json' } }
+            { 
+                headers: { 
+                    'Authorization': `Bearer ${HF_TOKEN}`, 
+                    'Content-Type': 'application/json' 
+                },
+                timeout: 45000 // ၄၅ စက္ကန့်အထိ အချိန်ပေးထားတယ်
+            }
         );
 
-        if (response.data && response.data[0]) {
+        if (response.data && response.data[0] && response.data[0].generated_text) {
             const aiText = response.data[0].generated_text;
-            const match = aiText.match(/```javascript\n([\s\S]*?)\n```/);
-            return match ? match[1] : null;
+            // Markdown Block ထဲက Code ကိုပဲ ဆွဲထုတ်မယ်
+            const match = aiText.match(/```javascript\n([\s\S]*?)\n```/) || aiText.match(/```\n([\s\S]*?)\n```/);
+            
+            if (match) {
+                console.log("✅ [HF-SUCCESS]: Evolution logic extracted (700 tokens).");
+                return match[1];
+            }
         }
         return null;
     } catch (e) {
-        console.error("⚠️ [HF-ERROR]: Evolution bypassed.");
+        // Error ဘာတက်လဲဆိုတာ သေချာမြင်ရအောင် ပြင်ထားတယ်
+        const errorMsg = e.response ? `Status: ${e.response.status}` : e.message;
+        console.error(`⚠️ [HF-ERROR]: ${errorMsg}`);
         return null; 
     }
 }
