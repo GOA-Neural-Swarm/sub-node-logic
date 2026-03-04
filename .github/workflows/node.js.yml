@@ -2,10 +2,9 @@ name: Cluster Sub-node Sync
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # ၁၅ မိနစ်တစ်ခါ အလိုအလျောက် ပွား/စစ်ဆေးမည်
-  workflow_dispatch:      # Manual နှိုးချင်ရင်လည်း ရသည်
+    - cron: '*/15 * * * *' # ၁၅ မိနစ်တစ်ခါ Run မည်
+  workflow_dispatch:      # Manual Run ရန်
 
-# 🛠️ Permissions အဆင့်မြှင့်တင်ခြင်း - GitHub ဆီ ဖိုင်ရေးခွင့် အပြည့်အဝပေးသည်
 permissions:
   contents: write
   pages: write
@@ -18,29 +17,46 @@ jobs:
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Git history အကုန်ယူရန် (Evolution အတွက် အရေးကြီးသည်)
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # Library သွင်းတာ ပိုမြန်စေရန်
 
-      # 🛠️ Dependencies အားလုံးကို Trinity Core နှင့် Match ဖြစ်အောင် သွင်းခြင်း
       - name: Install Dependencies
         run: |
           npm install @octokit/rest firebase-admin axios @supabase/supabase-js pg
+          # ပျောက်နေတတ်သော fs နှင့် child_process သည် node base တွင်ပါပြီးသားဖြစ်သည်
 
-      # 🚀 Swarm Logic ကို လိုအပ်တဲ့ Environment Variables အားလုံးနဲ့ Run ခြင်း
+      - name: Configure Git for Evolution
+        run: |
+          git config --global user.name "Omega-Architect"
+          git config --global user.email "omega@goa-natural-order.ai"
+
       - name: Execute Swarm Logic
         run: node cluster_sync.js
         env:
-          # Database & Firebase Keys (Sudo Access Mode)
+          # Database & Firebase Keys
           NEON_KEY: ${{ secrets.NEON_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
 
+          # AI Evolution Token (ဒါထည့်မှ AI က code ပြင်ပေးမှာပါ)
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
           # GitHub Authentication Tokens
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-# [Natural Order] Status: Synchronized & Shielded 🔱
+      - name: Commit & Push Evolved Code
+        run: |
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🧬 [EVOLVED]: Neural Brain Upgrade by AI" && git push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+# [Natural Order] Status: Synchronized, Shielded & Self-Evolving 🔱
