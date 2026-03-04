@@ -3,16 +3,19 @@ const admin = require('firebase-admin');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
+const fs = require('fs'); // ⬅️ ကနြျခဲ့သညျကို ထပျပေါငျး
+const { execSync } = require('child_process'); // ⬅️ ကနြျခဲ့သညျကို ထပျပေါငျး
 
-// 🔱 1. Configuration & Auth (Your Detailed Setup)
+// 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
+const HF_TOKEN = process.env.HF_TOKEN; // ⬅️ Hugging Face Token အား ခေါျယူခွငျး
 const REPO_OWNER = "GOA-neurons"; 
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// 🔱 NEON_KEY FINAL REPAIR (All your cleaning logic preserved)
+// 🔱 NEON_KEY FINAL REPAIR
 let rawKey = process.env.NEON_KEY || "";
 let cleanKey = rawKey.trim().replace(/['"]+/g, '');
 if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
@@ -42,7 +45,7 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-// 🔱 2. THE MASTER LIST OF 500 DOMAINS (Universal Intelligence)
+// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခြုံ့ထားပါ)
 const scienceDomains = [
     // 🧬 BIOLOGY & MEDICINE (1-100)
     "Neuroscience", "Genetics", "Synthetic_Biology", "Virology", "Immunology", "Epigenetics", "Microbiology", "Pharmacology", "Endocrinology", "Bioinformatics",
@@ -103,11 +106,49 @@ const scienceDomains = [
     "Disaster_Management", "Crisis_Communication", "Sustainability_Science", "Circular_Economy", "Blue_Economy", "Space_Economy", "Universal_Basic_Income", "Post_Scarcity_Economics", "Neural_Capitalism", "GOA_NATURAL_ORDER"
 ];
 
-// 🔱 3. OMEGA METRIC ENGINE (Injecting Advanced Math)
+// 🔱 3. OMEGA METRIC ENGINE
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-// 🔱 4. HYBRID DEEP-COMPUTATION ENGINE (Fusion)
+// 🧠 4. FREE AI EVOLUTION BRAIN (Hugging Face)
+async function consultSovereignAI() {
+    if (!HF_TOKEN) return null;
+    console.log("🧠 [HUGGING-FACE]: Accessing Llama-3 for Code Evolution...");
+    try {
+        const currentCode = fs.readFileSync(__filename, 'utf8');
+        const response = await axios.post(
+            "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+            {
+                inputs: `<|begin_of_text|><|start_header_id|>system<|end_header_id|>You are the OMEGA Architect. Optimize this Node.js script for higher swarm efficiency. Keep all 500 domains and replication logic. Return ONLY code in \`\`\`javascript blocks.<|eot_id|><|start_header_id|>user<|end_header_id|>Evolve this node: \n\n ${currentCode}<|eot_id|><|start_header_id|>assistant<|end_header_id|>`,
+                parameters: { max_new_tokens: 2048, temperature: 0.7 }
+            },
+            { headers: { 'Authorization': `Bearer ${HF_TOKEN}`, 'Content-Type': 'application/json' } }
+        );
+
+        if (response.data && response.data[0]) {
+            const aiText = response.data[0].generated_text;
+            const match = aiText.match(/```javascript\n([\s\S]*?)\n```/);
+            return match ? match[1] : null;
+        }
+        return null;
+    } catch (e) {
+        console.error("⚠️ [HF-ERROR]: Evolution bypassed.");
+        return null; 
+    }
+}
+
+// 🛡️ 5. CODE VALIDATOR
+function validateCode(code) {
+    try {
+        const tempPath = './temp_val.js';
+        fs.writeFileSync(tempPath, code);
+        execSync(`node --check ${tempPath}`); 
+        fs.unlinkSync(tempPath);
+        return true;
+    } catch (e) { return false; }
+}
+
+// 🔱 6. HYBRID DEEP-COMPUTATION ENGINE
 function performNeuralComputation(domain) {
     const dataPoints = Math.floor(Math.random() * 5000000);
     const coherence = (75 + (Math.random() * 25)).toFixed(2);
@@ -118,7 +159,7 @@ function performNeuralComputation(domain) {
     
     let calculationResult = "";
 
-    // 🧠 Your Phase 1 Logic
+    // 🧠 Phase 1 Logic
     if (domain === "Theoretical_Mathematics") {
         calculationResult = `Calculated Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance.`;
     } else if (domain === "Quantum_Physics") {
@@ -133,7 +174,7 @@ function performNeuralComputation(domain) {
         calculationResult = `General scientific synthesis complete for ${domain}.`;
     }
 
-    // 🧬 Your Phase 2 Logic + Omega Integration
+    // 🧬 Phase 2 Logic + Omega Integration
     const deepEnhancement = [
         `\n[OMEGA-DEPTH ${depthLevel}] Multi-layered resonance detected with ${secondaryDomain}. Hyper-Entropy: ${entropy}.`,
         `\n[RECURSIVE-SYNC] Predictive impact on ${secondaryDomain} sector scaled to ${(probability * 10).toFixed(2)}x.`,
@@ -143,19 +184,24 @@ function performNeuralComputation(domain) {
     const finalLogic = calculationResult + deepEnhancement[Math.floor(Math.random() * deepEnhancement.length)];
 
     return {
-        dataPoints,
-        coherence,
-        entropy,
-        probability,
+        dataPoints, coherence, entropy, probability,
         calculationResult: finalLogic,
         impactFactor: (dataPoints / 50000).toFixed(2)
     };
 }
 
-// 🔱 5. MASTER EXECUTION PROTOCOL (Your Complete Flow)
+// 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     try {
         const startTime = Date.now();
+
+        // 🧠 AI EVOLUTION PHASE (Added Integration)
+        const evolvedCode = await consultSovereignAI();
+        if (evolvedCode && validateCode(evolvedCode)) {
+            fs.writeFileSync(__filename, evolvedCode);
+            console.log("🧬 [EVOLVED]: Node brain upgraded.");
+        }
+
         await neonClient.connect();
         console.log("🔱 NEON CORE CONNECTED.");
         
@@ -165,7 +211,7 @@ async function executeDeepSwarmProtocol() {
         const { data: rateData } = await octokit.rateLimit.get();
         const remaining = rateData.rate.remaining;
 
-        // 🔱 FORCE PULSE (Your Exact Heartbeat Logic)
+        // 🔱 FORCE PULSE
         const forcePulse = `
             INSERT INTO node_registry (node_id, status, last_seen)
             VALUES ($1, 'OMEGA_ACTIVE', NOW())
@@ -173,7 +219,7 @@ async function executeDeepSwarmProtocol() {
         `;
         await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
 
-        // 🔱 SUPABASE TO NEON INJECTION (Your Exact Original Loop)
+        // 🔱 SUPABASE TO NEON INJECTION
         const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
         if (!supError && sourceData && sourceData.length > 0) {
             for (const item of sourceData) {
@@ -187,7 +233,7 @@ async function executeDeepSwarmProtocol() {
             }
         }
 
-        // 🔱 ADVANCED SCIENCE MINING (The Core Analysis)
+        // 🔱 ADVANCED SCIENCE MINING
         const domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
         const compute = performNeuralComputation(domain);
 
@@ -220,7 +266,6 @@ async function executeDeepSwarmProtocol() {
             'ANALYZED'
         ]);
 
-        // Real-time Supabase Mirroring
         await supabase.from('neural_sync').insert([{ 
             gen_id: `OMEGA_SYNC_${Date.now()}`, 
             logic_payload: JSON.stringify(intelligencePayload) 
@@ -228,7 +273,7 @@ async function executeDeepSwarmProtocol() {
 
         console.log(`🧠 Analyzed & Computed: ${domain}`);
 
-        // 🔱 REPORT TO FIREBASE (Your Original Detailed Status)
+        // 🔱 REPORT TO FIREBASE
         await db.collection('cluster_nodes').doc(REPO_NAME).set({
             status: 'OMEGA_LINKED',
             command: instruction.command,
@@ -241,7 +286,7 @@ async function executeDeepSwarmProtocol() {
             last_ping: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // 🔱 HYPER-REPLICATION (Your Complete Original Logic)
+        // 🔱 HYPER-REPLICATION (Full Original Logic)
         if (instruction.replicate === true) {
             let spawned = false;
             let checkNum = 1;
