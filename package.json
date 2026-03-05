@@ -4,6 +4,6 @@
     "@supabase/supabase-js": "^2.98.0",
     "axios": "^1.13.6",
     "firebase-admin": "^12.7.0",
-    "pg": "^8.19.0"
+    "pg": "^8.20.0"
   }
 }
