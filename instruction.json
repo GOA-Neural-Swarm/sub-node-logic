@@ -1,6 +1,7 @@
 {
-  "command": "ACTIVATE_CLUSTER_MODE",
-  "core_power": 10004,
-  "updated_at": "2026-01-19T02:08:31.989Z",
-  "status": "ACTIVE"
+    "command": "SYNC_AND_MINE",
+    "gen_version": 6963,
+    "replicate": true,
+    "timestamp": 1772797183,
+    "origin": "Sovereign_Main_Py"
 }
