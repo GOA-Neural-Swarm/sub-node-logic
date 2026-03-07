@@ -55,7 +55,13 @@ jobs:
       - name: Commit & Push Evolved Code
         run: |
           git add .
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🧬 [EVOLVED]: Neural Brain Upgrade by AI" && git push)
+          # အပြောင်းအလဲ ရှိမရှိ စစ်ဆေးပြီးမှသာ commit လုပ်ပါ
+          if ! git diff-index --quiet HEAD --; then
+            git commit -m "🧬 [EVOLVED]: Neural Brain Upgrade by AI"
+            git push origin main
+          else
+            echo "No changes detected to commit."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
