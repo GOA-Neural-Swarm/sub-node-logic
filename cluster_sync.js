@@ -260,8 +260,19 @@ async function executeDeepSwarmProtocol() {
             }
         }
 
-        // 🔱 ADVANCED SCIENCE MINING
-        const domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
+        // 🔍 RECOVERY LOGIC: Check missing domains
+        const { rows: existingRows } = await neonClient.query("SELECT title FROM research_data");
+        const existingDomains = existingRows.map(r => r.title);
+        const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
+
+        let domain;
+        if (missingDomains.length > 0) {
+            domain = missingDomains[0]; 
+            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
+        } else {
+            domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
+            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
+        }
         const compute = performNeuralComputation(domain);
 
         const intelligencePayload = {
