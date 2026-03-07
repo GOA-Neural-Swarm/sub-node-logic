@@ -280,6 +280,18 @@ async function executeDeepSwarmProtocol() {
             timestamp: new Date().toISOString()
         };
 
+        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
+const injectToResearch = `
+    INSERT INTO research_data (title, detail, harvested_at)
+    VALUES ($1, $2, NOW());
+`;
+await neonClient.query(injectToResearch, [
+    domain, 
+    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖြစ်ရမယ်
+]);
+
+console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
+        
         // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
         const injectIntelligence = `
             INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
