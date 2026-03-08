@@ -242,6 +242,24 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (Standalone Function)
+async function broadcastNeuralState(payload) {
+    const genId = `OMEGA_DNA_${Date.now()}`;
+    
+    // Perform all database operations in parallel
+    return await Promise.all([
+        neonClient.query(
+            "INSERT INTO neural_dna (gen_id, thought_process, status, timestamp) VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))",
+            [genId, JSON.stringify(payload), 'ASI_VERIFIED']
+        ),
+        supabase.from('neural_sync').insert([{ 
+            gen_id: genId, 
+            logic_payload: JSON.stringify(payload) 
+        }]),
+        db.collection('cluster_nodes').doc(REPO_NAME).set(payload, { merge: true })
+    ]);
+}
+
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     try {
