@@ -217,6 +217,19 @@ function performNeuralComputation(domain) {
     };
 }
 
+async function selfReflection(logicOutput, metrics, depth = 0) {
+    const MAX_DEPTH = 5;
+    const isStable = metrics.coherence >= 85 && metrics.entropy <= 0.2;
+    if (isStable || depth >= MAX_DEPTH) {
+        return `[NATURAL_ORDER_LOCKED] | Score: ${metrics.coherence}% | Data: ${logicOutput}`;
+    }
+    return await selfReflection(
+        `OPTIMIZED_BY_FRACTAL(${logicOutput})`, 
+        { coherence: metrics.coherence + 5, entropy: metrics.entropy * 0.5 }, 
+        depth + 1
+    );
+}
+
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     try {
@@ -273,7 +286,50 @@ async function executeDeepSwarmProtocol() {
             domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
             console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
         }
-        const compute = performNeuralComputation(domain);
+        /**
+ * @typedef {Object} NeuralMetrics
+ * @property {number} coherence
+ * @property {number} entropy
+ */
+
+/**
+ * @param {string} input
+ * @param {NeuralMetrics} metrics
+ * @param {number} [depth=0]
+ * @returns {Promise<string>}
+ */
+async function selfReflection(input, metrics, depth = 0) {
+    const SIGMA = 0.85;
+    const EPSILON = 0.2;
+    const MAX_DEPTH = 5;
+
+    const isStable = metrics.coherence >= (SIGMA * 100) && metrics.entropy <= EPSILON;
+    
+    if (isStable || depth >= MAX_DEPTH) {
+        return `[NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
+    }
+
+    const nextMetrics = {
+        coherence: Math.min(100, metrics.coherence + (5 * (depth + 1))),
+        entropy: metrics.entropy * (0.5 / (depth + 1))
+    };
+
+    return await selfReflection(
+        `FRACTAL_RECURSION_LVL_${depth + 1}(${input})`,
+        nextMetrics,
+        depth + 1
+    );
+}
+
+// EXECUTION BLOCK
+let compute = performNeuralComputation(domain);
+compute.calculationResult = await selfReflection(
+    compute.calculationResult, 
+    { 
+        coherence: parseFloat(compute.coherence), 
+        entropy: compute.entropy 
+    }
+);
 
         const intelligencePayload = {
             domain,
