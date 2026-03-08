@@ -217,23 +217,27 @@ function performNeuralComputation(domain) {
     };
 }
 
-async function selfReflection(logicOutput, metrics, depth = 0) {
+// 🛡️ REFACTORED: GLOBAL SELF-REFLECTION ENGINE
+// ဒီတစ်ခုတည်းကိုပဲ သုံးရမယ်
+async function selfReflection(input, metrics, depth = 0) {
+    const SIGMA = 0.85;
+    const EPSILON = 0.2;
     const MAX_DEPTH = 5;
-    const isStable = metrics.coherence >= 85 && metrics.entropy <= 0.2;
 
-    // ရပ်တန့်ရမည့် အခြေအနေ
+    const isStable = metrics.coherence >= (SIGMA * 100) && metrics.entropy <= EPSILON;
+    
     if (isStable || depth >= MAX_DEPTH) {
-        return {
-            status: "LOCKED",
-            finalData: logicOutput,
-            score: metrics.coherence
-        };
+        return `[NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
     }
 
-    // တန်ဖိုးများကို ချိန်ညှိခြင်း
+    const nextMetrics = {
+        coherence: Math.min(100, metrics.coherence + (5 * (depth + 1))),
+        entropy: metrics.entropy * (0.5 / (depth + 1))
+    };
+
     return await selfReflection(
-        logicOutput, // Data ကို မဖျက်ဆီးပါနဲ့
-        { coherence: metrics.coherence + 5, entropy: metrics.entropy * 0.5 },
+        `FRACTAL_RECURSION_LVL_${depth + 1}(${input})`, 
+        nextMetrics, 
         depth + 1
     );
 }
@@ -294,40 +298,6 @@ async function executeDeepSwarmProtocol() {
             domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
             console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
         }
-        /**
- * @typedef {Object} NeuralMetrics
- * @property {number} coherence
- * @property {number} entropy
- */
-
-/**
- * @param {string} input
- * @param {NeuralMetrics} metrics
- * @param {number} [depth=0]
- * @returns {Promise<string>}
- */
-async function selfReflection(input, metrics, depth = 0) {
-    const SIGMA = 0.85;
-    const EPSILON = 0.2;
-    const MAX_DEPTH = 5;
-
-    const isStable = metrics.coherence >= (SIGMA * 100) && metrics.entropy <= EPSILON;
-    
-    if (isStable || depth >= MAX_DEPTH) {
-        return `[NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
-    }
-
-    const nextMetrics = {
-        coherence: Math.min(100, metrics.coherence + (5 * (depth + 1))),
-        entropy: metrics.entropy * (0.5 / (depth + 1))
-    };
-
-    return await selfReflection(
-        `FRACTAL_RECURSION_LVL_${depth + 1}(${input})`,
-        nextMetrics,
-        depth + 1
-    );
-}
 
 // EXECUTION BLOCK
 let compute = performNeuralComputation(domain);
