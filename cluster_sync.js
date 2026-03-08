@@ -242,21 +242,28 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
-// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (Standalone Function)
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (Standalone Helper)
 async function broadcastNeuralState(payload) {
     const genId = `OMEGA_DNA_${Date.now()}`;
+    const syncId = `OMEGA_SYNC_${Date.now()}`;
     
-    // Perform all database operations in parallel
+    // Database အားလုံးကို Parallel (တစ်ပြိုင်နက်) ပို့ဆောင်ခြင်း
     return await Promise.all([
+        // Neon (neural_dna table)
         neonClient.query(
             "INSERT INTO neural_dna (gen_id, thought_process, status, timestamp) VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))",
             [genId, JSON.stringify(payload), 'ASI_VERIFIED']
         ),
+        // Supabase (neural_sync table)
         supabase.from('neural_sync').insert([{ 
-            gen_id: genId, 
+            gen_id: syncId, 
             logic_payload: JSON.stringify(payload) 
         }]),
-        db.collection('cluster_nodes').doc(REPO_NAME).set(payload, { merge: true })
+        // Firebase (cluster_nodes collection)
+        db.collection('cluster_nodes').doc(REPO_NAME).set({
+            ...payload,
+            last_ping: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true })
     ]);
 }
 
