@@ -220,12 +220,20 @@ function performNeuralComputation(domain) {
 async function selfReflection(logicOutput, metrics, depth = 0) {
     const MAX_DEPTH = 5;
     const isStable = metrics.coherence >= 85 && metrics.entropy <= 0.2;
+
+    // ရပ်တန့်ရမည့် အခြေအနေ
     if (isStable || depth >= MAX_DEPTH) {
-        return `[NATURAL_ORDER_LOCKED] | Score: ${metrics.coherence}% | Data: ${logicOutput}`;
+        return {
+            status: "LOCKED",
+            finalData: logicOutput,
+            score: metrics.coherence
+        };
     }
+
+    // တန်ဖိုးများကို ချိန်ညှိခြင်း
     return await selfReflection(
-        `OPTIMIZED_BY_FRACTAL(${logicOutput})`, 
-        { coherence: metrics.coherence + 5, entropy: metrics.entropy * 0.5 }, 
+        logicOutput, // Data ကို မဖျက်ဆီးပါနဲ့
+        { coherence: metrics.coherence + 5, entropy: metrics.entropy * 0.5 },
         depth + 1
     );
 }
