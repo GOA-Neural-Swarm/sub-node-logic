@@ -468,6 +468,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
         console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
     } catch (err) {
         console.error("❌ CRITICAL SWARM ERROR:", err.message);
+        throw err; // ⬅️ ဒီနေရာမှာ ဒါကို ထည့်မှသာ startGodMode က Error ကိုသိပြီး ပြင်ပေးမှာပါ
     } finally {
         await neonClient.end();
     }
