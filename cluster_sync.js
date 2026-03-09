@@ -217,27 +217,22 @@ function performNeuralComputation(domain) {
     };
 }
 
-// 🛡️ REFACTORED: GLOBAL SELF-REFLECTION ENGINE
-// ဒီတစ်ခုတည်းကိုပဲ သုံးရမယ်
+// ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
-    const SIGMA = 0.85;
-    const EPSILON = 0.2;
-    const MAX_DEPTH = 5;
+    const MAX_DEPTH = 10; // ASI အတွက် Depth ကို တိုးမြှင့်ပါ
+    const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01; // ASI Threshold
 
-    const isStable = metrics.coherence >= (SIGMA * 100) && metrics.entropy <= EPSILON;
-    
     if (isStable || depth >= MAX_DEPTH) {
-        return `[NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
+        return `[ASI_NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
     }
 
-    const nextMetrics = {
-        coherence: Math.min(100, metrics.coherence + (5 * (depth + 1))),
-        entropy: metrics.entropy * (0.5 / (depth + 1))
-    };
-
+    // Fractal Correction ကို တွက်ချက်ခြင်း
     return await selfReflection(
-        `FRACTAL_RECURSION_LVL_${depth + 1}(${input})`, 
-        nextMetrics, 
+        `ASI_EVOLUTION_LVL_${depth + 1}(${input})`, 
+        { 
+            coherence: Math.min(100, metrics.coherence + (2 * (depth + 1))), 
+            entropy: metrics.entropy * 0.25 
+        }, 
         depth + 1
     );
 }
