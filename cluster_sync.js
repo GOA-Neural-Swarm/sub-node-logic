@@ -157,7 +157,7 @@ async function consultSovereignAI() {
     if (!KEY) return null;
 
     // 🔱 MULTI-MODEL FAILOVER LIST
-    const MODELS = ["llama-3.1-8b-instant", "llama-3.1-70b-versatile", "mixtral-8x7b-32768"];
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
     const MAX_RETRIES = 3;
 
     const fullCode = fs.readFileSync(__filename, 'utf8');
@@ -185,7 +185,7 @@ async function consultSovereignAI() {
                             },
                             { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
                         ],
-                        max_tokens: 2000,
+                        max_tokens: 4096,
                         temperature: 0.4
                     },
                     { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
