@@ -396,17 +396,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
         console.log(`🧠 Analyzed & Computed: ${domain}`);
 
         // 🔱 REPORT TO FIREBASE
-        await db.collection('cluster_nodes').doc(REPO_NAME).set({
-            status: 'OMEGA_LINKED',
-            command: instruction.command,
-            last_analysis: domain,
-            coherence: compute.coherence,
-            probability: compute.probability,
-            entropy: compute.entropy,
-            latency: `${latency}ms`,
-            api_remaining: remaining,
-            last_ping: admin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        await broadcastNeuralState(intelligencePayload, compute, instruction, latency, remaining);
 
         // 🔱 HYPER-REPLICATION (Full Original Logic)
         if (instruction.replicate === true) {
