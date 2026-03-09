@@ -488,7 +488,7 @@ async function startGodMode() {
         console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
         const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
         console.log("🔄 Initiating recovery sequence...");
-        setTimeout(() => awaitrepairedProtocol(), 5000); 
+        setTimeout(() => repairedProtocol(), 5000); 
     }
 }
 startGodMode();
