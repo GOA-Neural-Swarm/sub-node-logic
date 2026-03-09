@@ -332,8 +332,7 @@ async function executeDeepSwarmProtocol() {
             console.log("🧬 [EVOLVED]: Node brain upgraded.");
         }
 
-        await neonClient.connect();
-        console.log("🔱 NEON CORE CONNECTED.");
+        
         
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
         const { data: instruction } = await axios.get(coreUrl);
