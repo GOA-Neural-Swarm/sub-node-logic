@@ -278,8 +278,8 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
-// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (Standalone Helper)
-async function broadcastNeuralState(payload, compute, instruction, latency, remaining) {
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပွငျပွီးသား)
+async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ျပါ
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     
@@ -291,10 +291,7 @@ async function broadcastNeuralState(payload, compute, instruction, latency, rema
     `;
 
     return await Promise.all([
-        // Neon Sync
         neonClient.query(neonQuery, [genId, JSON.stringify(payload), 'ANALYZED']),
-
-        // Supabase Sync
         supabase.from('neural_sync').insert([{ 
             gen_id: syncId, 
             logic_payload: JSON.stringify(payload) 
