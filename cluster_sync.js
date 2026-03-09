@@ -24,14 +24,16 @@ if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
-const neonClient = new Client({ 
-    connectionString: finalUrl.includes('sslmode=') 
-        ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
-        : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
-    ssl: { rejectUnauthorized: false }
-});
-
-console.log(`🔗 DB Linked Success: ${finalUrl.substring(0, 35)}...`);
+// ✅ Factory function
+function createNeonClient() {
+    return new Client({ 
+        connectionString: finalUrl.includes('sslmode=') 
+            ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
+            : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
+        ssl: { rejectUnauthorized: false }
+    });
+}
+console.log("🛠 [SYSTEM]: Neon Factory Ready.");
 
 if (!admin.apps.length) {
     try {
