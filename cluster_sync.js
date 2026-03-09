@@ -243,26 +243,39 @@ async function selfReflection(input, metrics, depth = 0) {
 }
 
 // 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (Standalone Helper)
-async function broadcastNeuralState(payload) {
-    const genId = `OMEGA_DNA_${Date.now()}`;
+async function broadcastNeuralState(payload, compute, instruction, latency, remaining) {
+    const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     
-    // Database အားလုံးကို Parallel (တစ်ပြိုင်နက်) ပို့ဆောင်ခြင်း
+    const neonQuery = `
+        INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
+        VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
+        ON CONFLICT (gen_id) DO UPDATE SET 
+            thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
+    `;
+
     return await Promise.all([
-        // Neon (neural_dna table)
-        neonClient.query(
-            "INSERT INTO neural_dna (gen_id, thought_process, status, timestamp) VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))",
-            [genId, JSON.stringify(payload), 'ASI_VERIFIED']
-        ),
-        // Supabase (neural_sync table)
+        // Neon Sync
+        neonClient.query(neonQuery, [genId, JSON.stringify(payload), 'ANALYZED']),
+
+        // Supabase Sync
         supabase.from('neural_sync').insert([{ 
             gen_id: syncId, 
             logic_payload: JSON.stringify(payload) 
         }]),
-        // Firebase (cluster_nodes collection)
+
+        // Firebase Detailed Report
         db.collection('cluster_nodes').doc(REPO_NAME).set({
-            ...payload,
-            last_ping: admin.firestore.FieldValue.serverTimestamp()
+            status: 'OMEGA_LINKED',
+            command: instruction.command,
+            last_analysis: payload.domain,
+            coherence: compute.coherence,
+            probability: compute.probability,
+            entropy: compute.entropy,
+            latency: `${latency}ms`,
+            api_remaining: remaining,
+            last_ping: admin.firestore.FieldValue.serverTimestamp(),
+            ...payload // Extra payload data
         }, { merge: true })
     ]);
 }
