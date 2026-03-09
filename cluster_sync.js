@@ -329,7 +329,8 @@ async function executeDeepSwarmProtocol() {
             console.log("🧬 [EVOLVED]: Node brain upgraded.");
         }
 
-        
+        // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
+        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
         
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
         const { data: instruction } = await axios.get(coreUrl);
