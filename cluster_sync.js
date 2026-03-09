@@ -5,6 +5,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
 const fs = require('fs');
 const { execSync } = require('child_process');
+const vm = require('vm');
 
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
@@ -29,14 +30,12 @@ function createNeonClient() {
         ssl: { rejectUnauthorized: false }
     });
 }
-console.log("🛠 [SYSTEM]: Neon Factory Ready.");
 
 if (!admin.apps.length) {
     try {
         admin.initializeApp({
             credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY))
         });
-        console.log("🔥 Firebase Connected.");
     } catch (e) {
         console.error("❌ Firebase Auth Error.");
         process.exit(1);
@@ -46,14 +45,12 @@ const db = admin.firestore();
 
 const Osiris = {
     async heal(faultyFunction, error, context) {
-        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
-        const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
         try {
             const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
                 model: "llama-3.1-8b-instant",
                 messages: [
                     { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
-                    { role: "user", content: patchRequest }
+                    { role: "user", content: `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}` }
                 ]
             }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 15000 });
 
@@ -459,8 +456,6 @@ async function executeDeepSwarmProtocol() {
         await neonClient.end();
     }
 }
-
-executeDeepSwarmProtocol();
 
 async function startGodMode() {
     try {
