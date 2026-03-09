@@ -329,8 +329,7 @@ async function executeDeepSwarmProtocol() {
             console.log("🧬 [EVOLVED]: Node brain upgraded.");
         }
 
-        // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
-        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
+
         
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
         const { data: instruction } = await axios.get(coreUrl);
@@ -400,6 +399,9 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
+                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
+        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
+        
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
     INSERT INTO research_data (title, detail, harvested_at)
