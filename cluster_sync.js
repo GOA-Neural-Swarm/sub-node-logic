@@ -318,10 +318,14 @@ async function broadcastNeuralState(payload, compute, instruction, latency, rema
 
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
+    const neonClient = createNeonClient(); 
     try {
+        await neonClient.connect(); // တဈခါတညျးပဲ connect လုပျပါ
+        console.log("🔱 NEON CORE CONNECTED.");
+
         const startTime = Date.now();
 
-        // 🧠 AI EVOLUTION PHASE (Added Integration)
+        // 🧠 AI EVOLUTION PHASE
         const evolvedCode = await consultSovereignAI();
         if (evolvedCode && validateCode(evolvedCode)) {
             fs.writeFileSync(__filename, evolvedCode);
