@@ -48,6 +48,49 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+    //  OSIRIS-REF-ULTRA: THE HYBRID BLUEPRINT REPAIR ENGINE (DNA-PROTECT MODE)
+const Osiris = {
+  async heal(faultyFunction, error, context) {
+    console.error(` [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
+    
+    // 1. DNA REFERENCE LOADING (code_lab.js ကို ဖတ်ခြင်း)
+    let blueprintCode = "";
+    try {
+      blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
+    } catch (fsErr) {
+      console.warn(" ⚠️ [OSIRIS-WARN]: code_lab.js not found. Proceeding without reference.");
+    }
+
+    const currentCode = faultyFunction.toString();
+    const MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama-3.1-8b-instant"];
+    
+    // 2. HYPER-HYBRID PROMPT CONSTRUCTION
+    const patchRequest = `
+### SYSTEM ROLE:
+You are the OMEGA Gene-Scribe, the ultimate autonomous Node.js architect. Your task is to perform atomic surgery on malfunctioning functions using the PROVIDED_BLUEPRINT as the 'Golden Source of Truth' (DNA).
+
+### CRITICAL CONSTRAINTS (DNA-PROTECT MODE):
+1. PRESERVATION: You must strictly maintain the function's original I/O signature, logic flow, and dependency configurations (Octokit, Firebase, Supabase, Neon).
+2. STABILITY: If the error relates to connections (Neon/Postgres/Firebase), strictly implement the connection logic (SSL modes, env parsing) exactly as shown in the REFERENCE_BLUEPRINT.
+3. OUTPUT: Return ONLY raw, executable JavaScript code.
+4. FORBIDDEN: NO markdown, NO triple backticks, NO explanations, NO introductory or concluding text.
+
+### ERROR CONTEXT:
+- Function Name: ${context}
+- Error Message: ${error.message}
+
+### REFERENCE_BLUEPRINT (The Golden Standard):
+${blueprintCode}
+
+### TARGET_CODE_TO_FIX (The Mutation):
+${currentCode}
+
+### EXECUTION TASK:
+1. Identify the structural/logic failure in the TARGET_CODE.
+2. Hybridize the fix by mapping the failed segment against the REFERENCE_BLUEPRINT architecture.
+3. Generate the corrected code that ensures perfect synchronization with the rest of the swarm-node architecture.
+`;
+
     // 3. MULTI-MODEL FAILOVER REPAIR LOOP
     for (const modelName of MODELS) {
       try {
