@@ -404,8 +404,9 @@ compute.calculationResult = await selfReflection(
         
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
-    INSERT INTO research_data (title, detail, harvested_at)
-    VALUES ($1, $2, NOW());
+  INSERT INTO research_data (title, detail, harvested_at)
+  VALUES ($1, $2, NOW())
+  ON CONFLICT (title) DO UPDATE SET detail = EXCLUDED.detail, harvested_at = NOW();
 `;
 await neonClient.query(injectToResearch, [
     domain, 
