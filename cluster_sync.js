@@ -105,15 +105,23 @@ ${currentCode}
           temperature: 0.2 // Stability အတွက် temperature ကို လျှော့ထားသည်
         }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 20000 });
 
-        let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
+        // --- HYBRID CLEAN-UP LAYER START ---
+        let responseContent = response.data.choices[0].message.content;
+        let patchedCode = responseContent
+            .replace(/^```[a-zA-Z]*\n?/, "") // အစက markdown ဖြတ်
+            .replace(/\n?```$/, "")         // အဆုံးက markdown ဖြတ်
+            .replace(/^`|`$/g, "")          // inline code backticks ဖြတ်
+            .trim();
+        // --- HYBRID CLEAN-UP LAYER END ---
 
-        if (patchedCode && patchedCode.includes("function") || patchedCode.includes("=>")) {
+        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>"))) {
           
           // 4. VM ISOLATION & VALIDATION (မူလ logic အတိုင်း စစ်ဆေးခြင်း)
           try {
             const script = new vm.Script(`(${patchedCode})`);
             const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
             vm.createContext(sandbox);
+            
             // Function ဟုတ်မဟုတ် validation လုပ်ခြင်း
             script.runInContext(sandbox, { timeout: 3000 });
             
