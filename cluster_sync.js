@@ -556,12 +556,17 @@ executeDeepSwarmProtocol();
 
 async function startGodMode() {
   try {
+    console.log(" [GOD-MODE]: Initializing Swarm Protocol...");
     await executeDeepSwarmProtocol();
   } catch (err) {
-    console.error(" [GOD-MODE] Protocol Breach detected!");
+    console.error(" [GOD-MODE] Protocol Breach detected! Error:", err.message);
     const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
-    console.log(" Initiating recovery sequence...");
     setTimeout(() => repairedProtocol(), 5000);
+  } finally {
+    // တဈ cycle ပွီးတိုငျး နောကျတဈ cycle ကို timer နဲ့ အလုပျလုပျစပေါ
+    console.log(" [SYSTEM]: Cycle finished. Cooling down before next sync...");
+    setTimeout(startGodMode, 30000); // 30 seconds wait
   }
 }
+
 startGodMode();
