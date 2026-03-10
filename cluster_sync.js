@@ -465,8 +465,7 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
-        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
+
         
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
