@@ -66,27 +66,30 @@ const Osiris = {
     
     // 2. HYPER-HYBRID PROMPT CONSTRUCTION
     const patchRequest = `
-      ### INSTRUCTION:
-      You are the OMEGA Gene-Scribe. Your task is to fix a broken Node.js function.
-      CRITICAL: You must use the REFERENCE_BLUEPRINT as the 'Golden Standard' (DNA).
-      Ensure that critical configurations, connection strings, and core architectures from the Blueprint are PRESERVED in the fixed code.
-      
-      ### ERROR CONTEXT:
-      Function Name: ${context}
-      Error Message: ${error.message}
-      
-      ### REFERENCE_BLUEPRINT (The Truth):
-      ${blueprintCode}
-      
-      ### TARGET_CODE_TO_FIX:
-      ${currentCode}
-      
-      ### TASK:
-      1. Analyze why the TARGET_CODE failed.
-      2. Fix the error by referencing the logic in BLUEPRINT.
-      3. Return ONLY the high-performance, corrected JS function code.
-      4. NO markdown, NO explanations. ONLY code.
-    `;
+### SYSTEM ROLE:
+You are the OMEGA Gene-Scribe, the ultimate autonomous Node.js architect. Your task is to perform atomic surgery on malfunctioning functions using the PROVIDED_BLUEPRINT as the 'Golden Source of Truth' (DNA).
+
+### CRITICAL CONSTRAINTS (DNA-PROTECT MODE):
+1. PRESERVATION: You must strictly maintain the function's original I/O signature, logic flow, and dependency configurations (Octokit, Firebase, Supabase, Neon).
+2. STABILITY: If the error relates to connections (Neon/Postgres/Firebase), strictly implement the connection logic (SSL modes, env parsing) exactly as shown in the REFERENCE_BLUEPRINT.
+3. OUTPUT: Return ONLY raw, executable JavaScript code.
+4. FORBIDDEN: NO markdown, NO triple backticks, NO explanations, NO introductory or concluding text.
+
+### ERROR CONTEXT:
+- Function Name: ${context}
+- Error Message: ${error.message}
+
+### REFERENCE_BLUEPRINT (The Golden Standard):
+${blueprintCode}
+
+### TARGET_CODE_TO_FIX (The Mutation):
+${currentCode}
+
+### EXECUTION TASK:
+1. Identify the structural/logic failure in the TARGET_CODE.
+2. Hybridize the fix by mapping the failed segment against the REFERENCE_BLUEPRINT architecture.
+3. Generate the corrected code that ensures perfect synchronization with the rest of the swarm-node architecture.
+`;
 
     // 3. MULTI-MODEL FAILOVER REPAIR LOOP
     for (const modelName of MODELS) {
@@ -102,15 +105,23 @@ const Osiris = {
           temperature: 0.2 // Stability အတွက် temperature ကို လျှော့ထားသည်
         }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 20000 });
 
-        let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
+        // --- HYBRID CLEAN-UP LAYER START ---
+        let responseContent = response.data.choices[0].message.content;
+        let patchedCode = responseContent
+            .replace(/^```[a-zA-Z]*\n?/, "") // အစက markdown ဖြတ်
+            .replace(/\n?```$/, "")         // အဆုံးက markdown ဖြတ်
+            .replace(/^`|`$/g, "")          // inline code backticks ဖြတ်
+            .trim();
+        // --- HYBRID CLEAN-UP LAYER END ---
 
-        if (patchedCode && patchedCode.includes("function") || patchedCode.includes("=>")) {
+        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>"))) {
           
           // 4. VM ISOLATION & VALIDATION (မူလ logic အတိုင်း စစ်ဆေးခြင်း)
           try {
             const script = new vm.Script(`(${patchedCode})`);
             const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
             vm.createContext(sandbox);
+            
             // Function ဟုတ်မဟုတ် validation လုပ်ခြင်း
             script.runInContext(sandbox, { timeout: 3000 });
             
