@@ -4,27 +4,26 @@ const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs'); //  ကနွခြဲ့သညကြို ထပျပေါငျး
-const { execSync } = require('child_process'); //  ကနွခြဲ့သညကြို ထပျပေါငျး
+const fs = require('fs');
+const { execSync } = require('child_process');
 
-//  1. Configuration & Auth
+// 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons";
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
+// 2. Client Initializations
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-//  NEON_KEY FINAL REPAIR
+// NEON_KEY REPAIR LOGIC
 let rawKey = process.env.NEON_KEY || "";
 let cleanKey = rawKey.trim().replace(/['"]+/g, '');
 if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
 if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
-
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
-//  Factory function
 function createNeonClient() {
   return new Client({
     connectionString: finalUrl.includes('sslmode=')
@@ -35,18 +34,24 @@ function createNeonClient() {
 }
 console.log(" [SYSTEM]: Neon Factory Ready.");
 
+// Firebase Initialization
 if (!admin.apps.length) {
   try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
     admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY))
+      credential: admin.credential.cert(serviceAccount)
     });
-    console.log(" Firebase Connected.");
+    console.log(" [SYSTEM]: Firebase Connected.");
   } catch (e) {
-    console.error(" Firebase Auth Error.");
+    console.error(" [SYSTEM]: Firebase Auth Error -", e.message);
     process.exit(1);
   }
 }
 const db = admin.firestore();
+
+// 3. OMEGA Metric Constants
+const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
+const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
 //  OSIRIS-REF-ULTRA: THE HYBRID BLUEPRINT REPAIR ENGINE (DNA-PROTECT MODE)
 const Osiris = {
