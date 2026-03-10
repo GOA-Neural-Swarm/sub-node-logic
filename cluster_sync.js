@@ -552,7 +552,7 @@ console.log(` [REAL-SYNC]: ${domain} saved to research_data.`);
   }
 }
 
-executeDeepSwarmProtocol();
+
 
 async function startGodMode() {
   try {
