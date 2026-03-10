@@ -151,58 +151,76 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-//  4. FREE AI EVOLUTION BRAIN (Groq - HIGH PERFORMANCE VERSION)
+// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
 async function consultSovereignAI() {
-  const KEY = process.env.GROQ_API_KEY;
-  if (!KEY) return null;
+    const KEY = process.env.GROQ_API_KEY; 
+    if (!KEY) return null;
 
-  try {
+    // 🔱 MULTI-MODEL FAILOVER LIST
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
+    const MAX_RETRIES = 3;
+
     const fullCode = fs.readFileSync(__filename, 'utf8');
-   
-    //  413 ERROR BYPASS: Domain list ကို ခဏ ဖယ်ထုတ်ထားမယ်
     const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
     if (!domainMatch) return null;
     const savedDomains = domainMatch[0];
     const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
 
-    console.log(" [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
-    const response = await axios.post(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "system",
-            content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker."
-          },
-          { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
-        ],
-        max_tokens: 2000,
-        temperature: 0.4
-      },
-      { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
-    );
+    // 🔱 STRATEGY: Loop through models and apply backoff logic
+    for (const modelName of MODELS) {
+        let retries = 0;
+        
+        while (retries < MAX_RETRIES) {
+            try {
+                console.log(`🧠 [GROQ-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`);
+                
+                const response = await axios.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    {
+                        model: modelName,
+                        messages: [
+                            { 
+                                role: "system", 
+                                content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." 
+                            },
+                            { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
+                        ],
+                        max_tokens: 2000,
+                        temperature: 0.4
+                    },
+                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
+                );
 
-    if (response.data?.choices?.[0]?.message?.content) {
-      let evolvedLogic = response.data.choices[0].message.content;
-      const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
-     
-      if (codeMatch) {
-        //  ATOMIC MERGE: Domain list အဟောင်းကို logic အသစ်ထဲ ပြန်ထည့်
-        const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
-       
-        //  SAFEGUARD: Syntax စစ်မယ်၊ မှန်မှ return ပြန်မယ်
-        if (validateCode(finalCode)) {
-          console.log(" [OMEGA-SYNC]: Autonomous Evolution Verified.");
-          return finalCode;
+                if (response.data?.choices?.[0]?.message?.content) {
+                    let evolvedLogic = response.data.choices[0].message.content;
+                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
+                    
+                    if (codeMatch) {
+                        const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+                        
+                        if (validateCode(finalCode)) {
+                            console.log(`✅ [OMEGA-SYNC]: Evolution Verified via ${modelName}.`);
+                            return finalCode;
+                        }
+                    }
+                }
+                break; // အောင်မြင်ရင် loop ကနေ ထွက်မယ်
+
+            } catch (e) {
+                // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
+                if (e.response && e.response.status === 429) {
+                    retries++;
+                    const waitTime = Math.pow(2, retries) * 1000;
+                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
+                    await new Promise(res => setTimeout(res, waitTime));
+                } else {
+                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
+                    break; // တခြား Error ဆိုရင် ဒီ model ကို ကျော်ပြီး နောက်တစ်ခုသွားမယ်
+                }
+            }
         }
-      }
     }
-    return null;
-  } catch (e) {
-    console.error(` [AI-ERROR]: ${e.message}`);
-    return null;
-  }
+    return null; // အားလုံးမအောင်မြင်မှ null ပြန်မယ်
 }
 
 //  5. CODE VALIDATOR
