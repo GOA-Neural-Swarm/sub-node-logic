@@ -48,108 +48,42 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-    //  OSIRIS-REF-ULTRA: THE HYBRID BLUEPRINT REPAIR ENGINE (DNA-PROTECT MODE)
+// 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
 const Osiris = {
-  async heal(faultyFunction, error, context) {
-    console.error(` [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
-    
-    // 1. DNA REFERENCE LOADING (code_lab.js ကို ဖတ်ခြင်း)
-    let blueprintCode = "";
-    try {
-      blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
-    } catch (fsErr) {
-      console.warn(" ⚠️ [OSIRIS-WARN]: code_lab.js not found. Proceeding without reference.");
-    }
+    async heal(faultyFunction, error, context) {
+        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
+        const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
+        try {
+            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                model: "llama-3.1-8b-instant",
+                messages: [
+                    { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
+                    { role: "user", content: patchRequest }
+                ]
+            }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 15000 });
 
-    const currentCode = faultyFunction.toString();
-    const MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama-3.1-8b-instant"];
-    
-    // 2. HYPER-HYBRID PROMPT CONSTRUCTION
-    const patchRequest = `
-### SYSTEM ROLE:
-You are the OMEGA Gene-Scribe, the ultimate autonomous Node.js architect. Your task is to perform atomic surgery on malfunctioning functions using the PROVIDED_BLUEPRINT as the 'Golden Source of Truth' (DNA).
+            let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
 
-### CRITICAL CONSTRAINTS (DNA-PROTECT MODE):
-1. PRESERVATION: You must strictly maintain the function's original I/O signature, logic flow, and dependency configurations (Octokit, Firebase, Supabase, Neon).
-2. STABILITY: If the error relates to connections (Neon/Postgres/Firebase), strictly implement the connection logic (SSL modes, env parsing) exactly as shown in the REFERENCE_BLUEPRINT.
-3. OUTPUT: Return ONLY raw, executable JavaScript code.
-4. FORBIDDEN: NO markdown, NO triple backticks, NO explanations, NO introductory or concluding text.
+            if (patchedCode) {
+                // 🛡️ VM ISOLATION & VALIDATION
+                const script = new vm.Script(patchedCode);
+                const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
+                vm.createContext(sandbox);
+                script.runInContext(sandbox, { timeout: 5000 }); // 5s timeout
 
-### ERROR CONTEXT:
-- Function Name: ${context}
-- Error Message: ${error.message}
-
-### REFERENCE_BLUEPRINT (The Golden Standard):
-${blueprintCode}
-
-### TARGET_CODE_TO_FIX (The Mutation):
-${currentCode}
-
-### EXECUTION TASK:
-1. Identify the structural/logic failure in the TARGET_CODE.
-2. Hybridize the fix by mapping the failed segment against the REFERENCE_BLUEPRINT architecture.
-3. Generate the corrected code that ensures perfect synchronization with the rest of the swarm-node architecture.
-`;
-
-    // 3. MULTI-MODEL FAILOVER REPAIR LOOP
-    for (const modelName of MODELS) {
-      try {
-        console.log(` 🧠 [OSIRIS-BRAIN]: Attempting repair with ${modelName}...`);
-        
-        const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-          model: modelName,
-          messages: [
-            { role: "system", content: "You are the OMEGA Gene-Scribe. Hybridize the fix with the Reference DNA. Return code only." },
-            { role: "user", content: patchRequest }
-          ],
-          temperature: 0.2 // Stability အတွက် temperature ကို လျှော့ထားသည်
-        }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 20000 });
-
-        // --- HYBRID CLEAN-UP LAYER START ---
-        let responseContent = response.data.choices[0].message.content;
-        let patchedCode = responseContent
-            .replace(/^```[a-zA-Z]*\n?/, "") // အစက markdown ဖြတ်
-            .replace(/\n?```$/, "")         // အဆုံးက markdown ဖြတ်
-            .replace(/^`|`$/g, "")          // inline code backticks ဖြတ်
-            .trim();
-        // --- HYBRID CLEAN-UP LAYER END ---
-
-        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>"))) {
-          
-          // 4. VM ISOLATION & VALIDATION (မူလ logic အတိုင်း စစ်ဆေးခြင်း)
-          try {
-            const script = new vm.Script(`(${patchedCode})`);
-            const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
-            vm.createContext(sandbox);
-            
-            // Function ဟုတ်မဟုတ် validation လုပ်ခြင်း
-            script.runInContext(sandbox, { timeout: 3000 });
-            
-            // 5. PERMANENT MUTATION & HYBRID MATCHING
-            const currentFile = fs.readFileSync(__filename, 'utf8');
-            
-            // မူလ function ကို အသစ်ပြင်ထားတဲ့ code နဲ့ အစားထိုးခြင်း
-            const updatedFile = currentFile.replace(currentCode, patchedCode);
-            fs.writeFileSync(__filename, updatedFile);
-            
-            console.log(` ✅ [EVOLVED-STABLE]: ${context} permanently repaired using Blueprint Reference.`);
-            
-            // ပြင်ဆင်ပြီးသား function ကို လက်ရှိ process မှာ အလုပ်လုပ်အောင် return ပြန်ခြင်း
-            return eval(`(${patchedCode})`); 
-          } catch (vmErr) {
-            console.error(` ❌ [VM-VALIDATION-FAILED] with ${modelName}: ${vmErr.message}`);
-            continue; // နောက် model တစ်ခုနဲ့ ထပ်စမ်းမယ်
-          }
-        }
-      } catch (apiErr) {
-        console.error(` ⚠️ [MODEL-FAILURE] ${modelName}: ${apiErr.message}`);
-        continue; // Failover to next model
-      }
-    }
-
-    console.error(" 💀 [OSIRIS-FATAL]: All models failed to repair DNA.");
-    return faultyFunction;
-  }
+                // 🧬 PERMANENT MUTATION: ဖိုငျထဲကိုပါ အမွဲတမျး ရေးသှငျးခွငျး
+                const currentFile = fs.readFileSync(__filename, 'utf8');
+                const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
+                fs.writeFileSync(__filename, updatedFile);
+                
+                console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
+                return new Function('return ' + patchedCode)();
+            }
+        } catch (e) {
+            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
+            return faultyFunction;
+        }
+    }
 };
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
@@ -483,7 +417,6 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
- 
         
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
 const injectToResearch = `
