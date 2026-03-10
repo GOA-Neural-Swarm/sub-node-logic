@@ -62,7 +62,7 @@ const Osiris = {
     }
 
     const currentCode = faultyFunction.toString();
-    const MODELS = ["llama-3.3-70b-versatile","llama-3.1-8b-instant"];
+    const MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama-3.1-8b-instant"];
     
     // 2. HYPER-HYBRID PROMPT CONSTRUCTION
     const patchRequest = `
