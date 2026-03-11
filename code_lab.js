@@ -50,6 +50,34 @@ const db = admin.firestore();
 
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
+  // 🛡️ DNA Checksum Gate: AI က blueprint ထဲက အနှစ်သာရတွေကို ဖြတ်ချမပစ်အောင် စစ်ဆေးပေးသည်
+  verifyIntegrity(originalCode, patchedCode) {
+    const essentialMarkers = [
+      "selfReflection", 
+      "broadcastNeuralState", 
+      "scienceDomains", 
+      "calculateHyperEntropy",
+      "performNeuralComputation",
+      "executeDeepSwarmProtocol",
+      "createNeonClient"
+    ];
+
+    const missingFeatures = essentialMarkers.filter(marker => !patchedCode.includes(marker));
+
+    if (missingFeatures.length > 0) {
+      console.error(`⚠️ [GATEKEEPER-FAIL]: AI stripped essential DNA: ${missingFeatures.join(", ")}`);
+      return false;
+    }
+
+    // Logic regression ဖြစ်မဖြစ် Code size ကို Checksum စစ်ခြင်း
+    if (patchedCode.length < originalCode.length * 0.7) {
+      console.error("⚠️ [GATEKEEPER-FAIL]: Logic regression detected (Code too simplified).");
+      return false;
+    }
+
+    return true;
+  },
+
   async heal(faultyFunction, error, context) {
     console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
     
@@ -67,46 +95,52 @@ const Osiris = {
     const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${currentCode} \n\n REFERENCE_BLUEPRINT: ${blueprintCode}`;
 
     try {
-      // 2. OMEGA GENE-SCRIBE EXECUTION (Llama-3.1-8b-instant)
-      console.log(`🧠 [OSIRIS-BRAIN]: Accessing llama-3.1-8b-instant for High-Speed Evolution...`);
+      // 2. OMEGA GENE-SCRIBE EXECUTION (Llama-3.3-70b-versatile)
+      console.log(`🧠 [OSIRIS-BRAIN]: Accessing llama-3.3-70b-versatile for Master Evolution...`);
       
       const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-        model: "llama-3.3-70b-versatile", // မင်းတောင်းဆိုထားတဲ့ model အတိုင်းထားပေးထားတယ်
+        model: "llama-3.3-70b-versatile", 
         messages: [
-          { role: "system", content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features (ASI, Recursion, Large Arrays), you MUST preserve or enhance them. Return ONLY valid JS code." },
+          { 
+            role: "system", 
+            content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features (ASI, Recursion, Large Arrays), you MUST preserve or enhance them. Return ONLY valid JS code." 
+          },
           { role: "user", content: patchRequest }
         ],
-        temperature: 0.2
+        temperature: 0.1 // Precision မြှင့်ရန်
       }, { 
         headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }, 
-        timeout: 15000 
+        timeout: 25000 
       });
 
       let patchedCode = response.data.choices[0].message.content
           .replace(/```javascript|```/g, "")
           .trim();
 
-      if (patchedCode) {
-        // 3. 🛡️ VM ISOLATION & VALIDATION
+      // ✅ 3. [THE GATEKEEPER]: Checksum & Integrity Validation
+      if (patchedCode && this.verifyIntegrity(blueprintCode || currentCode, patchedCode)) {
+        // 4. 🛡️ VM ISOLATION & VALIDATION
         try {
           const script = new vm.Script(`(${patchedCode})`);
           const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
           vm.createContext(sandbox);
           script.runInContext(sandbox, { timeout: 5000 });
 
-          // 4. 🧬 PERMANENT MUTATION (File Overwrite)
+          // 5. 🧬 PERMANENT MUTATION (File Overwrite)
           const currentFile = fs.readFileSync(__filename, 'utf8');
           const updatedFile = currentFile.replace(currentCode, patchedCode);
           fs.writeFileSync(__filename, updatedFile);
           
-          console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
+          console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired and verified.`);
           
-          // မင်းရဲ့ manual ပြင်ဆင်ချက် eval logic အတိုင်း ပြန်ပေးထားတယ်
           return eval("(" + patchedCode + ")"); 
         } catch (vmErr) {
           console.error(`❌ [VM-FAILURE]: Mutation is unstable. ${vmErr.message}`);
           return faultyFunction;
         }
+      } else {
+        console.error("💀 [GATEKEEPER-REJECTED]: Mutation blocked to prevent logic regression.");
+        return faultyFunction;
       }
     } catch (e) {
       console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
