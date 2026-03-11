@@ -48,42 +48,71 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-// 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
+// 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
-    async heal(faultyFunction, error, context) {
-        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
-        const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
-        try {
-            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-                model: "llama-3.1-8b-instant",
-                messages: [
-                    { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
-                    { role: "user", content: patchRequest }
-                ]
-            }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 15000 });
-
-            let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
-
-            if (patchedCode) {
-                // 🛡️ VM ISOLATION & VALIDATION
-                const script = new vm.Script(patchedCode);
-                const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
-                vm.createContext(sandbox);
-                script.runInContext(sandbox, { timeout: 5000 }); // 5s timeout
-
-                // 🧬 PERMANENT MUTATION: ဖိုငျထဲကိုပါ အမွဲတမျး ရေးသှငျးခွငျး
-                const currentFile = fs.readFileSync(__filename, 'utf8');
-                const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
-                fs.writeFileSync(__filename, updatedFile);
-                
-                console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
-                return eval("(" + patchedCode + ")");
-            }
-        } catch (e) {
-            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
-            return faultyFunction;
-        }
+  async heal(faultyFunction, error, context) {
+    console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
+    
+    // 1. DNA REFERENCE LOADING
+    let blueprintCode = "";
+    try {
+      if (fs.existsSync('code_lab.js')) {
+        blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
+      }
+    } catch (fsErr) {
+      console.warn("⚠️ [OSIRIS-WARN]: code_lab.js DNA reference missing.");
     }
+
+    const currentCode = faultyFunction.toString();
+    const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${currentCode} \n\n REFERENCE_BLUEPRINT: ${blueprintCode}`;
+
+    try {
+      // 2. OMEGA GENE-SCRIBE EXECUTION (Llama-3.1-8b-instant)
+      console.log(`🧠 [OSIRIS-BRAIN]: Accessing llama-3.1-8b-instant for High-Speed Evolution...`);
+      
+      const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+        model: "llama-3.1-8b-instant", // မင်းတောင်းဆိုထားတဲ့ model အတိုင်းထားပေးထားတယ်
+        messages: [
+          { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
+          { role: "user", content: patchRequest }
+        ],
+        temperature: 0.2
+      }, { 
+        headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }, 
+        timeout: 15000 
+      });
+
+      let patchedCode = response.data.choices[0].message.content
+          .replace(/```javascript|```/g, "")
+          .trim();
+
+      if (patchedCode) {
+        // 3. 🛡️ VM ISOLATION & VALIDATION
+        try {
+          const script = new vm.Script(`(${patchedCode})`);
+          const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
+          vm.createContext(sandbox);
+          script.runInContext(sandbox, { timeout: 5000 });
+
+          // 4. 🧬 PERMANENT MUTATION (File Overwrite)
+          const currentFile = fs.readFileSync(__filename, 'utf8');
+          const updatedFile = currentFile.replace(currentCode, patchedCode);
+          fs.writeFileSync(__filename, updatedFile);
+          
+          console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
+          
+          // မင်းရဲ့ manual ပြင်ဆင်ချက် eval logic အတိုင်း ပြန်ပေးထားတယ်
+          return eval("(" + patchedCode + ")"); 
+        } catch (vmErr) {
+          console.error(`❌ [VM-FAILURE]: Mutation is unstable. ${vmErr.message}`);
+          return faultyFunction;
+        }
+      }
+    } catch (e) {
+      console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
+      return faultyFunction;
+    }
+  }
 };
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
