@@ -403,11 +403,34 @@ async function executeDeepSwarmProtocol() {
 
         const startTime = Date.now();
 
-        // 🧠 AI EVOLUTION PHASE
-        const evolvedCode = await consultSovereignAI();
-        if (evolvedCode && validateCode(evolvedCode)) {
-            fs.writeFileSync(__filename, evolvedCode);
-            console.log("🧬 [EVOLVED]: Node brain upgraded.");
+        // 🧠 AI EVOLUTION PHASE (Throttle: 3 ကြိမ်လျှင် 1 ကြိမ်သာ Evolution လုပ်မည်)
+        let shouldEvolve = false;
+        try {
+            const lastEvolveFile = './last_evolve.txt';
+            let cycleCount = 0;
+            if (fs.existsSync(lastEvolveFile)) {
+                cycleCount = parseInt(fs.readFileSync(lastEvolveFile, 'utf8'));
+            }
+            
+            cycleCount = (cycleCount + 1) % 3; // 0, 1, 2 ဆိုပြီး 3 cycle လည်မယ်
+            if (cycleCount === 0) {
+                shouldEvolve = true;
+            }
+            fs.writeFileSync(lastEvolveFile, cycleCount.toString());
+        } catch (e) { 
+            console.warn("⚠️ [THROTTLE-WARN]: Throttle file access failed. Defaulting to Evolution.");
+            shouldEvolve = true; 
+        }
+
+        if (shouldEvolve) {
+            console.log("🧬 [EVOLUTION-CYCLE]: Initiating 70B Model Upgrade...");
+            const evolvedCode = await consultSovereignAI();
+            if (evolvedCode && validateCode(evolvedCode)) {
+                fs.writeFileSync(__filename, evolvedCode);
+                console.log("✅ [EVOLVED]: Node brain upgraded.");
+            }
+        } else {
+            console.log("⚖️ [STABILITY-CYCLE]: Skipping Evolution to preserve API quota.");
         }
 
 
