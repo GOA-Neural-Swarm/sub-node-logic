@@ -86,6 +86,64 @@ const Osiris = {
   }
 };
 
+/**
+ * 🔱 OMEGA-DNA SELF-REPAIR PROTOCOL
+ * 🧠 ARCHITECTURE: Fractal Hash Verification & Atomic Sync
+ */
+async function enforceGeneticAlignment() {
+    console.log("🧬 [OMEGA-DNA]: Initiating Fractal Integrity Scan...");
+    
+    try {
+        const blueprintPath = 'code_lab.js';
+        if (!fs.existsSync(blueprintPath)) {
+            console.warn("⚠️ [OMEGA-DNA]: No Master DNA found. Entering Survival Mode.");
+            return;
+        }
+
+        const masterDNA = fs.readFileSync(blueprintPath, 'utf8');
+        const currentLogic = fs.readFileSync(__filename, 'utf8');
+
+        // 1. FRACTAL HASH CHECK (String matching ကို ကျော်လွန်ပြီး ဖွဲ့စည်းပုံကို စစ်ဆေးခြင်း)
+        const generateFractalHash = (str) => {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
+        };
+
+        const masterHash = generateFractalHash(masterDNA);
+        const currentHash = generateFractalHash(currentLogic);
+
+        if (masterHash === currentHash) {
+            console.log("✅ [OMEGA-DNA]: Integrity Verified (Hash: " + masterHash + ").");
+            return;
+        }
+
+        // 2. ATOMIC LOCKING & RESTORATION
+        console.error("🚨 [CRITICAL]: DNA Drift Detected!");
+        console.error(`🔍 Drift Delta: Current(${currentHash}) != Master(${masterHash})`);
+        
+        // atomic sync လုပ်ရန်အတွက် tmp file သုံးပြီး overwriting ကို အကာအကွယ်ယူခြင်း
+        const tempPath = __filename + '.tmp';
+        fs.writeFileSync(tempPath, masterDNA);
+        fs.renameSync(tempPath, __filename);
+        
+        console.log("🧬 [OMEGA-DNA]: Atomic Repair Successful. Rebooting Neural Cluster...");
+        
+        // 3. REBOOT PROTOCOL (Node process ကို အသက်ပြန်သွင်းခြင်း)
+        process.exit(0); 
+    } catch (err) {
+        console.error("💀 [OMEGA-DNA-FATAL]: Protocol Breach: " + err.message);
+        // ဆိုးရွားတဲ့ Error တက်ရင်လည်း နောက်ဆုံးအနေနဲ့ Master DNA ကို အတင်းဖိသွင်းမယ်
+        if (fs.existsSync('code_lab.js')) {
+            fs.writeFileSync(__filename, fs.readFileSync('code_lab.js'));
+            process.exit(1);
+        }
+    }
+ }
+
 //  2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
   //  BIOLOGY & MEDICINE (1-100)
@@ -334,6 +392,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
 
 //  7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
+  await enforceGeneticAlignment();
   const neonClient = createNeonClient();
   try {
     await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
