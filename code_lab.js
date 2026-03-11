@@ -387,178 +387,180 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
 
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
-    const neonClient = createNeonClient(); 
-    try {
-        await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
-        console.log("🔱 NEON CORE CONNECTED.");
+    const neonClient = createNeonClient(); 
+    try {
+        await neonClient.connect(); // တဈခါတညျးပဲ connect လုပျပါ
+        console.log("🔱 NEON CORE CONNECTED.");
 
-        const startTime = Date.now();
+        const startTime = Date.now();
 
-        // 🧠 AI EVOLUTION PHASE
-        const evolvedCode = await consultSovereignAI();
-        if (evolvedCode && validateCode(evolvedCode)) {
-            fs.writeFileSync(__filename, evolvedCode);
-            console.log("🧬 [EVOLVED]: Node brain upgraded.");
-        }
+        // 🧠 AI EVOLUTION PHASE
+        const evolvedCode = await consultSovereignAI();
+        if (evolvedCode && validateCode(evolvedCode)) {
+            fs.writeFileSync(__filename, evolvedCode);
+            console.log("🧬 [EVOLVED]: Node brain upgraded.");
+        }
 
 
-        
-        const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
-        const { data: instruction } = await axios.get(coreUrl);
-        const latency = Date.now() - startTime;
-        const { data: rateData } = await octokit.rateLimit.get();
-        const remaining = rateData.rate.remaining;
+        
+        const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
+        const { data: instruction } = await axios.get(coreUrl);
+        const latency = Date.now() - startTime;
+        const { data: rateData } = await octokit.rateLimit.get();
+        const remaining = rateData.rate.remaining;
 
-        // 🔱 FORCE PULSE
-        const forcePulse = `
-            INSERT INTO node_registry (node_id, status, last_seen)
-            VALUES ($1, 'OMEGA_ACTIVE', NOW())
-            ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'OMEGA_ACTIVE';
-        `;
-        await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
+        // 🔱 FORCE PULSE
+        const forcePulse = `
+            INSERT INTO node_registry (node_id, status, last_seen)
+            VALUES ($1, 'OMEGA_ACTIVE', NOW())
+            ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'OMEGA_ACTIVE';
+        `;
+        await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
 
-        // 🔱 SUPABASE TO NEON INJECTION
-        const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
-        if (!supError && sourceData && sourceData.length > 0) {
-            for (const item of sourceData) {
-                const upsertDna = `
-                    INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
-                    VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
-                    ON CONFLICT (gen_id) DO UPDATE SET 
-                        thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
-                `;
-                await neonClient.query(upsertDna, [item.gen_id, item.logic_payload, 'OMEGA_UPGRADING']);
-            }
-        }
+        // 🔱 SUPABASE TO NEON INJECTION
+        const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
+        if (!supError && sourceData && sourceData.length > 0) {
+            for (const item of sourceData) {
+                const upsertDna = `
+                    INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
+                    VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
+                    ON CONFLICT (gen_id) DO UPDATE SET 
+                        thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
+                `;
+                await neonClient.query(upsertDna, [item.gen_id, item.logic_payload, 'OMEGA_UPGRADING']);
+            }
+        }
 
-        // 🔍 RECOVERY LOGIC: Check missing domains
-        const { rows: existingRows } = await neonClient.query("SELECT title FROM research_data");
-        const existingDomains = existingRows.map(r => r.title);
-        const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
+        // 🔍 RECOVERY LOGIC: Check missing domains
+        const { rows: existingRows } = await neonClient.query("SELECT title FROM research_data");
+        const existingDomains = existingRows.map(r => r.title);
+        const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
 
-        let domain;
-        if (missingDomains.length > 0) {
-            domain = missingDomains[0]; 
-            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
-        } else {
-            domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
-            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
-        }
+        let domain;
+        if (missingDomains.length > 0) {
+            domain = missingDomains[0]; 
+            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
+        } else {
+            domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
+            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
+        }
 
 // EXECUTION BLOCK
 let compute = performNeuralComputation(domain);
 compute.calculationResult = await selfReflection(
-    compute.calculationResult, 
-    { 
-        coherence: parseFloat(compute.coherence), 
-        entropy: compute.entropy 
-    }
+    compute.calculationResult, 
+    { 
+        coherence: parseFloat(compute.coherence), 
+        entropy: compute.entropy 
+    }
 );
 
-        const intelligencePayload = {
-            domain,
-            metrics: {
-                data_scanned: compute.dataPoints,
-                coherence: `${compute.coherence}%`,
-                entropy: compute.entropy,
-                probability: compute.probability,
-                impact_factor: compute.impactFactor
-            },
-            computation: {
-                logic_output: compute.calculationResult,
-                status: "VERIFIED_OMEGA"
-            },
-            timestamp: new Date().toISOString()
-        };
+        const intelligencePayload = {
+            domain,
+            metrics: {
+                data_scanned: compute.dataPoints,
+                coherence: `${compute.coherence}%`,
+                entropy: compute.entropy,
+                probability: compute.probability,
+                impact_factor: compute.impactFactor
+            },
+            computation: {
+                logic_output: compute.calculationResult,
+                status: "VERIFIED_OMEGA"
+            },
+            timestamp: new Date().toISOString()
+        };
 
-        
-        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
+
+        
+        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
-    INSERT INTO research_data (title, detail, harvested_at)
-    VALUES ($1, $2, NOW());
+  INSERT INTO research_data (title, detail, harvested_at)
+  VALUES ($1, $2, NOW())
+  ON CONFLICT (title) DO UPDATE SET detail = EXCLUDED.detail, harvested_at = NOW();
 `;
 await neonClient.query(injectToResearch, [
-    domain, 
-    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖွဈရမယျ
+    domain, 
+    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖြစ်ရမယ်
 ]);
 
 console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
-        
-        // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
-        const injectIntelligence = `
-            INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
-            VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
-            ON CONFLICT (gen_id) DO UPDATE SET 
-                thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
-        `;
-        await neonClient.query(injectIntelligence, [
-            `OMEGA_ANALYSIS_${domain.toUpperCase()}_${Date.now()}`, 
-            JSON.stringify(intelligencePayload), 
-            'ANALYZED'
-        ]);
+        
+        // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
+        const injectIntelligence = `
+            INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
+            VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
+            ON CONFLICT (gen_id) DO UPDATE SET 
+                thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
+        `;
+        await neonClient.query(injectIntelligence, [
+            `OMEGA_ANALYSIS_${domain.toUpperCase()}_${Date.now()}`, 
+            JSON.stringify(intelligencePayload), 
+            'ANALYZED'
+        ]);
 
-        await supabase.from('neural_sync').insert([{ 
-            gen_id: `OMEGA_SYNC_${Date.now()}`, 
-            logic_payload: JSON.stringify(intelligencePayload) 
-        }]);
+        await supabase.from('neural_sync').insert([{ 
+            gen_id: `OMEGA_SYNC_${Date.now()}`, 
+            logic_payload: JSON.stringify(intelligencePayload) 
+        }]);
 
-        console.log(`🧠 Analyzed & Computed: ${domain}`);
+        console.log(`🧠 Analyzed & Computed: ${domain}`);
 
-        // 🔱 REPORT TO FIREBASE
-        await broadcastNeuralState(neonClient,intelligencePayload, compute, instruction, latency, remaining);
+        // 🔱 REPORT TO FIREBASE
+        await broadcastNeuralState(neonClient,intelligencePayload, compute, instruction, latency, remaining);
 
-        // 🔱 HYPER-REPLICATION (Full Original Logic)
-        if (instruction.replicate === true) {
-            let spawned = false;
-            let checkNum = 1;
-            const MAX_NODES = 10; 
-            while (!spawned && checkNum <= MAX_NODES) {
-                const nextNodeName = `swarm-node-${String(checkNum).padStart(7, '0')}`;
-                try {
-                    await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
-                    checkNum++;
-                } catch (e) {
-                    console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
-                    try {
-                        await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
-                    } catch (orgErr) {
-                        await octokit.repos.createForAuthenticatedUser({ name: nextNodeName, auto_init: true });
-                    }
+        // 🔱 HYPER-REPLICATION (Full Original Logic)
+        if (instruction.replicate === true) {
+            let spawned = false;
+            let checkNum = 1;
+            const MAX_NODES = 10; 
+            while (!spawned && checkNum <= MAX_NODES) {
+                const nextNodeName = `swarm-node-${String(checkNum).padStart(7, '0')}`;
+                try {
+                    await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
+                    checkNum++;
+                } catch (e) {
+                    console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
+                    try {
+                        await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
+                    } catch (orgErr) {
+                        await octokit.repos.createForAuthenticatedUser({ name: nextNodeName, auto_init: true });
+                    }
 
-                    const filesToCopy = ['package.json', 'cluster_sync.js', '.github/workflows/sync.yml'];
-                    for (const fileName of filesToCopy) {
-                        try {
-                            const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
-                            await octokit.repos.createOrUpdateFileContents({
-                                owner: REPO_OWNER, repo: nextNodeName, path: fileName,
-                                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
-                                content: content.content
-                            });
-                        } catch (copyErr) { console.error(`   ❌ Failed to inject ${fileName}`); }
-                    }
-                    spawned = true; 
-                }
-            }
-        }
-        console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
-    } catch (err) {
-        console.error("❌ CRITICAL SWARM ERROR:", err.message);
-        throw err; 
-    } finally {
-        await neonClient.end();
-    }
+                    const filesToCopy = ['package.json', 'cluster_sync.js', '.github/workflows/sync.yml'];
+                    for (const fileName of filesToCopy) {
+                        try {
+                            const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
+                            await octokit.repos.createOrUpdateFileContents({
+                                owner: REPO_OWNER, repo: nextNodeName, path: fileName,
+                                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
+                                content: content.content
+                            });
+                        } catch (copyErr) { console.error(`   ❌ Failed to inject ${fileName}`); }
+                    }
+                    spawned = true; 
+                }
+            }
+        }
+        console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
+    } catch (err) {
+        console.error("❌ CRITICAL SWARM ERROR:", err.message);
+        throw err; 
+    } finally {
+        await neonClient.end();
+    }
 }
 
 
 
 async function startGodMode() {
-    try {
-        await executeDeepSwarmProtocol();
-    } catch (err) {
-        console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
-        const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
-        console.log("🔄 Initiating recovery sequence...");
-        setTimeout(() => repairedProtocol(), 5000); 
-    }
+    try {
+        await executeDeepSwarmProtocol();
+    } catch (err) {
+        console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
+        const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
+        console.log("🔄 Initiating recovery sequence...");
+        setTimeout(() => repairedProtocol(), 5000); 
+    }
 }
 startGodMode();
