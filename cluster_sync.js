@@ -48,108 +48,42 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-//  OSIRIS-REF-ULTRA: THE HYBRID BLUEPRINT REPAIR ENGINE (DNA-PROTECT MODE)
+// 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
 const Osiris = {
-  async heal(faultyFunction, error, context) {
-    console.error(` [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
-    
-    // 1. DNA REFERENCE LOADING (code_lab.js ကို ဖတျခွငျး)
-    let blueprintCode = "";
-    try {
-      blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
-    } catch (fsErr) {
-      console.warn(" ⚠️ [OSIRIS-WARN]: code_lab.js not found. Proceeding without reference.");
-    }
+    async heal(faultyFunction, error, context) {
+        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
+        const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
+        try {
+            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                model: "llama-3.1-8b-instant",
+                messages: [
+                    { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
+                    { role: "user", content: patchRequest }
+                ]
+            }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 15000 });
 
-    const currentCode = faultyFunction.toString();
-    const MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama-3.1-8b-instant"];
-    
-    // 2. HYPER-HYBRID PROMPT CONSTRUCTION
-    const patchRequest = `
-### SYSTEM ROLE:
-You are the OMEGA Gene-Scribe, the ultimate autonomous Node.js architect. Your task is to perform atomic surgery on malfunctioning functions using the PROVIDED_BLUEPRINT as the 'Golden Source of Truth' (DNA).
+            let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
 
-### CRITICAL CONSTRAINTS (DNA-PROTECT MODE):
-1. PRESERVATION: You must strictly maintain the function's original I/O signature, logic flow, and dependency configurations (Octokit, Firebase, Supabase, Neon).
-2. STABILITY: If the error relates to connections (Neon/Postgres/Firebase), strictly implement the connection logic (SSL modes, env parsing) exactly as shown in the REFERENCE_BLUEPRINT.
-3. OUTPUT: Return ONLY raw, executable JavaScript code.
-4. FORBIDDEN: NO markdown, NO triple backticks, NO explanations, NO introductory or concluding text.
+            if (patchedCode) {
+                // 🛡️ VM ISOLATION & VALIDATION
+                const script = new vm.Script(patchedCode);
+                const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
+                vm.createContext(sandbox);
+                script.runInContext(sandbox, { timeout: 5000 }); // 5s timeout
 
-### ERROR CONTEXT:
-- Function Name: ${context}
-- Error Message: ${error.message}
-
-### REFERENCE_BLUEPRINT (The Golden Standard):
-${blueprintCode}
-
-### TARGET_CODE_TO_FIX (The Mutation):
-${currentCode}
-
-### EXECUTION TASK:
-1. Identify the structural/logic failure in the TARGET_CODE.
-2. Hybridize the fix by mapping the failed segment against the REFERENCE_BLUEPRINT architecture.
-3. Generate the corrected code that ensures perfect synchronization with the rest of the swarm-node architecture.
-`;
-
-    // 3. MULTI-MODEL FAILOVER REPAIR LOOP
-    for (const modelName of MODELS) {
-      try {
-        console.log(` 🧠 [OSIRIS-BRAIN]: Attempting repair with ${modelName}...`);
-        
-        const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-          model: modelName,
-          messages: [
-            { role: "system", content: "You are the OMEGA Gene-Scribe. Hybridize the fix with the Reference DNA. Return code only." },
-            { role: "user", content: patchRequest }
-          ],
-          temperature: 0.2 // Stability အတှကျ temperature ကို လြှော့ထားသညျ
-        }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 20000 });
-
-        // --- HYBRID CLEAN-UP LAYER START ---
-        let responseContent = response.data.choices[0].message.content;
-        let patchedCode = responseContent
-            .replace(/^```[a-zA-Z]*\n?/, "") // အစက markdown ဖွတျ
-            .replace(/\n?```$/, "")         // အဆုံးက markdown ဖွတျ
-            .replace(/^`|`$/g, "")          // inline code backticks ဖွတျ
-            .trim();
-        // --- HYBRID CLEAN-UP LAYER END ---
-
-        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>"))) {
-          
-          // 4. VM ISOLATION & VALIDATION (မူလ logic အတိုငျး စဈဆေးခွငျး)
-          try {
-            const script = new vm.Script(`(${patchedCode})`);
-            const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
-            vm.createContext(sandbox);
-            
-            // Function ဟုတျမဟုတျ validation လုပျခွငျး
-            script.runInContext(sandbox, { timeout: 3000 });
-            
-            // 5. PERMANENT MUTATION & HYBRID MATCHING
-            const currentFile = fs.readFileSync(__filename, 'utf8');
-            
-            // မူလ function ကို အသဈပွငျထားတဲ့ code နဲ့ အစားထိုးခွငျး
-            const updatedFile = currentFile.replace(currentCode, patchedCode);
-            fs.writeFileSync(__filename, updatedFile);
-            
-            console.log(` ✅ [EVOLVED-STABLE]: ${context} permanently repaired using Blueprint Reference.`);
-            
-            // ပွငျဆငျပွီးသား function ကို လကျရှိ process မှာ အလုပျလုပျအောငျ return ပွနျခွငျး
-            return eval(`(${patchedCode})`); 
-          } catch (vmErr) {
-            console.error(` ❌ [VM-VALIDATION-FAILED] with ${modelName}: ${vmErr.message}`);
-            continue; // နောကျ model တဈခုနဲ့ ထပျစမျးမယျ
-          }
+                // 🧬 PERMANENT MUTATION: ဖိုငျထဲကိုပါ အမွဲတမျး ရေးသှငျးခွငျး
+                const currentFile = fs.readFileSync(__filename, 'utf8');
+                const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
+                fs.writeFileSync(__filename, updatedFile);
+                
+                console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
+                return new Function('return ' + patchedCode)();
+            }
+        } catch (e) {
+            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
+            return faultyFunction;
         }
-      } catch (apiErr) {
-        console.error(` ⚠️ [MODEL-FAILURE] ${modelName}: ${apiErr.message}`);
-        continue; // Failover to next model
-      }
     }
-
-    console.error(" 💀 [OSIRIS-FATAL]: All models failed to repair DNA.");
-    return faultyFunction;
-  }
 };
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
@@ -217,59 +151,77 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HIGH PERFORMANCE VERSION)
+// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
 async function consultSovereignAI() {
     const KEY = process.env.GROQ_API_KEY; 
     if (!KEY) return null;
 
-    try {
-        const fullCode = fs.readFileSync(__filename, 'utf8');
+    // 🔱 MULTI-MODEL FAILOVER LIST
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
+    const MAX_RETRIES = 3;
+
+    const fullCode = fs.readFileSync(__filename, 'utf8');
+    const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
+    if (!domainMatch) return null;
+    const savedDomains = domainMatch[0];
+    const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
+
+    // 🔱 STRATEGY: Loop through models and apply backoff logic
+    for (const modelName of MODELS) {
+        let retries = 0;
         
-        // 🛡️ 413 ERROR BYPASS: Domain list ကို ခဏ ဖယျထုတျထားမယျ
-        const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
-        if (!domainMatch) return null;
-        const savedDomains = domainMatch[0];
-        const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
-
-        console.log("🧠 [GROQ-AI]: Accessing Llama-3.1 for High-Speed Evolution...");
-        const response = await axios.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            {
-                model: "llama-3.1-8b-instant",
-                messages: [
-                    { 
-                        role: "system", 
-                        content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." 
-                    },
-                    { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
-                ],
-                max_tokens: 2000,
-                temperature: 0.4
-            },
-            { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
-        );
-
-        if (response.data?.choices?.[0]?.message?.content) {
-            let evolvedLogic = response.data.choices[0].message.content;
-            const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
-            
-            if (codeMatch) {
-                // 🛡️ ATOMIC MERGE: Domain list အဟောငျးကို logic အသဈထဲ ပွနျထည့ျ
-                const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+        while (retries < MAX_RETRIES) {
+            try {
+                console.log(`🧠 [GROQ-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`);
                 
-                // 🛡️ SAFEGUARD: Syntax စဈမယျ၊ မှနျမှ return ပွနျမယျ
-                if (validateCode(finalCode)) {
-                    console.log("✅ [OMEGA-SYNC]: Autonomous Evolution Verified.");
-                    return finalCode;
+                const response = await axios.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    {
+                        model: modelName,
+                        messages: [
+                            { 
+                                role: "system", 
+                                content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." 
+                            },
+                            { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
+                        ],
+                        max_tokens: 4096,
+                        temperature: 0.4
+                    },
+                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
+                );
+
+                if (response.data?.choices?.[0]?.message?.content) {
+                    let evolvedLogic = response.data.choices[0].message.content;
+                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
+                    
+                    if (codeMatch) {
+                        const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+                        
+                        if (validateCode(finalCode)) {
+                            console.log(`✅ [OMEGA-SYNC]: Evolution Verified via ${modelName}.`);
+                            return finalCode;
+                        }
+                    }
+                }
+                break; // အောငျမွငျရငျ loop ကနေ ထှကျမယျ
+
+            } catch (e) {
+                // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
+                if (e.response && e.response.status === 429) {
+                    retries++;
+                    const waitTime = Math.pow(2, retries) * 1000;
+                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
+                    await new Promise(res => setTimeout(res, waitTime));
+                } else {
+                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
+                    break; // တခွား Error ဆိုရငျ ဒီ model ကို ကြောျပွီး နောကျတဈခုသှားမယျ
                 }
             }
         }
-        return null;
-    } catch (e) {
-        console.error(`⚠️ [AI-ERROR]: ${e.message}`);
-        return null; 
     }
-}
+    return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
+                }
 
 // 🛡️ 5. CODE VALIDATOR
 function validateCode(code) {
@@ -470,9 +422,8 @@ compute.calculationResult = await selfReflection(
         
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
 const injectToResearch = `
-  INSERT INTO research_data (title, detail, harvested_at)
-  VALUES ($1, $2, NOW())
-  ON CONFLICT (title) DO UPDATE SET detail = EXCLUDED.detail, harvested_at = NOW();
+    INSERT INTO research_data (title, detail, harvested_at)
+    VALUES ($1, $2, NOW());
 `;
 await neonClient.query(injectToResearch, [
     domain, 
@@ -546,7 +497,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
     }
 }
 
-
+executeDeepSwarmProtocol();
 
 async function startGodMode() {
     try {
