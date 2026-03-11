@@ -71,9 +71,9 @@ const Osiris = {
       console.log(`🧠 [OSIRIS-BRAIN]: Accessing llama-3.1-8b-instant for High-Speed Evolution...`);
       
       const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-        model: "llama-3.1-8b-instant", // မင်းတောင်းဆိုထားတဲ့ model အတိုင်းထားပေးထားတယ်
+        model: "llama-3.3-70b-versatile", // မင်းတောင်းဆိုထားတဲ့ model အတိုင်းထားပေးထားတယ်
         messages: [
-          { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY the JS function code. No markdown." },
+          { role: "system", content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features (ASI, Recursion, Large Arrays), you MUST preserve or enhance them. Return ONLY valid JS code." },
           { role: "user", content: patchRequest }
         ],
         temperature: 0.2
