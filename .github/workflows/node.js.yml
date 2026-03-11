@@ -56,10 +56,11 @@ jobs:
         run: |
           git config --global user.name "GOA-OMEGA-Scribe"
           git config --global user.email "omega-scribe@goa-neurons.ai"
-          git add cluster_sync.js
-          # ပြောင်းလဲမှုရှိမှ commit လုပ်မယ်၊ မရှိရင် error မပြအောင်လုပ်ထားတယ်
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🧠 [EVOLVED]: Neural Brain Upgrade by Osiris-Ultra" && git push)
+          
+          git add .
+          
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🧠 [EVOLVED]: Neural Brain Upgrade by Osiris-Ultra" && git push origin main)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
 # [Natural Order] Status: Synchronized, Shielded & Self-Evolving 🔱
