@@ -254,7 +254,7 @@ async function consultSovereignAI() {
         }
     }
     return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
-                }
+}
 
 // 🛡️ 5. CODE VALIDATOR
 function validateCode(code) {
