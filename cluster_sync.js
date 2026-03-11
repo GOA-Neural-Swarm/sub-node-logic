@@ -408,15 +408,25 @@ async function executeDeepSwarmProtocol() {
         try {
             const lastEvolveFile = './last_evolve.txt';
             let cycleCount = 0;
+            
             if (fs.existsSync(lastEvolveFile)) {
-                cycleCount = parseInt(fs.readFileSync(lastEvolveFile, 'utf8'));
+                let rawData = fs.readFileSync(lastEvolveFile, 'utf8').trim();
+                cycleCount = parseInt(rawData);
+                
+                if (isNaN(cycleCount)) {
+                    console.warn("⚠️ [RECOVERY]: Corrupted cycle count detected. Resetting to 0.");
+                    cycleCount = 0;
+                }
             }
             
-            cycleCount = (cycleCount + 1) % 3; // 0, 1, 2 ဆိုပြီး 3 cycle လည်မယ်
+            cycleCount = (cycleCount + 1) % 3;
+            
             if (cycleCount === 0) {
                 shouldEvolve = true;
             }
+            
             fs.writeFileSync(lastEvolveFile, cycleCount.toString());
+            
         } catch (e) { 
             console.warn("⚠️ [THROTTLE-WARN]: Throttle file access failed. Defaulting to Evolution.");
             shouldEvolve = true; 
