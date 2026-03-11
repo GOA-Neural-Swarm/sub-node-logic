@@ -117,7 +117,10 @@ const Osiris = {
         console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
         return faultyFunction;
     }
-}
+
+ }
+
+};
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
