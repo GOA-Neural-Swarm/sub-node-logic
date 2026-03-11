@@ -193,7 +193,7 @@ async function consultSovereignAI() {
     if (!KEY) return null;
 
     // 🔱 MULTI-MODEL FAILOVER LIST
-    const MODELS = ["llama-3.1-8b-instant", "llama-3.1-70b-versatile", "mixtral-8x7b-32768"];
+    const MODELS =  ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192"];
     const MAX_RETRIES = 3;
 
     const fullCode = fs.readFileSync(__filename, 'utf8');
