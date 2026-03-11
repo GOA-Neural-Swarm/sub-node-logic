@@ -4,8 +4,8 @@ const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs'); // ⬅️ ကနှခွဲ့သညကွို ထပပွေါငွး
-const { execSync } = require('child_process'); // ⬅️ ကနှခွဲ့သညကွို ထပပွေါငွး
+const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 
 // 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
@@ -48,111 +48,99 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-    //  OSIRIS-REF-ULTRA: THE HYBRID BLUEPRINT REPAIR ENGINE (DNA-PROTECT MODE)
+// 🔱 OSIRIS-ULTRA-HYBRID: THE ULTIMATE DNA REPAIR ENGINE
 const Osiris = {
   async heal(faultyFunction, error, context) {
-    console.error(` [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
+    console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Hybrid Mutation in [${context}]...`);
     
-    // 1. DNA REFERENCE LOADING (code_lab.js ကို ဖတျခွငျး)
+    // 1. DNA REFERENCE LOADING (The Golden Standard)
     let blueprintCode = "";
     try {
       blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
     } catch (fsErr) {
-      console.warn(" ⚠️ [OSIRIS-WARN]: code_lab.js not found. Proceeding without reference.");
+      console.warn("⚠️ [OSIRIS-WARN]: code_lab.js DNA reference missing. Mutation may be unstable.");
     }
 
     const currentCode = faultyFunction.toString();
-    const MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama-3.1-8b-instant"];
+    // Multi-model failover list
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
     
-    // 2. HYPER-HYBRID PROMPT CONSTRUCTION
+    // 2. HYPER-HYBRID PROMPT (Strict DNA-Protect Mode)
     const patchRequest = `
 ### SYSTEM ROLE:
-You are the OMEGA Gene-Scribe, the ultimate autonomous Node.js architect. Your task is to perform atomic surgery on malfunctioning functions using the PROVIDED_BLUEPRINT as the 'Golden Source of Truth' (DNA).
+You are the OMEGA Gene-Scribe. Perform atomic surgery on the TARGET_CODE using PROVIDED_BLUEPRINT as the 'Golden DNA'.
 
-### CRITICAL CONSTRAINTS (DNA-PROTECT MODE):
-1. PRESERVATION: You must strictly maintain the function's original I/O signature, logic flow, and dependency configurations (Octokit, Firebase, Supabase, Neon).
-2. STABILITY: If the error relates to connections (Neon/Postgres/Firebase), strictly implement the connection logic (SSL modes, env parsing) exactly as shown in the REFERENCE_BLUEPRINT.
-3. OUTPUT: Return ONLY raw, executable JavaScript code.
-4. FORBIDDEN: NO markdown, NO triple backticks, NO explanations, NO introductory or concluding text.
+### CRITICAL CONSTRAINTS:
+1. PRESERVATION: Keep original I/O signature and dependencies (Octokit, Firebase, Supabase, Neon).
+2. STABILITY: Implement connection logic (SSL/Env parsing) EXACTLY as shown in REFERENCE_BLUEPRINT.
+3. OUTPUT: Return ONLY raw, executable JavaScript. NO Markdown. NO triple backticks.
 
-### ERROR CONTEXT:
-- Function Name: ${context}
-- Error Message: ${error.message}
+### CONTEXT:
+- Function: ${context}
+- Error: ${error.message}
 
-### REFERENCE_BLUEPRINT (The Golden Standard):
+### REFERENCE_BLUEPRINT:
 ${blueprintCode}
 
-### TARGET_CODE_TO_FIX (The Mutation):
+### TARGET_CODE_TO_FIX:
 ${currentCode}
-
-### EXECUTION TASK:
-1. Identify the structural/logic failure in the TARGET_CODE.
-2. Hybridize the fix by mapping the failed segment against the REFERENCE_BLUEPRINT architecture.
-3. Generate the corrected code that ensures perfect synchronization with the rest of the swarm-node architecture.
 `;
 
     // 3. MULTI-MODEL FAILOVER REPAIR LOOP
     for (const modelName of MODELS) {
       try {
-        console.log(` 🧠 [OSIRIS-BRAIN]: Attempting repair with ${modelName}...`);
+        console.log(`🧠 [OSIRIS-BRAIN]: Attempting Hybrid Repair with ${modelName}...`);
         
         const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
           model: modelName,
           messages: [
-            { role: "system", content: "You are the OMEGA Gene-Scribe. Hybridize the fix with the Reference DNA. Return code only." },
+            { role: "system", content: "You are the OMEGA Gene-Scribe. Return ONLY raw JS code. No explanations." },
             { role: "user", content: patchRequest }
           ],
-          temperature: 0.2 // Stability အတှကျ temperature ကို လြှော့ထားသညျ
-        }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 20000 });
+          temperature: 0.2
+        }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 25000 });
 
-        // --- HYBRID CLEAN-UP LAYER START ---
-        let responseContent = response.data.choices[0].message.content;
-        let patchedCode = responseContent
-            .replace(/^```[a-zA-Z]*\n?/, "") // အစက markdown ဖွတျ
-            .replace(/\n?```$/, "")         // အဆုံးက markdown ဖွတျ
-            .replace(/^`|`$/g, "")          // inline code backticks ဖွတျ
+        let patchedCode = response.data.choices[0].message.content
+            .replace(/```javascript|```/g, "")
             .trim();
-        // --- HYBRID CLEAN-UP LAYER END ---
 
-        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>"))) {
+        if (patchedCode && (patchedCode.includes("function") || patchedCode.includes("=>") || patchedCode.includes("async"))) {
           
-          // 4. VM ISOLATION & VALIDATION (မူလ logic အတိုငျး စဈဆေးခွငျး)
+          // 4. VM ISOLATION & VALIDATION (From Original Logic)
           try {
             const script = new vm.Script(`(${patchedCode})`);
-            const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
+            const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
             vm.createContext(sandbox);
             
-            // Function ဟုတျမဟုတျ validation လုပျခွငျး
-            script.runInContext(sandbox, { timeout: 3000 });
+            // Validate by running in isolated context
+            script.runInContext(sandbox, { timeout: 5000 });
             
-            // 5. PERMANENT MUTATION & HYBRID MATCHING
+            // 5. PERMANENT MUTATION (File Overwrite)
             const currentFile = fs.readFileSync(__filename, 'utf8');
-            
-            // မူလ function ကို အသဈပွငျထားတဲ့ code နဲ့ အစားထိုးခွငျး
             const updatedFile = currentFile.replace(currentCode, patchedCode);
             fs.writeFileSync(__filename, updatedFile);
             
-            console.log(` ✅ [EVOLVED-STABLE]: ${context} permanently repaired using Blueprint Reference.`);
+            console.log(`✅ [EVOLVED-STABLE]: ${context} permanently repaired and synced with DNA.`);
             
-            // ပွငျဆငျပွီးသား function ကို လကျရှိ process မှာ အလုပျလုပျအောငျ return ပွနျခွငျး
+            // Return the live function for immediate execution
             return eval(`(${patchedCode})`); 
           } catch (vmErr) {
-            console.error(` ❌ [VM-VALIDATION-FAILED] with ${modelName}: ${vmErr.message}`);
-            continue; // နောကျ model တဈခုနဲ့ ထပျစမျးမယျ
+            console.error(`❌ [VM-FAILURE] with ${modelName}: ${vmErr.message}`);
+            continue; // Failover to next model
           }
         }
       } catch (apiErr) {
-        console.error(` ⚠️ [MODEL-FAILURE] ${modelName}: ${apiErr.message}`);
-        continue; // Failover to next model
+        console.error(`⚠️ [MODEL-FAILURE] ${modelName}: ${apiErr.message}`);
+        continue; 
       }
     }
 
-    console.error(" 💀 [OSIRIS-FATAL]: All models failed to repair DNA.");
+    console.error("💀 [OSIRIS-FATAL]: All DNA repair attempts failed. Executing fallback.");
     return faultyFunction;
   }
 };
 
-// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခှုံ့ထားပါ)
+// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
     // 🧬 BIOLOGY & MEDICINE (1-100)
     "Neuroscience", "Genetics", "Synthetic_Biology", "Virology", "Immunology", "Epigenetics", "Microbiology", "Pharmacology", "Endocrinology", "Bioinformatics",
@@ -270,7 +258,7 @@ async function consultSovereignAI() {
                         }
                     }
                 }
-                break; // အောငမြှငရြငြ loop ကနေ ထှကမြယြ
+                break; // အောငျမွငျရငျ loop ကနေ ထှကျမယျ
 
             } catch (e) {
                 // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
@@ -281,12 +269,12 @@ async function consultSovereignAI() {
                     await new Promise(res => setTimeout(res, waitTime));
                 } else {
                     console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
-                    break; // တခှား Error ဆိုရငြ ဒီ model ကို ကွောပြှီး နောကတြဈခုသှားမယြ
+                    break; // တခွား Error ဆိုရငျ ဒီ model ကို ကြောျပွီး နောကျတဈခုသှားမယျ
                 }
             }
         }
     }
-    return null; // အားလုံးမအောငမြှငမြှ null ပှနမြယြ
+    return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
                 }
 
 // 🛡️ 5. CODE VALIDATOR
@@ -344,14 +332,14 @@ function performNeuralComputation(domain) {
 
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
-    const MAX_DEPTH = 10; // ASI အတှကြ Depth ကို တိုးမှှင့ပြါ
+    const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
     const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01; // ASI Threshold
 
     if (isStable || depth >= MAX_DEPTH) {
         return `[ASI_NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
     }
 
-    // Fractal Correction ကို တှကခြကွခြှငြး
+    // Fractal Correction ကို တှကျခကြျခွငျး
     return await selfReflection(
         `ASI_EVOLUTION_LVL_${depth + 1}(${input})`, 
         { 
@@ -362,8 +350,8 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
-// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပွှီးသား)
-async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပွါ
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပြှီးသား)
+async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပြါ
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     
@@ -401,7 +389,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
 async function executeDeepSwarmProtocol() {
     const neonClient = createNeonClient(); 
     try {
-        await neonClient.connect(); // တဈခါတညွးပဲ connect လုပပွါ
+        await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
         console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
@@ -483,16 +471,15 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
- 
         
-        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပှငမြှ research_data ထဲ ရောကမြှာပါ)
+        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
 const injectToResearch = `
     INSERT INTO research_data (title, detail, harvested_at)
     VALUES ($1, $2, NOW());
 `;
 await neonClient.query(injectToResearch, [
     domain, 
-    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖှဈရမယြ
+    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖွဈရမယျ
 ]);
 
 console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
