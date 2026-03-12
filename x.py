@@ -434,6 +434,8 @@ async function executeHyperMutation() {
 
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
+    const selfAwareness = await performRecursiveCognition();
+    console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
     const neonClient = createNeonClient(); 
     try {
         await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
