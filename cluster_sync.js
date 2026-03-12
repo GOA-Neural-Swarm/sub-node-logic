@@ -6,6 +6,7 @@ const { Client } = require('pg');
 const fs = require('fs');
 const { execSync } = require('child_process');
 const vm = require('vm');
+
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
@@ -449,5 +450,3 @@ async function startGodMode() {
     }
 }
 startGodMode();
-
-// Removed unnecessary code and improved formatting
