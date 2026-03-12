@@ -6,7 +6,6 @@ const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
 const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
-const fs = require('fs');
 const { execSync } = require('child_process');
 const ProtectedCore = require('./protected_core'); // ⬅️ ဒါကို 
 
