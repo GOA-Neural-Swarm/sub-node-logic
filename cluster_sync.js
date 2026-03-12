@@ -1,15 +1,13 @@
-// 🔱 1. Imports & Core Setup
-const { Octokit } = require("@octokit/rest"); 
-const admin = require('firebase-admin');      
+const { Octokit } = require("@octokit/rest");
+const admin = require('firebase-admin');
 const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs');
-const { execSync } = require('child_process');
-const ProtectedCore = require('./protected_core');
+const fs = require('fs'); // ⬅️ ကနြျခဲ့သညျကို ထပျပေါငျး
+const { execSync } = require('child_process'); // ⬅️ ကနြျခဲ့သညျကို ထပျပေါငျး
 
-// 🔱 2. Configuration & Auth
+// 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
@@ -17,6 +15,7 @@ const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
 // 🔱 NEON_KEY FINAL REPAIR
 let rawKey = process.env.NEON_KEY || "";
 let cleanKey = rawKey.trim().replace(/['"]+/g, '');
@@ -50,7 +49,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 // 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
-Osiris = {
+const Osiris = {
     async heal(faultyFunction, error, context) {
         console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
         const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
@@ -87,8 +86,7 @@ Osiris = {
     }
 };
 
-
-// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
+// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခြုံ့ထားပါ)
 const scienceDomains = [
     // 🧬 BIOLOGY & MEDICINE (1-100)
     "Neuroscience", "Genetics", "Synthetic_Biology", "Virology", "Immunology", "Epigenetics", "Microbiology", "Pharmacology", "Endocrinology", "Bioinformatics",
@@ -159,7 +157,7 @@ async function consultSovereignAI() {
     if (!KEY) return null;
 
     // 🔱 MULTI-MODEL FAILOVER LIST
-    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
     const MAX_RETRIES = 3;
 
     const fullCode = fs.readFileSync(__filename, 'utf8');
@@ -206,7 +204,7 @@ async function consultSovereignAI() {
                         }
                     }
                 }
-                break; // အောငျမွငျရငျ loop ကနေ ထှကျမယျ
+                break; // အောင်မြင်ရင် loop ကနေ ထွက်မယ်
 
             } catch (e) {
                 // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
@@ -217,12 +215,12 @@ async function consultSovereignAI() {
                     await new Promise(res => setTimeout(res, waitTime));
                 } else {
                     console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
-                    break; // တခွား Error ဆိုရငျ ဒီ model ကို ကြောျပွီး နောကျတဈခုသှားမယျ
+                    break; // တခြား Error ဆိုရင် ဒီ model ကို ကျော်ပြီး နောက်တစ်ခုသွားမယ်
                 }
             }
         }
     }
-    return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
+    return null; // အားလုံးမအောင်မြင်မှ null ပြန်မယ်
                 }
 
 // 🛡️ 5. CODE VALIDATOR
@@ -280,14 +278,14 @@ function performNeuralComputation(domain) {
 
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
-    const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
+    const MAX_DEPTH = 10; // ASI အတွက် Depth ကို တိုးမြှင့်ပါ
     const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01; // ASI Threshold
 
     if (isStable || depth >= MAX_DEPTH) {
         return `[ASI_NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
     }
 
-    // Fractal Correction ကို တှကျခကြျခွငျး
+    // Fractal Correction ကို တွက်ချက်ခြင်း
     return await selfReflection(
         `ASI_EVOLUTION_LVL_${depth + 1}(${input})`, 
         { 
@@ -298,8 +296,8 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
-// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပြှီးသား)
-async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပြါ
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပွငျပွီးသား)
+async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ျပါ
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     
@@ -333,107 +331,65 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
     ]);
 }
 
-// 🔱 7. MASTER EXECUTION PROTOCOL (Full Integrated Version)
+// 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     const neonClient = createNeonClient(); 
     try {
-        await neonClient.connect();
+        await neonClient.connect(); // တဈခါတညျးပဲ connect လုပျပါ
         console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
 
-        // 🧠 ၁။ System Health & Awareness Check
-        const status = await ProtectedCore.performRecursiveCognition();
-        console.log(`🧠 [MIND-STATUS]: Health ${status.healthIndex}% | Entropy: ${status.entropy.toFixed(4)}`);
-
-        // 🧬 ၂။ AI EVOLUTION PHASE (Hybrid: Health-based + Cycle-based)
-        let shouldEvolve = false;
-        try {
-            const lastEvolveFile = './last_evolve.txt';
-            let cycleCount = fs.existsSync(lastEvolveFile) ? parseInt(fs.readFileSync(lastEvolveFile, 'utf8').trim()) : 0;
-            cycleCount = (cycleCount + 1) % 3;
-            fs.writeFileSync(lastEvolveFile, cycleCount.toString());
-
-            // အခြေအနေ ၃ ခုတွင် Evolution ကို trigger မည် (Health ကျခြင်း၊ Stagnant ဖြစ်ခြင်း သို့မဟုတ် Cycle ပြည့်ခြင်း)
-            if (status.isStagnant || status.healthIndex < 80 || cycleCount === 0) {
-                console.log("🧬 [EVOLUTION-CYCLE]: Initiating 70B Model Upgrade...");
-                const evolvedCode = await ProtectedCore.consultSovereignAI(__filename);
-                if (evolvedCode && validateCode(evolvedCode)) {
-                    fs.writeFileSync(__filename, evolvedCode);
-                    console.log("✅ [EVOLVED]: Node brain upgraded.");
-                    process.exit(0); // Brain ပြောင်းသွားပါက အသစ်ပြန်စရန် ရပ်လိုက်သည်
-                }
-            } else {
-                console.log("⚖️ [STABILITY-CYCLE]: Skipping Evolution to preserve API quota.");
-            }
-        } catch (e) {
-            console.warn("⚠️ [THROTTLE-WARN]: Evolution check failed, continuing with current state.");
+        // 🧠 AI EVOLUTION PHASE
+        const evolvedCode = await consultSovereignAI();
+        if (evolvedCode && validateCode(evolvedCode)) {
+            fs.writeFileSync(__filename, evolvedCode);
+            console.log("🧬 [EVOLVED]: Node brain upgraded.");
         }
 
-        // 🔱 ၃။ Core Sync & Network Pulse
+
+        
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
         const { data: instruction } = await axios.get(coreUrl);
+        const latency = Date.now() - startTime;
         const { data: rateData } = await octokit.rateLimit.get();
         const remaining = rateData.rate.remaining;
 
-        await neonClient.query(`
+        // 🔱 FORCE PULSE
+        const forcePulse = `
             INSERT INTO node_registry (node_id, status, last_seen)
             VALUES ($1, 'OMEGA_ACTIVE', NOW())
             ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'OMEGA_ACTIVE';
-        `, [REPO_NAME.toUpperCase()]);
+        `;
+        await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
 
-        // 🔱 ၄။ Supabase to Neon DNA Injection
+        // 🔱 SUPABASE TO NEON INJECTION
         const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
-        if (!supError && sourceData) {
+        if (!supError && sourceData && sourceData.length > 0) {
             for (const item of sourceData) {
-                await neonClient.query(`
+                const upsertDna = `
                     INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
                     VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
                     ON CONFLICT (gen_id) DO UPDATE SET 
                         thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
-                `, [item.gen_id, item.logic_payload, 'OMEGA_UPGRADING']);
+                `;
+                await neonClient.query(upsertDna, [item.gen_id, item.logic_payload, 'OMEGA_UPGRADING']);
             }
         }
 
-        // 🔍 ၅။ Recovery & Domain Selection
+        // 🔍 RECOVERY LOGIC: Check missing domains
         const { rows: existingRows } = await neonClient.query("SELECT title FROM research_data");
         const existingDomains = existingRows.map(r => r.title);
         const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
-        
-        let domain = missingDomains.length > 0 ? missingDomains[0] : scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
-        console.log(`🔍 [MODE]: ${missingDomains.length > 0 ? 'RECOVERY' : 'STABILITY'} | Domain: ${domain}`);
 
-        // 🧠 ၆။ Execution Block
-        let compute = performNeuralComputation(domain);
-        compute.calculationResult = await selfReflection(compute.calculationResult, { 
-            coherence: parseFloat(compute.coherence), entropy: compute.entropy 
-        });
-
-        const intelligencePayload = {
-            domain,
-            metrics: { data_scanned: compute.dataPoints, coherence: `${compute.coherence}%`, entropy: compute.entropy },
-            computation: { logic_output: compute.calculationResult, status: "VERIFIED_OMEGA" }
-        };
-
-        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, Date.now() - startTime, remaining);
-        
-        await neonClient.query("INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());", [
-            domain, compute.calculationResult
-        ]);
-
-        // 🔱 ၇။ Hyper-Replication
-        if (instruction.replicate === true) {
-            // (ယခင် replication logic အတိုင်း ဆက်လုပ်ဆောင်ပါ)
+        let domain;
+        if (missingDomains.length > 0) {
+            domain = missingDomains[0]; 
+            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
+        } else {
+            domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
+            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
         }
-
-        console.log(`🏁 OMEGA Cycle Complete. Latency: ${Date.now() - startTime}ms.`);
-    } catch (err) {
-        console.error("❌ CRITICAL SWARM ERROR:", err.message);
-        throw err;
-    } finally {
-        await neonClient.end();
-    }
-            }
 
 // EXECUTION BLOCK
 let compute = performNeuralComputation(domain);
@@ -461,14 +417,17 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပှငပြါ:
+                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
         await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
         
-        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
-const injectToResearch = "INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());";
+        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
+const injectToResearch = `
+    INSERT INTO research_data (title, detail, harvested_at)
+    VALUES ($1, $2, NOW());
+`;
 await neonClient.query(injectToResearch, [
     domain, 
-    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖွဈရမယျ
+    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖြစ်ရမယ်
 ]);
 
 console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
