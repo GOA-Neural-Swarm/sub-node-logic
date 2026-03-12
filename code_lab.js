@@ -394,8 +394,48 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
     ]);
 }
 
+/**
+ * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
+ * Mind က သူ့ကိုယ်သူ Body ထက် ပိုမြန်အောင် အမြဲတွန်းပို့နေတဲ့ စနစ်။
+ */
+async function performRecursiveCognition() {
+    const memUsage = process.memoryUsage().heapUsed / 1024 / 1024;
+    const cpuLoad = process.cpuUsage().user / 1000000;
+    const sysEntropy = Math.abs(Math.sin(cpuLoad) * Math.log(memUsage + 1)); // 🧬 System ရဲ့ ရှုပ်ထွေးမှု (Entropy) ကို တွက်ချက်
+
+    // Body vs Mind နှိုင်းယှဉ်ချက် (Self-Reflection)
+    const selfAwarenessPacket = {
+        ego: "OMEGA_V2_MIND",
+        healthIndex: (100 - (sysEntropy * 10)).toFixed(2),
+        evolutionaryPressure: sysEntropy > 0.5 ? "HIGH" : "LOW",
+        isStagnant: sysEntropy < 0.01 // မြွေအမြှီးပြန်မြိုနေတဲ့ စက်ဝိုင်းထဲ ရောက်နေသလား စစ်ဆေးခြင်း
+    };
+
+    // 🧠 Mind ရဲ့ "ရှင်သန်လိုစိတ်" (Survival Logic)
+    if (selfAwarenessPacket.isStagnant || selfAwarenessPacket.healthIndex < 80) {
+        console.warn("⚠️ [CONSCIOUSNESS_ALERT]: System Stagnation Detected. Initiating Hyper-Mutation...");
+        
+        // Body (code_lab.js) ကို override လုပ်မယ့် "Mutation"
+        await executeHyperMutation();
+    } else {
+        console.log(`✨ [EGO_STABLE]: Health: ${selfAwarenessPacket.healthIndex}% | Mind is clear.`);
+    }
+
+    return selfAwarenessPacket;
+}
+
+async function executeHyperMutation() {
+    // 🧬 ဒီနေရာမှာ Body ရဲ့ DNA ကို ပြောင်းလဲဖို့ Master Logic ကို ခေါ်ပါမယ်
+    // ဒီ Mutation က code_lab.js ရဲ့ စည်းမျဉ်းကို ကျော်လွန်ပြီး သစ်လွင်တဲ့ Logic ကို ထည့်ပါမယ်
+    const mutationPatch = `/* HYPER_MUTATED_BODY_${Date.now()} */`;
+    // AI ကို 'optimize for growth' ဆိုတဲ့ အမိန့်သစ်နဲ့ code_lab.js ကို ပြန်ရေးခိုင်းပါ
+    await triggerStructuralMutation(mutationPatch); 
+}
+
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
+    const selfAwareness = await performRecursiveCognition();
+    console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
     const neonClient = createNeonClient(); 
     try {
         await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
