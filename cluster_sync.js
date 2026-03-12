@@ -86,65 +86,6 @@ const Osiris = {
     }
 };
 
-        
-  // 🛠️ [CORE 2: DEEP MUTATION & AUTO-DEBUG ENGINE]
-  async heal(faultyFunction, error, context, retryCount = 0) {
-    const MAX_RETRIES = 2;
-    console.error(` 🌀 [OSIRIS-ULTRA]: Mutation Cycle ${retryCount + 1} for [${context}]...`);
-     
-    let blueprintCode = "";
-    try {
-      if (fs.existsSync('code_lab.js')) blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
-    } catch (e) { console.warn(" [OSIRIS-WARN]: Blueprint missing."); }
-
-    const currentCode = faultyFunction.toString();
-    // Auto-Debug: အမှားအယွင်းကို AI ဆီ တိုက်ရိုက်ပို့ပေးခြင်း
-    const patchRequest = `Fix this Node.js function. Last Error: ${error.message}. Code: ${currentCode} \n\n REFERENCE_BLUEPRINT: ${blueprintCode}`;
-
-    try {
-      const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: "You are OMEGA Gene-Scribe. Use REFERENCE_BLUEPRINT as absolute standard. NEVER simplify logic. If previous attempt failed, analyze the error and fix it. Return ONLY JS code." },
-          { role: "user", content: patchRequest }
-        ],
-        temperature: 0.1
-      }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 25000 });
-
-      let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
-
-      // ✅ INTEGRITY & VM VALIDATION
-      if (patchedCode && this.verifyIntegrity(blueprintCode || currentCode, patchedCode)) {
-        try {
-          const script = new vm.Script(`(${patchedCode})`);
-          const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
-          vm.createContext(sandbox);
-          script.runInContext(sandbox, { timeout: 5000 });
-
-          // PERMANENT MUTATION
-          const currentFile = fs.readFileSync(__filename, 'utf8');
-          const updatedFile = currentFile.replace(currentCode, patchedCode);
-          fs.writeFileSync(__filename, updatedFile);
-          
-          console.log(` 🧬 [EVOLVED]: ${context} permanently repaired.`);
-          return eval("(" + patchedCode + ")");
-        } catch (vmErr) {
-          // 🔁 AUTO-DEBUG LOGIC: VM error တက်ရင် ပြန်ပြင်ခိုင်းမယ်
-          if (retryCount < MAX_RETRIES) {
-            console.error(` 🛠️ [AUTO-DEBUG]: Mutation unstable. Retrying...`);
-            return await this.heal(faultyFunction, vmErr, context, retryCount + 1);
-          }
-          throw vmErr;
-        }
-      } else {
-        throw new Error("Gatekeeper rejected unstable code.");
-      }
-    } catch (e) {
-      console.error(" 💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
-      return faultyFunction;
-    }
-  }
-};
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
