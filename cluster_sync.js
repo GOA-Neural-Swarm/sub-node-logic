@@ -157,7 +157,7 @@ async function consultSovereignAI() {
     if (!KEY) return null;
 
     // 🔱 MULTI-MODEL FAILOVER LIST
-    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
     const MAX_RETRIES = 3;
 
     const fullCode = fs.readFileSync(__filename, 'utf8');
@@ -185,7 +185,7 @@ async function consultSovereignAI() {
                             },
                             { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
                         ],
-                        max_tokens: 2000,
+                        max_tokens: 4096,
                         temperature: 0.4
                     },
                     { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
@@ -417,7 +417,9 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                
+                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
+        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
+        
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
     INSERT INTO research_data (title, detail, harvested_at)
@@ -495,7 +497,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
     }
 }
 
-
+executeDeepSwarmProtocol();
 
 async function startGodMode() {
     try {
