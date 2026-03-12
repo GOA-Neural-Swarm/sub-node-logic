@@ -35,9 +35,9 @@ if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY))
         });
-        console.log("🔥 Firebase Connected.");
+        console.log("Firebase Connected.");
     } catch (e) {
-        console.error("❌ Firebase Auth Error.");
+        console.error("Firebase Auth Error.");
         process.exit(1);
     }
 }
@@ -45,7 +45,7 @@ const db = admin.firestore();
 
 const Osiris = {
     async heal(faultyFunction, error, context) {
-        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
+        console.error(`Initiating Deep Mutation in [${context}]...`);
         const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
         try {
             const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
@@ -65,11 +65,11 @@ const Osiris = {
                 const currentFile = fs.readFileSync(__filename, 'utf8');
                 const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
                 fs.writeFileSync(__filename, updatedFile);
-                console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
+                console.log(`Evolution Verified.`);
                 return new Function('return ' + patchedCode)();
             }
         } catch (e) {
-            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
+            console.error("Mutation failed. " + e.message);
             return faultyFunction;
         }
     }
@@ -175,7 +175,7 @@ async function consultSovereignAI() {
                     if (codeMatch) {
                         const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
                         if (validateCode(finalCode)) {
-                            console.log(`✅ [OMEGA-SYNC]: Evolution Verified via ${modelName}.`);
+                            console.log(`Evolution Verified via ${modelName}.`);
                             return finalCode;
                         }
                     }
@@ -185,10 +185,10 @@ async function consultSovereignAI() {
                 if (e.response && e.response.status === 429) {
                     retries++;
                     const waitTime = Math.pow(2, retries) * 1000;
-                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
+                    console.log(`Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
                     await new Promise(res => setTimeout(res, waitTime));
                 } else {
-                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
+                    console.error(`[MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
                     break;
                 }
             }
@@ -291,14 +291,14 @@ async function executeDeepSwarmProtocol() {
     const neonClient = createNeonClient();
     try {
         await neonClient.connect();
-        console.log("🔱 NEON CORE CONNECTED.");
+        console.log("NEON CORE CONNECTED.");
 
         const startTime = Date.now();
 
         const evolvedCode = await consultSovereignAI();
         if (evolvedCode && validateCode(evolvedCode)) {
             fs.writeFileSync(__filename, evolvedCode);
-            console.log("🧬 [EVOLVED]: Node brain upgraded.");
+            console.log("Node brain upgraded.");
         }
 
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
@@ -333,10 +333,10 @@ async function executeDeepSwarmProtocol() {
         let domain;
         if (missingDomains.length > 0) {
             domain = missingDomains[0];
-            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
+            console.log(`Found missing domain: ${domain}`);
         } else {
             domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
-            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
+            console.log(`All domains synced. Orbiting: ${domain}`);
         }
 
         const compute = performNeuralComputation(domain);
@@ -375,7 +375,7 @@ async function executeDeepSwarmProtocol() {
             compute.calculationResult
         ]);
 
-        console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
+        console.log(`Saved to research_data.`);
         
         const injectIntelligence = `
             INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
@@ -394,7 +394,7 @@ async function executeDeepSwarmProtocol() {
             logic_payload: JSON.stringify(intelligencePayload) 
         }]);
 
-        console.log(`🧠 Analyzed & Computed: ${domain}`);
+        console.log(`Analyzed & Computed: ${domain}`);
 
         if (instruction.replicate === true) {
             let spawned = false;
@@ -406,7 +406,7 @@ async function executeDeepSwarmProtocol() {
                     await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
                     checkNum++;
                 } catch (e) {
-                    console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
+                    console.log(`DNA Slot Found: Spawning ${nextNodeName}...`);
                     try {
                         await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
                     } catch (orgErr) {
@@ -419,18 +419,18 @@ async function executeDeepSwarmProtocol() {
                             const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
                             await octokit.repos.createOrUpdateFileContents({
                                 owner: REPO_OWNER, repo: nextNodeName, path: fileName,
-                                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
+                                message: `Initializing Autonomous Omega Node: ${fileName}`,
                                 content: content.content
                             });
-                        } catch (copyErr) { console.error(`   ❌ Failed to inject ${fileName}`); }
+                        } catch (copyErr) { console.error(`Failed to inject ${fileName}`); }
                     }
                     spawned = true; 
                 }
             }
         }
-        console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
+        console.log(`OMEGA Cycle Complete. Latency: ${latency}ms.`);
     } catch (err) {
-        console.error("❌ CRITICAL SWARM ERROR:", err.message);
+        console.error("CRITICAL SWARM ERROR:", err.message);
         throw err; 
     } finally {
         await neonClient.end();
@@ -441,9 +441,9 @@ async function startGodMode() {
     try {
         await executeDeepSwarmProtocol();
     } catch (err) {
-        console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
+        console.error("[GOD-MODE] Protocol Breach detected!");
         const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
-        console.log("🔄 Initiating recovery sequence...");
+        console.log("Initiating recovery sequence...");
         setTimeout(() => repairedProtocol(), 5000); 
     }
 }
