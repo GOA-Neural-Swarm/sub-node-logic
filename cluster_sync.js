@@ -417,9 +417,7 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
-        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
-        
+                
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
     INSERT INTO research_data (title, detail, harvested_at)
@@ -497,7 +495,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
     }
 }
 
-executeDeepSwarmProtocol();
+
 
 async function startGodMode() {
     try {
