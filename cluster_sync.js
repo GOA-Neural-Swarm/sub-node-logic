@@ -15,34 +15,16 @@ const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-let rawKey = process.env.NEON_KEY || "";
-let cleanKey = rawKey.trim().replace(/['"]+/g, '');
-if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
-if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
-
-let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
-
-function createNeonClient() {
+const createNeonClient = () => {
+    const finalUrl = process.env.NEON_KEY || "";
+    const cleanUrl = finalUrl.trim().replace(/['"]+/g, '');
+    if (cleanUrl.includes("base")) cleanUrl = cleanUrl.split("base")[0].trim();
+    if (cleanUrl.includes(" ")) cleanUrl = cleanUrl.split(" ")[0];
     return new Client({ 
-        connectionString: finalUrl.includes('sslmode=') 
-            ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
-            : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
+        connectionString: cleanUrl.replace(/^postgres:\/\//, "postgresql://"),
         ssl: { rejectUnauthorized: false }
     });
-}
-
-if (!admin.apps.length) {
-    try {
-        admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY))
-        });
-        console.log("Firebase Connected.");
-    } catch (e) {
-        console.error("Firebase Auth Error.");
-        process.exit(1);
-    }
-}
-const db = admin.firestore();
+};
 
 const Osiris = {
     async heal(faultyFunction, error, context) {
@@ -61,7 +43,7 @@ const Osiris = {
 
             if (patchedCode) {
                 const script = new vm.Script(patchedCode);
-                const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
+                const sandbox = { console, axios, admin, supabase, createNeonClient, octokit, process, fs };
                 script.runInContext(sandbox, { timeout: 5000 });
                 const currentFile = fs.readFileSync(__filename, 'utf8');
                 const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
@@ -139,66 +121,7 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-async function consultSovereignAI() {
-    const KEY = process.env.GROQ_API_KEY; 
-    if (!KEY) return null;
-
-    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.3-70b-specdec"];
-    const MAX_RETRIES = 3;
-
-    const fullCode = fs.readFileSync(__filename, 'utf8');
-    const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
-    if (!domainMatch) return null;
-    const savedDomains = domainMatch[0];
-    const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
-
-    for (const modelName of MODELS) {
-        let retries = 0;
-        while (retries < MAX_RETRIES) {
-            try {
-                const response = await axios.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    {
-                        model: modelName,
-                        messages: [
-                            { role: "system", content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." },
-                            { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
-                        ],
-                        max_tokens: 4096,
-                        temperature: 0.4
-                    },
-                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
-                );
-
-                if (response.data?.choices?.[0]?.message?.content) {
-                    let evolvedLogic = response.data.choices[0].message.content;
-                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
-                    if (codeMatch) {
-                        const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
-                        if (validateCode(finalCode)) {
-                            console.log(`Evolution Verified via ${modelName}.`);
-                            return finalCode;
-                        }
-                    }
-                }
-                break;
-            } catch (e) {
-                if (e.response && e.response.status === 429) {
-                    retries++;
-                    const waitTime = Math.pow(2, retries) * 1000;
-                    console.log(`Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
-                    await new Promise(res => setTimeout(res, waitTime));
-                } else {
-                    console.error(`[MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
-                    break;
-                }
-            }
-        }
-    }
-    return null;
-}
-
-function validateCode(code) {
+const validateCode = (code) => {
     try {
         const tempPath = './temp_val.js';
         fs.writeFileSync(tempPath, code);
@@ -206,9 +129,9 @@ function validateCode(code) {
         fs.unlinkSync(tempPath);
         return true;
     } catch (e) { return false; }
-}
+};
 
-function performNeuralComputation(domain) {
+const performNeuralComputation = (domain) => {
     const dataPoints = Math.floor(Math.random() * 5000000);
     const coherence = (75 + (Math.random() * 25)).toFixed(2);
     const entropy = calculateHyperEntropy();
@@ -240,9 +163,9 @@ function performNeuralComputation(domain) {
         calculationResult: finalLogic,
         impactFactor: (dataPoints / 50000).toFixed(2)
     };
-}
+};
 
-async function selfReflection(input, metrics, depth = 0) {
+const selfReflection = async (input, metrics, depth = 0) => {
     const MAX_DEPTH = 10;
     const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01;
     if (isStable || depth >= MAX_DEPTH) {
@@ -256,9 +179,9 @@ async function selfReflection(input, metrics, depth = 0) {
         }, 
         depth + 1
     );
-}
+};
 
-async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) {
+const broadcastNeuralState = async (neonClient, payload, compute, instruction, latency, remaining) => {
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     const neonQuery = `
@@ -273,7 +196,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
             gen_id: syncId, 
             logic_payload: JSON.stringify(payload) 
         }]),
-        db.collection('cluster_nodes').doc(REPO_NAME).set({
+        admin.firestore().collection('cluster_nodes').doc(REPO_NAME).set({
             status: 'OMEGA_LINKED',
             command: instruction.command,
             last_analysis: payload.domain,
@@ -286,9 +209,9 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
             ...payload
         }, { merge: true })
     ]);
-}
+};
 
-async function executeDeepSwarmProtocol() {
+const executeDeepSwarmProtocol = async () => {
     const neonClient = createNeonClient();
     try {
         await neonClient.connect();
@@ -437,9 +360,9 @@ async function executeDeepSwarmProtocol() {
     } finally {
         await neonClient.end();
     }
-}
+};
 
-async function startGodMode() {
+const startGodMode = async () => {
     try {
         await executeDeepSwarmProtocol();
     } catch (err) {
@@ -448,5 +371,5 @@ async function startGodMode() {
         console.log("Initiating recovery sequence...");
         setTimeout(() => repairedProtocol(), 5000); 
     }
-}
+};
 startGodMode();
