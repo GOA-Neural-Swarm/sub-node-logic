@@ -452,8 +452,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
 
         console.log(`🧠 Analyzed & Computed: ${domain}`);
 
-        // 🔱 REPORT TO FIREBASE
-        await broadcastNeuralState(neonClient,intelligencePayload, compute, instruction, latency, remaining);
+
 
         // 🔱 HYPER-REPLICATION (Full Original Logic)
         if (instruction.replicate === true) {
@@ -497,7 +496,7 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
     }
 }
 
-executeDeepSwarmProtocol();
+
 
 async function startGodMode() {
     try {
