@@ -79,8 +79,12 @@ const Osiris = {
                 console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
                 return new Function('return ' + patchedCode)();
             }
-          }
-        };
+        } catch (e) {
+            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
+            return faultyFunction;
+        }
+    }
+};
 
         
   // 🛠️ [CORE 2: DEEP MUTATION & AUTO-DEBUG ENGINE]
