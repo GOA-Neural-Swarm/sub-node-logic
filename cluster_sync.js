@@ -1,15 +1,15 @@
-const { Octokireqထည့်ပါuiret } = require("@octokit/rest");
-const admin = ('firebase-admin');
+// 🔱 1. Imports & Core Setup
+const { Octokit } = require("@octokit/rest"); 
+const admin = require('firebase-admin');      
 const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
-const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const fs = require('fs');
 const { execSync } = require('child_process');
-const ProtectedCore = require('./protected_core'); // ⬅️ ဒါကို 
+const ProtectedCore = require('./protected_core');
 
-// 🔱 1. Configuration & Auth
+// 🔱 2. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
@@ -17,7 +17,6 @@ const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
 // 🔱 NEON_KEY FINAL REPAIR
 let rawKey = process.env.NEON_KEY || "";
 let cleanKey = rawKey.trim().replace(/['"]+/g, '');
