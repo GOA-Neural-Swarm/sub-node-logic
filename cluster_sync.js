@@ -79,13 +79,15 @@ const Osiris = {
                 console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
                 return new Function('return ' + patchedCode)();
             }
+          }
+        };
 
-
+        
   // 🛠️ [CORE 2: DEEP MUTATION & AUTO-DEBUG ENGINE]
   async heal(faultyFunction, error, context, retryCount = 0) {
     const MAX_RETRIES = 2;
     console.error(` 🌀 [OSIRIS-ULTRA]: Mutation Cycle ${retryCount + 1} for [${context}]...`);
-    
+     
     let blueprintCode = "";
     try {
       if (fs.existsSync('code_lab.js')) blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
