@@ -1,11 +1,14 @@
-const { Octokit } = require("@octokit/rest");
-const admin = require('firebase-admin');
+const { Octokireqထည့်ပါuiret } = require("@octokit/rest");
+const admin = ('firebase-admin');
 const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
 const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const fs = require('fs');
+const { execSync } = require('child_process');
+const ProtectedCore = require('./protected_core'); // ⬅️ ဒါကို 
 
 // 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
@@ -49,7 +52,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 // 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
-const Osiris = {
+Osiris = {
     async heal(faultyFunction, error, context) {
         console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
         const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
