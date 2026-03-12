@@ -327,8 +327,10 @@ async function executeDeepSwarmProtocol() {
             }
         }
 
-        const existingRows = await neonClient.query("SELECT title FROM research_data");
-        const existingDomains = existingRows.rows ? existingRows.rows.map(r => r.title) : [];
+            // 🔍 RECOVERY LOGIC: Check missing domains
+        const result = await neonClient.query("SELECT title FROM research_data");
+        const existingRows = result.rows; // ဒီနေရာမှာ .rows ကို သေချာခွဲထုတ်ပေးလိုက်ပါ
+        const existingDomains = existingRows.map(r => r.title);
         const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
         let domain;
         if (missingDomains.length > 0) {
