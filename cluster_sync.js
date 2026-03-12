@@ -328,7 +328,7 @@ async function executeDeepSwarmProtocol() {
         }
 
         const existingRows = await neonClient.query("SELECT title FROM research_data");
-        const existingDomains = existingRows.map(r => r.title);
+        const existingDomains = existingRows.rows ? existingRows.rows.map(r => r.title) : [];
         const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
         let domain;
         if (missingDomains.length > 0) {
