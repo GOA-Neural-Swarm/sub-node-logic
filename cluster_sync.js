@@ -329,7 +329,7 @@ async function executeDeepSwarmProtocol() {
 
             // 🔍 RECOVERY LOGIC: Check missing domains
         const result = await neonClient.query("SELECT title FROM research_data");
-        const existingRows = result.rows; // ဒီနေရာမှာ .rows ကို သေချာခွဲထုတ်ပေးလိုက်ပါ
+        const existingRows = result.rows || [];
         const existingDomains = existingRows.map(r => r.title);
         const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
         let domain;
