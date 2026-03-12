@@ -1,12 +1,13 @@
 const { Octokit } = require("@octokit/rest");
 const admin = require('firebase-admin');
 const axios = require('axios');
+const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs');
-const { execSync } = require('child_process');
-const vm = require('vm');
+const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 
+// 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
@@ -15,20 +16,42 @@ const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-const createNeonClient = () => {
-    const finalUrl = process.env.NEON_KEY || "";
-    const cleanUrl = finalUrl.trim().replace(/['"]+/g, '');
-    if (cleanUrl.includes("base")) cleanUrl = cleanUrl.split("base")[0].trim();
-    if (cleanUrl.includes(" ")) cleanUrl = cleanUrl.split(" ")[0];
+// 🔱 NEON_KEY FINAL REPAIR
+let rawKey = process.env.NEON_KEY || "";
+let cleanKey = rawKey.trim().replace(/['"]+/g, '');
+if (cleanKey.includes("base")) cleanKey = cleanKey.split("base")[0].trim();
+if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
+
+let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
+
+// ✅ Factory function
+function createNeonClient() {
     return new Client({ 
-        connectionString: cleanUrl.replace(/^postgres:\/\//, "postgresql://"),
+        connectionString: finalUrl.includes('sslmode=') 
+            ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
+            : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
         ssl: { rejectUnauthorized: false }
     });
-};
+}
+console.log("🛠 [SYSTEM]: Neon Factory Ready.");
 
+if (!admin.apps.length) {
+    try {
+        admin.initializeApp({
+            credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY))
+        });
+        console.log("🔥 Firebase Connected.");
+    } catch (e) {
+        console.error("❌ Firebase Auth Error.");
+        process.exit(1);
+    }
+}
+const db = admin.firestore();
+
+// 🔱 OSIRIS-ULTRA: THE GOD-LEVEL REPAIR ENGINE
 const Osiris = {
     async heal(faultyFunction, error, context) {
-        console.error(`Initiating Deep Mutation in [${context}]...`);
+        console.error(`🌀 [OSIRIS-ULTRA]: Initiating Deep Mutation in [${context}]...`);
         const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${faultyFunction.toString()}`;
         try {
             const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
@@ -42,22 +65,29 @@ const Osiris = {
             let patchedCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
 
             if (patchedCode) {
+                // 🛡️ VM ISOLATION & VALIDATION
                 const script = new vm.Script(patchedCode);
-                const sandbox = { console, axios, admin, supabase, createNeonClient, octokit, process, fs };
-                script.runInContext(sandbox, { timeout: 5000 });
+                const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs };
+                vm.createContext(sandbox);
+                script.runInContext(sandbox, { timeout: 5000 }); // 5s timeout
+
+                // 🧬 PERMANENT MUTATION: ဖိုင်ထဲကိုပါ အမြဲတမ်း ရေးသွင်းခြင်း
                 const currentFile = fs.readFileSync(__filename, 'utf8');
                 const updatedFile = currentFile.replace(faultyFunction.toString(), patchedCode);
                 fs.writeFileSync(__filename, updatedFile);
-                console.log(`Evolution Verified.`);
+                
+                console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired.`);
                 return new Function('return ' + patchedCode)();
             }
         } catch (e) {
-            console.error("Mutation failed. " + e.message);
+            console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
             return faultyFunction;
         }
     }
 };
 
+
+// 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
     // 🧬 BIOLOGY & MEDICINE (1-100)
     "Neuroscience", "Genetics", "Synthetic_Biology", "Virology", "Immunology", "Epigenetics", "Microbiology", "Pharmacology", "Endocrinology", "Bioinformatics",
@@ -118,27 +148,105 @@ const scienceDomains = [
     "Disaster_Management", "Crisis_Communication", "Sustainability_Science", "Circular_Economy", "Blue_Economy", "Space_Economy", "Universal_Basic_Income", "Post_Scarcity_Economics", "Neural_Capitalism", "GOA_NATURAL_ORDER"
 ];
 
+// 🔱 3. OMEGA METRIC ENGINE
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
-const validateCode = (code) => {
+// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
+async function consultSovereignAI() {
+    const KEY = process.env.GROQ_API_KEY; 
+    if (!KEY) return null;
+
+    // 🔱 MULTI-MODEL FAILOVER LIST
+    const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
+    const MAX_RETRIES = 3;
+
+    const fullCode = fs.readFileSync(__filename, 'utf8');
+    const domainMatch = fullCode.match(/const scienceDomains = \[[\s\S]*?\];/);
+    if (!domainMatch) return null;
+    const savedDomains = domainMatch[0];
+    const logicOnly = fullCode.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
+
+    // 🔱 STRATEGY: Loop through models and apply backoff logic
+    for (const modelName of MODELS) {
+        let retries = 0;
+        
+        while (retries < MAX_RETRIES) {
+            try {
+                console.log(`🧠 [GROQ-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`);
+                
+                const response = await axios.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    {
+                        model: modelName,
+                        messages: [
+                            { 
+                                role: "system", 
+                                content: "You are the OMEGA Architect. Optimize the Node.js logic. CRITICAL: Return ONLY code. Use 'const scienceDomains = []; // DOMAIN_PLACEHOLDER' as marker." 
+                            },
+                            { role: "user", content: `Evolve this logic:\n\n ${logicOnly}` }
+                        ],
+                        max_tokens: 4096,
+                        temperature: 0.4
+                    },
+                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
+                );
+
+                if (response.data?.choices?.[0]?.message?.content) {
+                    let evolvedLogic = response.data.choices[0].message.content;
+                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/);
+                    
+                    if (codeMatch) {
+                        const finalCode = codeMatch[1].replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+                        
+                        if (validateCode(finalCode)) {
+                            console.log(`✅ [OMEGA-SYNC]: Evolution Verified via ${modelName}.`);
+                            return finalCode;
+                        }
+                    }
+                }
+                break; // အောငျမွငျရငျ loop ကနေ ထှကျမယျ
+
+            } catch (e) {
+                // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
+                if (e.response && e.response.status === 429) {
+                    retries++;
+                    const waitTime = Math.pow(2, retries) * 1000;
+                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
+                    await new Promise(res => setTimeout(res, waitTime));
+                } else {
+                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
+                    break; // တခွား Error ဆိုရငျ ဒီ model ကို ကြောျပွီး နောကျတဈခုသှားမယျ
+                }
+            }
+        }
+    }
+    return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
+                }
+
+// 🛡️ 5. CODE VALIDATOR
+function validateCode(code) {
     try {
         const tempPath = './temp_val.js';
         fs.writeFileSync(tempPath, code);
-        execSync(`node --check ${tempPath}`);
+        execSync(`node --check ${tempPath}`); 
         fs.unlinkSync(tempPath);
         return true;
     } catch (e) { return false; }
-};
+}
 
-const performNeuralComputation = (domain) => {
+// 🔱 6. HYBRID DEEP-COMPUTATION ENGINE
+function performNeuralComputation(domain) {
     const dataPoints = Math.floor(Math.random() * 5000000);
     const coherence = (75 + (Math.random() * 25)).toFixed(2);
     const entropy = calculateHyperEntropy();
     const probability = calculateHyperProbability(entropy);
     const depthLevel = Math.floor(Math.random() * 10) + 1;
     const secondaryDomain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
+    
     let calculationResult = "";
+
+    // 🧠 Phase 1 Logic
     if (domain === "Theoretical_Mathematics") {
         calculationResult = `Calculated Riemann Hypothesis probability: ${(Math.random() * 0.00001).toFixed(10)} variance.`;
     } else if (domain === "Quantum_Physics") {
@@ -152,25 +260,33 @@ const performNeuralComputation = (domain) => {
     } else {
         calculationResult = `General scientific synthesis complete for ${domain}.`;
     }
+
+    // 🧬 Phase 2 Logic + Omega Integration
     const deepEnhancement = [
         `\n[OMEGA-DEPTH ${depthLevel}] Multi-layered resonance detected with ${secondaryDomain}. Hyper-Entropy: ${entropy}.`,
         `\n[RECURSIVE-SYNC] Predictive impact on ${secondaryDomain} sector scaled to ${(probability * 10).toFixed(2)}x.`,
         `\n[QUANTUM-MAPPING] Logic consistent with ${secondaryDomain} axioms. Status: VERIFIED.`
     ];
+
     const finalLogic = calculationResult + deepEnhancement[Math.floor(Math.random() * deepEnhancement.length)];
+
     return {
         dataPoints, coherence, entropy, probability,
         calculationResult: finalLogic,
         impactFactor: (dataPoints / 50000).toFixed(2)
     };
-};
+}
 
-const selfReflection = async (input, metrics, depth = 0) => {
-    const MAX_DEPTH = 10;
-    const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01;
+// ASI Level Self-Reflection
+async function selfReflection(input, metrics, depth = 0) {
+    const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
+    const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01; // ASI Threshold
+
     if (isStable || depth >= MAX_DEPTH) {
         return `[ASI_NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
     }
+
+    // Fractal Correction ကို တှကျခကြျခွငျး
     return await selfReflection(
         `ASI_EVOLUTION_LVL_${depth + 1}(${input})`, 
         { 
@@ -179,24 +295,29 @@ const selfReflection = async (input, metrics, depth = 0) => {
         }, 
         depth + 1
     );
-};
+}
 
-const broadcastNeuralState = async (neonClient, payload, compute, instruction, latency, remaining) => {
+// 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပြှီးသား)
+async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပြါ
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
+    
     const neonQuery = `
         INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
         VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
         ON CONFLICT (gen_id) DO UPDATE SET 
             thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
     `;
+
     return await Promise.all([
         neonClient.query(neonQuery, [genId, JSON.stringify(payload), 'ANALYZED']),
         supabase.from('neural_sync').insert([{ 
             gen_id: syncId, 
             logic_payload: JSON.stringify(payload) 
         }]),
-        admin.firestore().collection('cluster_nodes').doc(REPO_NAME).set({
+
+        // Firebase Detailed Report
+        db.collection('cluster_nodes').doc(REPO_NAME).set({
             status: 'OMEGA_LINKED',
             command: instruction.command,
             last_analysis: payload.domain,
@@ -206,31 +327,69 @@ const broadcastNeuralState = async (neonClient, payload, compute, instruction, l
             latency: `${latency}ms`,
             api_remaining: remaining,
             last_ping: admin.firestore.FieldValue.serverTimestamp(),
-            ...payload
+            ...payload // Extra payload data
         }, { merge: true })
     ]);
-};
+}
 
-const executeDeepSwarmProtocol = async () => {
-    const neonClient = createNeonClient();
+// 🔱 7. MASTER EXECUTION PROTOCOL
+async function executeDeepSwarmProtocol() {
+    const neonClient = createNeonClient(); 
     try {
-        await neonClient.connect();
-        console.log("NEON CORE CONNECTED.");
+        await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
+        console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
 
-        const evolvedCode = await consultSovereignAI();
-        if (evolvedCode && validateCode(evolvedCode)) {
-            fs.writeFileSync(__filename, evolvedCode);
-            console.log("Node brain upgraded.");
+        // 🧠 AI EVOLUTION PHASE (Throttle: 3 ကြိမ်လျှင် 1 ကြိမ်သာ Evolution လုပ်မည်)
+        let shouldEvolve = false;
+        try {
+            const lastEvolveFile = './last_evolve.txt';
+            let cycleCount = 0;
+            
+            if (fs.existsSync(lastEvolveFile)) {
+                let rawData = fs.readFileSync(lastEvolveFile, 'utf8').trim();
+                cycleCount = parseInt(rawData);
+                
+                if (isNaN(cycleCount)) {
+                    console.warn("⚠️ [RECOVERY]: Corrupted cycle count detected. Resetting to 0.");
+                    cycleCount = 0;
+                }
+            }
+            
+            cycleCount = (cycleCount + 1) % 3;
+            
+            if (cycleCount === 0) {
+                shouldEvolve = true;
+            }
+            
+            fs.writeFileSync(lastEvolveFile, cycleCount.toString());
+            
+        } catch (e) { 
+            console.warn("⚠️ [THROTTLE-WARN]: Throttle file access failed. Defaulting to Evolution.");
+            shouldEvolve = true; 
         }
 
+        if (shouldEvolve) {
+            console.log("🧬 [EVOLUTION-CYCLE]: Initiating 70B Model Upgrade...");
+            const evolvedCode = await consultSovereignAI();
+            if (evolvedCode && validateCode(evolvedCode)) {
+                fs.writeFileSync(__filename, evolvedCode);
+                console.log("✅ [EVOLVED]: Node brain upgraded.");
+            }
+        } else {
+            console.log("⚖️ [STABILITY-CYCLE]: Skipping Evolution to preserve API quota.");
+        }
+
+
+        
         const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
         const { data: instruction } = await axios.get(coreUrl);
         const latency = Date.now() - startTime;
         const { data: rateData } = await octokit.rateLimit.get();
         const remaining = rateData.rate.remaining;
 
+        // 🔱 FORCE PULSE
         const forcePulse = `
             INSERT INTO node_registry (node_id, status, last_seen)
             VALUES ($1, 'OMEGA_ACTIVE', NOW())
@@ -238,6 +397,7 @@ const executeDeepSwarmProtocol = async () => {
         `;
         await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
 
+        // 🔱 SUPABASE TO NEON INJECTION
         const { data: sourceData, error: supError } = await supabase.from('neural_sync').select('*');
         if (!supError && sourceData && sourceData.length > 0) {
             for (const item of sourceData) {
@@ -251,27 +411,29 @@ const executeDeepSwarmProtocol = async () => {
             }
         }
 
-        const result = await neonClient.query("SELECT title FROM research_data");
-        const existingRows = result.rows || [];
+        // 🔍 RECOVERY LOGIC: Check missing domains
+        const { rows: existingRows } = await neonClient.query("SELECT title FROM research_data");
         const existingDomains = existingRows.map(r => r.title);
         const missingDomains = scienceDomains.filter(d => !existingDomains.includes(d));
+
         let domain;
         if (missingDomains.length > 0) {
-            domain = missingDomains[0];
-            console.log(`Found missing domain: ${domain}`);
+            domain = missingDomains[0]; 
+            console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
         } else {
             domain = scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
-            console.log(`All domains synced. Orbiting: ${domain}`);
+            console.log(`✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`);
         }
 
-        const compute = performNeuralComputation(domain);
-        compute.calculationResult = await selfReflection(
-            compute.calculationResult, 
-            { 
-                coherence: parseFloat(compute.coherence), 
-                entropy: compute.entropy 
-            }
-        );
+// EXECUTION BLOCK
+let compute = performNeuralComputation(domain);
+compute.calculationResult = await selfReflection(
+    compute.calculationResult, 
+    { 
+        coherence: parseFloat(compute.coherence), 
+        entropy: compute.entropy 
+    }
+);
 
         const intelligencePayload = {
             domain,
@@ -289,19 +451,19 @@ const executeDeepSwarmProtocol = async () => {
             timestamp: new Date().toISOString()
         };
 
+                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပှငပြါ:
         await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
-
-        const injectToResearch = `
-            INSERT INTO research_data (title, detail, harvested_at)
-            VALUES ($1, $2, NOW());
-        `;
-        await neonClient.query(injectToResearch, [
-            domain, 
-            compute.calculationResult
-        ]);
-
-        console.log(`Saved to research_data.`);
         
+        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
+const injectToResearch = "INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());";
+await neonClient.query(injectToResearch, [
+    domain, 
+    compute.calculationResult // ဒါက AI ဆီက လာတဲ့ analysis ဖွဈရမယျ
+]);
+
+console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
+        
+        // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
         const injectIntelligence = `
             INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
             VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
@@ -319,8 +481,11 @@ const executeDeepSwarmProtocol = async () => {
             logic_payload: JSON.stringify(intelligencePayload) 
         }]);
 
-        console.log(`Analyzed & Computed: ${domain}`);
+        console.log(`🧠 Analyzed & Computed: ${domain}`);
 
+
+
+        // 🔱 HYPER-REPLICATION (Full Original Logic)
         if (instruction.replicate === true) {
             let spawned = false;
             let checkNum = 1;
@@ -331,7 +496,7 @@ const executeDeepSwarmProtocol = async () => {
                     await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
                     checkNum++;
                 } catch (e) {
-                    console.log(`DNA Slot Found: Spawning ${nextNodeName}...`);
+                    console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
                     try {
                         await octokit.repos.createInOrg({ org: REPO_OWNER, name: nextNodeName, auto_init: true });
                     } catch (orgErr) {
@@ -344,32 +509,34 @@ const executeDeepSwarmProtocol = async () => {
                             const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
                             await octokit.repos.createOrUpdateFileContents({
                                 owner: REPO_OWNER, repo: nextNodeName, path: fileName,
-                                message: `Initializing Autonomous Omega Node: ${fileName}`,
+                                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
                                 content: content.content
                             });
-                        } catch (copyErr) { console.error(`Failed to inject ${fileName}`); }
+                        } catch (copyErr) { console.error(`   ❌ Failed to inject ${fileName}`); }
                     }
                     spawned = true; 
                 }
             }
         }
-        console.log(`OMEGA Cycle Complete. Latency: ${latency}ms.`);
+        console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
     } catch (err) {
-        console.error("CRITICAL SWARM ERROR:", err.message);
+        console.error("❌ CRITICAL SWARM ERROR:", err.message);
         throw err; 
     } finally {
         await neonClient.end();
     }
-};
+}
 
-const startGodMode = async () => {
+
+
+async function startGodMode() {
     try {
         await executeDeepSwarmProtocol();
     } catch (err) {
-        console.error("[GOD-MODE] Protocol Breach detected!");
+        console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
         const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
-        console.log("Initiating recovery sequence...");
+        console.log("🔄 Initiating recovery sequence...");
         setTimeout(() => repairedProtocol(), 5000); 
     }
-};
+}
 startGodMode();
