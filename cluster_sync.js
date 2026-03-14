@@ -12,13 +12,19 @@ const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
     ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) 
     : null;
 
-if (serviceAccount) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-} else {
-    // Local သို့မဟုတျ Default environment အတှကျ
-    admin.initializeApp();
+if (!admin.apps.length) {
+    try {
+        const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            // Project ID ကို JSON ထဲကနေ တိုက်ရိုက် ဆွဲထုတ်ပြီး သတ်မှတ်ပေးခြင်း
+            projectId: serviceAccount.project_id 
+        });
+        console.log("🔥 Firebase Connected successfully.");
+    } catch (e) {
+        console.error("❌ Firebase Auth Error:", e.message);
+        process.exit(1);
+    }
 }
 
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
