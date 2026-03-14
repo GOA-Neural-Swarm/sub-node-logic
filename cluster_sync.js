@@ -11,8 +11,8 @@ const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
-const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const db = admin.firestore();
 
 // 🔱 NEON_KEY FINAL REPAIR
 let rawKey = process.env.NEON_KEY || "";
