@@ -1,4 +1,9 @@
 // 🔱 1. Configuration & Auth
+const { Octokit } = require("@octokit/rest");
+const axios = require("axios");               
+const fs = require("fs");                     
+const { Client } = require("pg");             
+const { createClient } = require("@supabase/supabase-client"); 
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
