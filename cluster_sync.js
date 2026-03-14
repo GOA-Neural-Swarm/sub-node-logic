@@ -8,9 +8,18 @@ const { createClient } = require("@supabase/supabase-js");
 const admin = require("firebase-admin");
 
 
-admin.initializeApp({
-    credential: admin.credential.applicationDefault()
-});
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
+    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) 
+    : null;
+
+if (serviceAccount) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+} else {
+    // Local သို့မဟုတျ Default environment အတှကျ
+    admin.initializeApp();
+}
 
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
@@ -420,14 +429,23 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
     ]);
 }
 
+async function recoverProtocol(err) {
+    console.error("🔄 [RECOVERY-MODE]: Initiating self-repair...");
+    try {
+        // Recovery logic ဒီနရောမှာ ထည့ျပါ (ဥပမာ- client အသဈပွနျဆောကျတာမြိုး)
+        await executeDeepSwarmProtocol();
+    } catch (newErr) {
+        console.error("❌ [RECOVERY-FAILED]: Emergency shutdown.");
+    }
+}
+
 async function startGodMode() {
     try {
         await executeDeepSwarmProtocol();
     } catch (err) {
         console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
-        const repairedProtocol = await Osiris.heal(executeDeepSwarmProtocol, err, "executeDeepSwarmProtocol");
-        console.log("🔄 Initiating recovery sequence...");
-        setTimeout(() => repairedProtocol(), 5000); 
+        
+        await recoverProtocol(err);
     }
 }
 startGodMode();
