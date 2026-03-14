@@ -2,14 +2,16 @@
 const { Octokit } = require("@octokit/rest");
 const axios = require("axios");               
 const fs = require("fs");                     
+const { execSync } = require("child_process");
 const { Client } = require("pg");             
 const { createClient } = require("@supabase/supabase-client"); 
+const admin = require("firebase-admin");
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
 const REPO_OWNER = "GOA-neurons"; 
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
-
+const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // 🔱 NEON_KEY FINAL REPAIR
