@@ -47,7 +47,7 @@ if (!currentContent.includes('startGodMode()')) {
 // <SOVEREIGN_CORE>
 // 🔱 DATABASE FACTORY
 const neonClientFactory = async () => {
-    // Client ရှိပြီးသားဆိုရင် ပြန်မချိတ်ပါနဲ့
+    // Client ရှိပြီးသားဆိုရင် ပြန်မချိတ်ပါနဲ့ (Singleton Pattern)
     if (global.neonClient) return global.neonClient;
 
     const client = new Client({ 
@@ -62,12 +62,12 @@ const neonClientFactory = async () => {
 // 🛑 Database 
 async function bootSystem() {
     try {
-        console.log("🛠 [SYSTEM]: Initializing...");
+        console.log("🛠 [SYSTEM]: Initializing Database...");
         await neonClientFactory();
         console.log("✅ [DATABASE]: Global Neon Client Initialized.");
         
-        
-        ();
+        // အားလုံးအဆင်ပြေမှ စနစ်စတင်ပါ
+        startGodMode();
     } catch (err) {
         console.error("❌ [SYSTEM]: Initialization failed!", err.message);
         process.exit(1);
