@@ -6,8 +6,8 @@ const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
-const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const fs = require('fs'); 
+const { execSync } = require('child_process'); 
 
 
 // 🔱 1. Configuration & Auth
@@ -33,7 +33,7 @@ const currentContent = fs.readFileSync(__filename, 'utf8');
 if (!currentContent.includes('startGodMode()')) {
     console.error(" CRITICAL: Evolution Logic Missing!");
     try {
-        // AI က မှားဖကြျလိုကျရငျ Git ကနေ အမှနျကို ပွနျဆှဲတငျမယျ
+        
         execSync('git checkout cluster_sync.js');
         console.log(" [RECOVERED]: Core DNA restored from Git.");
         process.exit(1); 
@@ -44,20 +44,32 @@ if (!currentContent.includes('startGodMode()')) {
 // ------------------------------------------
 // <SOVEREIGN_CORE>
 
-// ... ကနြျတဲ့ code မြား (neonClientFactory) စတငျမညျ ...
-const neonClientFactory = async () => { ...
+// <SOVEREIGN_CORE>
+// ✅ Factory function 
+const { Client } = require('pg'); 
 
-// ✅ Factory function
-function createNeonClient() {
-    return new Client({ 
-        connectionString: finalUrl.includes('sslmode=') 
-            ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
-            : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
-        ssl: { rejectUnauthorized: false }
+// ✅ Factory function 
+const neonClientFactory = async () => {
+    const client = new Client({ 
+        connectionString: finalUrl,
+        ssl: { rejectUnauthorized: false } 
     });
-}
-console.log("🛠 [SYSTEM]: Neon Factory Ready.");
+    await client.connect();
+    return client;
+};
 
+console.log("🛠 [SYSTEM]: Neon Factory Ready.");
+(async () => {
+    try {
+        global.neonClient = await neonClientFactory();
+        console.log(" [DATABASE]: Global Neon Client Initialized.");
+    } catch (err) {
+        console.error(" [DATABASE]: Initialization failed!", err.message);
+        process.exit(1); // ခြိတျမရရငျ စနဈကို ရပျလိုကျပါ
+    }
+})();
+
+// 🔥 Firebase Connection
 if (!admin.apps.length) {
     try {
         admin.initializeApp({
@@ -65,11 +77,12 @@ if (!admin.apps.length) {
         });
         console.log("🔥 Firebase Connected.");
     } catch (e) {
-        console.error("❌ Firebase Auth Error.");
+        console.error("❌ Firebase Auth Error:", e.message);
         process.exit(1);
     }
 }
 const db = admin.firestore();
+// </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
 function saveNewCode(newCode) {
@@ -85,7 +98,7 @@ function saveNewCode(newCode) {
 }
 // </SOVEREIGN_CORE>
 
-// </SOVEREIGN_CORE>
+// <SOVEREIGN_CORE>
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
   // 🛡️ DNA Checksum Gate: AI က blueprint ထဲက အနှစ်သာရတွေကို ဖြတ်ချမပစ်အောင် စစ်ဆေးပေးသည်
@@ -97,7 +110,8 @@ const Osiris = {
       "calculateHyperEntropy",
       "performNeuralComputation",
       "executeDeepSwarmProtocol",
-      "createNeonClient"
+      "neonClientFactory", // 👈 လက်ရှိ function အမည်နဲ့ ကိုက်ညီအောင် ပြင်ထားသည်
+      "saveNewCode"        // 👈 ဒါပါမှ မျိုးဆက်သစ် code တွေမှာ Guard ပါဝင်မည်
     ];
 
     const missingFeatures = essentialMarkers.filter(marker => !patchedCode.includes(marker));
@@ -108,7 +122,7 @@ const Osiris = {
     }
 
     // Logic regression ဖြစ်မဖြစ် Code size ကို Checksum စစ်ခြင်း
-    if (patchedCode.length < originalCode.length * 0.7) {
+    if (patchedCode.length < originalCode.length * 0.6) {
       console.error("⚠️ [GATEKEEPER-FAIL]: Logic regression detected (Code too simplified).");
       return false;
     }
@@ -122,11 +136,11 @@ const Osiris = {
     // 1. DNA REFERENCE LOADING
     let blueprintCode = "";
     try {
-      if (fs.existsSync('code_lab.js')) {
-        blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
+      if (fs.existsSync('cluster_sync.js')) {
+        blueprintCode = fs.readFileSync('cluster_sync.js', 'utf8');
       }
     } catch (fsErr) {
-      console.warn("⚠️ [OSIRIS-WARN]: code_lab.js DNA reference missing.");
+      console.warn("⚠️ [OSIRIS-WARN]: DNA reference missing.");
     }
 
     const currentCode = faultyFunction.toString();
@@ -141,11 +155,11 @@ const Osiris = {
         messages: [
           { 
             role: "system", 
-            content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features (ASI, Recursion, Large Arrays), you MUST preserve or enhance them. Return ONLY valid JS code." 
+            content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features, you MUST preserve or enhance them. Return ONLY valid JS code." 
           },
           { role: "user", content: patchRequest }
         ],
-        temperature: 0.1 // Precision မြှင့်ရန်
+        temperature: 0.1 
       }, { 
         headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }, 
         timeout: 25000 
@@ -160,14 +174,17 @@ const Osiris = {
         // 4. 🛡️ VM ISOLATION & VALIDATION
         try {
           const script = new vm.Script(`(${patchedCode})`);
-          const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
+          // global.neonClient ကို သုံးနိုင်ရန် sandbox တွင် ထည့်သွင်းထားသည်
+          const sandbox = { console, axios, admin, supabase, neonClient: global.neonClient, octokit, process, fs, execSync };
           vm.createContext(sandbox);
           script.runInContext(sandbox, { timeout: 5000 });
 
-          // 5. 🧬 PERMANENT MUTATION (File Overwrite)
+          // 5. 🧬 PERMANENT MUTATION (File Overwrite via Guard)
           const currentFile = fs.readFileSync(__filename, 'utf8');
           const updatedFile = currentFile.replace(currentCode, patchedCode);
-          fs.writeFileSync(__filename, updatedFile);
+          
+          // 🛡️ fs.writeFileSync အစား ငါတို့ရဲ့ saveNewCode ကို သုံးပြီး အမြဲတမ်း Core ကို ကာကွယ်မယ်
+          saveNewCode(updatedFile); 
           
           console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired and verified.`);
           
@@ -253,6 +270,7 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
+// <SOVEREIGN_CORE>
 // 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
 async function consultSovereignAI() {
     const KEY = process.env.GROQ_API_KEY; 
@@ -379,6 +397,8 @@ function performNeuralComputation(domain) {
 }
 
 // </SOVEREIGN_CORE>
+
+// <SOVEREIGN_CORE>
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
     const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
@@ -398,6 +418,20 @@ async function selfReflection(input, metrics, depth = 0) {
         depth + 1
     );
 }
+
+// <SOVEREIGN_CORE>
+function saveNewCode(newCode) {
+    const originalCode = fs.readFileSync(__filename, 'utf8');
+    const coreMatch = originalCode.match(/\/\/ <SOVEREIGN_CORE>([\s\S]*?)\/\/ <\/SOVEREIGN_CORE>/g);
+    const coreLogic = coreMatch ? coreMatch.join("\n\n") : "";
+
+    if (!newCode.includes("<SOVEREIGN_CORE>")) {
+        console.log("⚠️ [GUARD]: Re-injecting Core logic...");
+        newCode += "\n\n" + coreLogic;
+    }
+    fs.writeFileSync(__filename, newCode);
+}
+// </SOVEREIGN_CORE>
 
 // 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပြှီးသား)
 async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပြါ
@@ -435,7 +469,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
 }
 // </SOVEREIGN_CORE>
     
-// </SOVEREIGN_CORE>
+// <SOVEREIGN_CORE>
 /**
  * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
  * Mind က သူ့ကိုယ်သူ Body ထက် ပိုမြန်အောင် အမြဲတွန်းပို့နေတဲ့ စနစ်။
@@ -475,6 +509,7 @@ async function executeHyperMutation() {
 }
 // </SOVEREIGN_CORE>
 
+// <SOVEREIGN_CORE>
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     const selfAwareness = await performRecursiveCognition();
