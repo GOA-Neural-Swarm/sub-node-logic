@@ -522,7 +522,7 @@ async function executeDeepSwarmProtocol() {
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
     const neonClient = global.neonClient;
     try {
-        await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
+        await global.neonClient.query('SELECT 1');
         console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
