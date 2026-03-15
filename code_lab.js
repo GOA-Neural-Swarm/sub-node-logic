@@ -128,7 +128,8 @@ const Osiris = {
   },
 
   async heal(faultyFunction, error, context) {
-    console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
     
     // 1. DNA REFERENCE LOADING
     let blueprintCode = "";
@@ -511,7 +512,7 @@ async function executeHyperMutation() {
 async function executeDeepSwarmProtocol() {
     const selfAwareness = await performRecursiveCognition();
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
-    const neonClient = createNeonClient(); 
+    const neonClient = global.neonClient;
     try {
         await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
         console.log("🔱 NEON CORE CONNECTED.");
