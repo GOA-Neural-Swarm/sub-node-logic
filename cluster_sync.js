@@ -401,7 +401,14 @@ compute.calculationResult = await selfReflection(
         };
 
                 // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပွငျပါ:
-        await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
+        await broadcastNeuralState({
+    domain: "FPGA_Programming", 
+    data: intelligencePayload,
+    compute: compute,
+    instruction: instruction,
+    latency: latency,
+    remaining: remaining
+});
         
         // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပြင်မှ research_data ထဲ ရောက်မှာပါ)
 const injectToResearch = `
