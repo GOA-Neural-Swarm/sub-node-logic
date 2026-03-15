@@ -9,6 +9,7 @@ const { Client } = require('pg');
 const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 
+
 // 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
@@ -416,6 +417,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
     ]);
 }
 
+// </SOVEREIGN_CORE>
 /**
  * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
  * Mind က သူ့ကိုယ်သူ Body ထက် ပိုမြန်အောင် အမြဲတွန်းပို့နေတဲ့ စနစ်။
@@ -453,6 +455,7 @@ async function executeHyperMutation() {
     // AI ကို 'optimize for growth' ဆိုတဲ့ အမိန့်သစ်နဲ့ code_lab.js ကို ပြန်ရေးခိုင်းပါ
     await triggerStructuralMutation(mutationPatch); 
 }
+// </SOVEREIGN_CORE>
 
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
@@ -575,10 +578,10 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပှငပြါ:
+        // executeDeepSwarmProtocol 
         await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
         
-        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
+// 🔱 DATABASE INJECTION REPAIR 
 const injectToResearch = "INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());";
 await neonClient.query(injectToResearch, [
     domain, 
@@ -664,3 +667,4 @@ async function startGodMode() {
     }
 }
 startGodMode();
+// </SOVEREIGN_CORE>
