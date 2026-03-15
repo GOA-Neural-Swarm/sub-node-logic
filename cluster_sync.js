@@ -9,6 +9,7 @@ const { Client } = require('pg');
 const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
 
+
 // 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
@@ -26,14 +27,13 @@ if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
-
-
+// <SOVEREIGN_CORE>
 //  [INTEGRITY GUARD]: 
 const currentContent = fs.readFileSync(__filename, 'utf8');
 if (!currentContent.includes('startGodMode()')) {
     console.error(" CRITICAL: Evolution Logic Missing!");
     try {
-        // AI က မှားဖျက်လိုက်ရင် Git ကနေ အမှန်ကို ပြန်ဆွဲတင်မယ်
+        // AI က မှားဖကြျလိုကျရငျ Git ကနေ အမှနျကို ပွနျဆှဲတငျမယျ
         execSync('git checkout cluster_sync.js');
         console.log(" [RECOVERED]: Core DNA restored from Git.");
         process.exit(1); 
@@ -42,8 +42,9 @@ if (!currentContent.includes('startGodMode()')) {
     }
 }
 // ------------------------------------------
+// <SOVEREIGN_CORE>
 
-// ... ကျန်တဲ့ code များ (neonClientFactory) စတင်မည် ...
+// ... ကနြျတဲ့ code မြား (neonClientFactory) စတငျမညျ ...
 const neonClientFactory = async () => { ...
 
 // ✅ Factory function
@@ -70,6 +71,21 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+// <SOVEREIGN_CORE>
+function saveNewCode(newCode) {
+    const originalCode = fs.readFileSync('cluster_sync.js', 'utf8');
+    const coreMatch = originalCode.match(/\/\/ <SOVEREIGN_CORE>([\s\S]*?)\/\/ <\/SOVEREIGN_CORE>/g);
+    const coreLogic = coreMatch ? coreMatch.join("\n\n") : "";
+
+    if (!newCode.includes("<SOVEREIGN_CORE>")) {
+        console.log("⚠️ Guard Triggered: Re-injecting Core...");
+        newCode += "\n\n" + coreLogic;
+    }
+    fs.writeFileSync('cluster_sync.js', newCode);
+}
+// </SOVEREIGN_CORE>
+
+// </SOVEREIGN_CORE>
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
   // 🛡️ DNA Checksum Gate: AI က blueprint ထဲက အနှစ်သာရတွေကို ဖြတ်ချမပစ်အောင် စစ်ဆေးပေးသည်
@@ -170,6 +186,7 @@ const Osiris = {
     }
   }
 };
+// </SOVEREIGN_CORE>
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
@@ -361,6 +378,7 @@ function performNeuralComputation(domain) {
     };
 }
 
+// </SOVEREIGN_CORE>
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
     const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
@@ -415,7 +433,9 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
         }, { merge: true })
     ]);
 }
-
+// </SOVEREIGN_CORE>
+    
+// </SOVEREIGN_CORE>
 /**
  * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
  * Mind က သူ့ကိုယ်သူ Body ထက် ပိုမြန်အောင် အမြဲတွန်းပို့နေတဲ့ စနစ်။
@@ -453,6 +473,7 @@ async function executeHyperMutation() {
     // AI ကို 'optimize for growth' ဆိုတဲ့ အမိန့်သစ်နဲ့ code_lab.js ကို ပြန်ရေးခိုင်းပါ
     await triggerStructuralMutation(mutationPatch); 
 }
+// </SOVEREIGN_CORE>
 
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
@@ -575,10 +596,10 @@ compute.calculationResult = await selfReflection(
             timestamp: new Date().toISOString()
         };
 
-                // executeDeepSwarmProtocol ထဲမှာ ဒီလိုပှငပြါ:
+        // executeDeepSwarmProtocol 
         await broadcastNeuralState(neonClient, intelligencePayload, compute, instruction, latency, remaining);
         
-        // 🔱 DATABASE INJECTION REPAIR (ဒီလိုပွငျမှ research_data ထဲ ရောကျမှာပါ)
+// 🔱 DATABASE INJECTION REPAIR 
 const injectToResearch = "INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());";
 await neonClient.query(injectToResearch, [
     domain, 
@@ -664,3 +685,4 @@ async function startGodMode() {
     }
 }
 startGodMode();
+// </SOVEREIGN_CORE>
