@@ -42,29 +42,37 @@ if (!currentContent.includes('startGodMode()')) {
     }
 }
 // ------------------------------------------
-// </SOVEREIGN_CORE>
+// </SOVstartGodModeEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
-// ✅ Factory function 
+// 🔱 DATABASE FACTORY
 const neonClientFactory = async () => {
+    // Client ရှိပြီးသားဆိုရင် ပြန်မချိတ်ပါနဲ့
+    if (global.neonClient) return global.neonClient;
+
     const client = new Client({ 
         connectionString: finalUrl,
         ssl: { rejectUnauthorized: false } 
     });
     await client.connect();
+    global.neonClient = client;
     return client;
 };
 
-console.log("🛠 [SYSTEM]: Neon Factory Ready.");
-(async () => {
+// 🛑 Database 
+async function bootSystem() {
     try {
-        global.neonClient = await neonClientFactory();
-        console.log(" [DATABASE]: Global Neon Client Initialized.");
+        console.log("🛠 [SYSTEM]: Initializing...");
+        await neonClientFactory();
+        console.log("✅ [DATABASE]: Global Neon Client Initialized.");
+        
+        
+        ();
     } catch (err) {
-        console.error(" [DATABASE]: Initialization failed!", err.message);
-        process.exit(1); // ခြိတျမရရငျ စနဈကို ရပျလိုကျပါ
+        console.error("❌ [SYSTEM]: Initialization failed!", err.message);
+        process.exit(1);
     }
-})();
+}
 
 // 🔥 Firebase Connection
 if (!admin.apps.length) {
@@ -514,7 +522,7 @@ async function executeDeepSwarmProtocol() {
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
     const neonClient = global.neonClient;
     try {
-        await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
+        await global.neonClient.query('SELECT 1');
         console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
@@ -717,5 +725,5 @@ async function startGodMode() {
         setTimeout(() => repairedProtocol(), 5000); 
     }
 }
-startGodMode();
+bootSystem();
 // </SOVEREIGN_CORE>
