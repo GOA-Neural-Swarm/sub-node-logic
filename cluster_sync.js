@@ -128,7 +128,8 @@ const Osiris = {
   },
 
   async heal(faultyFunction, error, context) {
-    console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.error(`🌀 [OSIRIS-ULTRA]: Initiating Blueprint-Based Mutation in [${context}]...`);
     
     // 1. DNA REFERENCE LOADING
     let blueprintCode = "";
