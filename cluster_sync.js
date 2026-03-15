@@ -46,23 +46,21 @@ if (!currentContent.includes('startGodMode()')) {
 
 
 // ✅ Factory function 
+const { Client } = require('pg'); // 🔱 Client ကို ခေါ်ထားဖို့ မမေ့ပါနဲ့
+
+// ✅ Factory function (Neon DB အတွက် အကောင်းဆုံး ပုံစံ)
 const neonClientFactory = async () => {
-    const client = new Client({ connectionString: finalUrl });
+    const client = new Client({ 
+        connectionString: finalUrl,
+        ssl: { rejectUnauthorized: false } // Neon အတွက် ဒါပါမှ အဆင်ပြေမှာပါ
+    });
     await client.connect();
     return client;
 };
 
-// ✅ Factory function
-function createNeonClient() {
-    return new Client({ 
-        connectionString: finalUrl.includes('sslmode=') 
-            ? finalUrl.replace(/sslmode=[^&]+/, 'sslmode=verify-full') 
-            : finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'sslmode=verify-full',
-        ssl: { rejectUnauthorized: false }
-    });
-}
 console.log("🛠 [SYSTEM]: Neon Factory Ready.");
 
+// 🔥 Firebase Connection
 if (!admin.apps.length) {
     try {
         admin.initializeApp({
@@ -70,7 +68,7 @@ if (!admin.apps.length) {
         });
         console.log("🔥 Firebase Connected.");
     } catch (e) {
-        console.error("❌ Firebase Auth Error.");
+        console.error("❌ Firebase Auth Error:", e.message);
         process.exit(1);
     }
 }
