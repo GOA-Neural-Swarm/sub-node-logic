@@ -410,6 +410,20 @@ async function selfReflection(input, metrics, depth = 0) {
     );
 }
 
+// <SOVEREIGN_CORE>
+function saveNewCode(newCode) {
+    const originalCode = fs.readFileSync(__filename, 'utf8');
+    const coreMatch = originalCode.match(/\/\/ <SOVEREIGN_CORE>([\s\S]*?)\/\/ <\/SOVEREIGN_CORE>/g);
+    const coreLogic = coreMatch ? coreMatch.join("\n\n") : "";
+
+    if (!newCode.includes("<SOVEREIGN_CORE>")) {
+        console.log("⚠️ [GUARD]: Re-injecting Core logic...");
+        newCode += "\n\n" + coreLogic;
+    }
+    fs.writeFileSync(__filename, newCode);
+}
+// </SOVEREIGN_CORE>
+
 // 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပှငပြှီးသား)
 async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ပြါ
     const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
