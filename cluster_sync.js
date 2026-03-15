@@ -511,7 +511,7 @@ async function executeHyperMutation() {
 async function executeDeepSwarmProtocol() {
     const selfAwareness = await performRecursiveCognition();
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Load: ${selfAwareness.load}`);
-    const neonClient = createNeonClient(); 
+    const neonClient = global.neonClient;
     try {
         await neonClient.connect(); // တဈခါတညြးပဲ connect လုပပြါ
         console.log("🔱 NEON CORE CONNECTED.");
