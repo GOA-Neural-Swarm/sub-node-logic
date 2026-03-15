@@ -378,6 +378,7 @@ function performNeuralComputation(domain) {
     };
 }
 
+// </SOVEREIGN_CORE>
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
     const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
@@ -432,7 +433,8 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
         }, { merge: true })
     ]);
 }
-
+// </SOVEREIGN_CORE>
+    
 // </SOVEREIGN_CORE>
 /**
  * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
