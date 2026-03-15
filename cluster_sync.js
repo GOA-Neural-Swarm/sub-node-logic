@@ -42,12 +42,9 @@ if (!currentContent.includes('startGodMode()')) {
     }
 }
 // ------------------------------------------
-// <SOVEREIGN_CORE>
+// </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
-// ✅ Factory function 
-const { Client } = require('pg'); 
-
 // ✅ Factory function 
 const neonClientFactory = async () => {
     const client = new Client({ 
