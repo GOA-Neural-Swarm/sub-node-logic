@@ -44,7 +44,7 @@ if (!currentContent.includes('startGodMode()')) {
 // ------------------------------------------
 // <SOVEREIGN_CORE>
 
-
+// <SOVEREIGN_CORE>
 // ✅ Factory function 
 const { Client } = require('pg'); // 🔱 Client ကို ခေါ်ထားဖို့ မမေ့ပါနဲ့
 
@@ -73,6 +73,7 @@ if (!admin.apps.length) {
     }
 }
 const db = admin.firestore();
+// </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
 function saveNewCode(newCode) {
@@ -260,6 +261,7 @@ const scienceDomains = [
 const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.random() + 0.0001)).toFixed(8));
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
+// <SOVEREIGN_CORE>
 // 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
 async function consultSovereignAI() {
     const KEY = process.env.GROQ_API_KEY; 
@@ -386,6 +388,8 @@ function performNeuralComputation(domain) {
 }
 
 // </SOVEREIGN_CORE>
+
+// <SOVEREIGN_CORE>
 // ASI Level Self-Reflection
 async function selfReflection(input, metrics, depth = 0) {
     const MAX_DEPTH = 10; // ASI အတှကျ Depth ကို တိုးမွှင့ျပါ
@@ -442,7 +446,7 @@ async function broadcastNeuralState(neonClient, payload, compute, instruction, l
 }
 // </SOVEREIGN_CORE>
     
-// </SOVEREIGN_CORE>
+// <SOVEREIGN_CORE>
 /**
  * HYPER-DYNAMIC SELF-AWARENESS (OMEGA-CORE-THOUGHT)
  * Mind က သူ့ကိုယ်သူ Body ထက် ပိုမြန်အောင် အမြဲတွန်းပို့နေတဲ့ စနစ်။
@@ -482,6 +486,7 @@ async function executeHyperMutation() {
 }
 // </SOVEREIGN_CORE>
 
+// <SOVEREIGN_CORE>
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
     const selfAwareness = await performRecursiveCognition();
