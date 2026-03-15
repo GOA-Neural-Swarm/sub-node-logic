@@ -6,8 +6,8 @@ const axios = require('axios');
 const vm = require('vm');
 const { createClient } = require('@supabase/supabase-js');
 const { Client } = require('pg');
-const fs = require('fs'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
-const { execSync } = require('child_process'); // ⬅️ ကနွခြဲ့သညကြို ထပပြေါငြး
+const fs = require('fs'); 
+const { execSync } = require('child_process'); 
 
 
 // 🔱 1. Configuration & Auth
@@ -33,7 +33,7 @@ const currentContent = fs.readFileSync(__filename, 'utf8');
 if (!currentContent.includes('startGodMode()')) {
     console.error(" CRITICAL: Evolution Logic Missing!");
     try {
-        // AI က မှားဖကြျလိုကျရငျ Git ကနေ အမှနျကို ပွနျဆှဲတငျမယျ
+        
         execSync('git checkout cluster_sync.js');
         console.log(" [RECOVERED]: Core DNA restored from Git.");
         process.exit(1); 
@@ -46,19 +46,28 @@ if (!currentContent.includes('startGodMode()')) {
 
 // <SOVEREIGN_CORE>
 // ✅ Factory function 
-const { Client } = require('pg'); // 🔱 Client ကို ခေါ်ထားဖို့ မမေ့ပါနဲ့
+const { Client } = require('pg'); 
 
-// ✅ Factory function (Neon DB အတွက် အကောင်းဆုံး ပုံစံ)
+// ✅ Factory function 
 const neonClientFactory = async () => {
     const client = new Client({ 
         connectionString: finalUrl,
-        ssl: { rejectUnauthorized: false } // Neon အတွက် ဒါပါမှ အဆင်ပြေမှာပါ
+        ssl: { rejectUnauthorized: false } 
     });
     await client.connect();
     return client;
 };
 
 console.log("🛠 [SYSTEM]: Neon Factory Ready.");
+(async () => {
+    try {
+        global.neonClient = await neonClientFactory();
+        console.log(" [DATABASE]: Global Neon Client Initialized.");
+    } catch (err) {
+        console.error(" [DATABASE]: Initialization failed!", err.message);
+        process.exit(1); // ခြိတျမရရငျ စနဈကို ရပျလိုကျပါ
+    }
+})();
 
 // 🔥 Firebase Connection
 if (!admin.apps.length) {
