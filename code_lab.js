@@ -26,6 +26,26 @@ if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
+
+
+//  [INTEGRITY GUARD]: 
+const currentContent = fs.readFileSync(__filename, 'utf8');
+if (!currentContent.includes('startGodMode()')) {
+    console.error(" CRITICAL: Evolution Logic Missing!");
+    try {
+        // AI က မှားဖကြျလိုကျရငျ Git ကနေ အမှနျကို ပွနျဆှဲတငျမယျ
+        execSync('git checkout cluster_sync.js');
+        console.log(" [RECOVERED]: Core DNA restored from Git.");
+        process.exit(1); 
+    } catch (e) {
+        console.error(" Recovery Failed:", e.message);
+    }
+}
+// ------------------------------------------
+
+// ... ကနြျတဲ့ code မြား (neonClientFactory) စတငျမညျ ...
+const neonClientFactory = async () => { ...
+
 // ✅ Factory function
 function createNeonClient() {
     return new Client({ 
