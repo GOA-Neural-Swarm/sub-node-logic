@@ -44,8 +44,13 @@ if (!currentContent.includes('startGodMode()')) {
 // ------------------------------------------
 // <SOVEREIGN_CORE>
 
-// ... ကနြျတဲ့ code မြား (neonClientFactory) စတငျမညျ ...
-const neonClientFactory = async () => { ...
+
+// ✅ Factory function 
+const neonClientFactory = async () => {
+    const client = new Client({ connectionString: finalUrl });
+    await client.connect();
+    return client;
+};
 
 // ✅ Factory function
 function createNeonClient() {
