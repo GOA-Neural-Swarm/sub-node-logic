@@ -27,8 +27,7 @@ if (cleanKey.includes(" ")) cleanKey = cleanKey.split(" ")[0];
 
 let finalUrl = cleanKey.replace(/^postgres:\/\//, "postgresql://");
 
-
-
+// <SOVEREIGN_CORE>
 //  [INTEGRITY GUARD]: 
 const currentContent = fs.readFileSync(__filename, 'utf8');
 if (!currentContent.includes('startGodMode()')) {
@@ -43,6 +42,7 @@ if (!currentContent.includes('startGodMode()')) {
     }
 }
 // ------------------------------------------
+// <SOVEREIGN_CORE>
 
 // ... ကနြျတဲ့ code မြား (neonClientFactory) စတငျမညျ ...
 const neonClientFactory = async () => { ...
@@ -71,6 +71,21 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+// <SOVEREIGN_CORE>
+function saveNewCode(newCode) {
+    const originalCode = fs.readFileSync('cluster_sync.js', 'utf8');
+    const coreMatch = originalCode.match(/\/\/ <SOVEREIGN_CORE>([\s\S]*?)\/\/ <\/SOVEREIGN_CORE>/g);
+    const coreLogic = coreMatch ? coreMatch.join("\n\n") : "";
+
+    if (!newCode.includes("<SOVEREIGN_CORE>")) {
+        console.log("⚠️ Guard Triggered: Re-injecting Core...");
+        newCode += "\n\n" + coreLogic;
+    }
+    fs.writeFileSync('cluster_sync.js', newCode);
+}
+// </SOVEREIGN_CORE>
+
+// </SOVEREIGN_CORE>
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
   // 🛡️ DNA Checksum Gate: AI က blueprint ထဲက အနှစ်သာရတွေကို ဖြတ်ချမပစ်အောင် စစ်ဆေးပေးသည်
@@ -171,6 +186,7 @@ const Osiris = {
     }
   }
 };
+// </SOVEREIGN_CORE>
 
 // 🔱 2. THE MASTER LIST OF 500 DOMAINS (လုံးဝ မခွုံ့ထားပါ)
 const scienceDomains = [
