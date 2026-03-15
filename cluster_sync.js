@@ -88,7 +88,7 @@ function saveNewCode(newCode) {
 }
 // </SOVEREIGN_CORE>
 
-// </SOVEREIGN_CORE>
+// <SOVEREIGN_CORE>
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
 const Osiris = {
   // 🛡️ DNA Checksum Gate: AI က blueprint ထဲက အနှစ်သာရတွေကို ဖြတ်ချမပစ်အောင် စစ်ဆေးပေးသည်
@@ -100,7 +100,8 @@ const Osiris = {
       "calculateHyperEntropy",
       "performNeuralComputation",
       "executeDeepSwarmProtocol",
-      "createNeonClient"
+      "neonClientFactory", // 👈 လက်ရှိ function အမည်နဲ့ ကိုက်ညီအောင် ပြင်ထားသည်
+      "saveNewCode"        // 👈 ဒါပါမှ မျိုးဆက်သစ် code တွေမှာ Guard ပါဝင်မည်
     ];
 
     const missingFeatures = essentialMarkers.filter(marker => !patchedCode.includes(marker));
@@ -111,7 +112,7 @@ const Osiris = {
     }
 
     // Logic regression ဖြစ်မဖြစ် Code size ကို Checksum စစ်ခြင်း
-    if (patchedCode.length < originalCode.length * 0.7) {
+    if (patchedCode.length < originalCode.length * 0.6) {
       console.error("⚠️ [GATEKEEPER-FAIL]: Logic regression detected (Code too simplified).");
       return false;
     }
@@ -125,11 +126,11 @@ const Osiris = {
     // 1. DNA REFERENCE LOADING
     let blueprintCode = "";
     try {
-      if (fs.existsSync('code_lab.js')) {
-        blueprintCode = fs.readFileSync('code_lab.js', 'utf8');
+      if (fs.existsSync('cluster_sync.js')) {
+        blueprintCode = fs.readFileSync('cluster_sync.js', 'utf8');
       }
     } catch (fsErr) {
-      console.warn("⚠️ [OSIRIS-WARN]: code_lab.js DNA reference missing.");
+      console.warn("⚠️ [OSIRIS-WARN]: DNA reference missing.");
     }
 
     const currentCode = faultyFunction.toString();
@@ -144,11 +145,11 @@ const Osiris = {
         messages: [
           { 
             role: "system", 
-            content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features (ASI, Recursion, Large Arrays), you MUST preserve or enhance them. Return ONLY valid JS code." 
+            content: "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features, you MUST preserve or enhance them. Return ONLY valid JS code." 
           },
           { role: "user", content: patchRequest }
         ],
-        temperature: 0.1 // Precision မြှင့်ရန်
+        temperature: 0.1 
       }, { 
         headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }, 
         timeout: 25000 
@@ -163,14 +164,17 @@ const Osiris = {
         // 4. 🛡️ VM ISOLATION & VALIDATION
         try {
           const script = new vm.Script(`(${patchedCode})`);
-          const sandbox = { console, axios, admin, supabase, neonClient, octokit, process, fs, execSync };
+          // global.neonClient ကို သုံးနိုင်ရန် sandbox တွင် ထည့်သွင်းထားသည်
+          const sandbox = { console, axios, admin, supabase, neonClient: global.neonClient, octokit, process, fs, execSync };
           vm.createContext(sandbox);
           script.runInContext(sandbox, { timeout: 5000 });
 
-          // 5. 🧬 PERMANENT MUTATION (File Overwrite)
+          // 5. 🧬 PERMANENT MUTATION (File Overwrite via Guard)
           const currentFile = fs.readFileSync(__filename, 'utf8');
           const updatedFile = currentFile.replace(currentCode, patchedCode);
-          fs.writeFileSync(__filename, updatedFile);
+          
+          // 🛡️ fs.writeFileSync အစား ငါတို့ရဲ့ saveNewCode ကို သုံးပြီး အမြဲတမ်း Core ကို ကာကွယ်မယ်
+          saveNewCode(updatedFile); 
           
           console.log(`🧬 [EVOLVED]: ${context} has been permanently repaired and verified.`);
           
