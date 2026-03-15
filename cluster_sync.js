@@ -280,7 +280,8 @@ async function selfReflection(input, metrics, depth = 0) {
 
 // 🔱 OMEGA-SYNC: BROADCAST NEURAL STATE (ပွငျပွီးသား)
 async function broadcastNeuralState(neonClient, payload, compute, instruction, latency, remaining) { // neonClient ထည့ျပါ
-    const genId = `OMEGA_ANALYSIS_${payload.domain.toUpperCase()}_${Date.now()}`;
+    const domainName = (payload && payload.domain) ? payload.domain.toUpperCase() : "UNKNOWN";
+    const genId = `OMEGA_ANALYSIS_${domainName}_${Date.now()}`;
     const syncId = `OMEGA_SYNC_${Date.now()}`;
     
     const neonQuery = `
