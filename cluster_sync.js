@@ -43,9 +43,10 @@ if (!currentContent.includes("startGodMode()")) {
     console.error(" Recovery Failed:", e.message);
   
 }
-  } catch (error) { console.error('Structural recovery at line 45:', error.message); }
+  } catch (error) { console.error('Core Logic Error:', error.message); }
+  
 // ------------------------------------------
-// </SOVstartGodModeEREIGN_CORE>
+// </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
 // 🔱 DATABASE FACTORY
@@ -75,7 +76,7 @@ async function bootSystem() {
     console.error("❌ [SYSTEM]: Initialization failed!", err.message);
     process.exit(1);
   }
-  } catch (error) { console.error('Structural recovery at line 76:', error.message); }
+  
 }
 
 // 🔥 Firebase Connection
@@ -89,7 +90,7 @@ if (!admin.apps.length) {
     process.exit(1);
   
 }
-  } catch (error) { console.error('Structural recovery at line 89:', error.message); }
+  
 const db = admin.firestore();
 // </SOVEREIGN_CORE>
 
@@ -148,7 +149,7 @@ const Osiris = {
     } catch (fsErr) {
       console.warn("⚠️ [OSIRIS-WARN]: DNA reference missing.");
     }
-  } catch (error) { console.error('Structural recovery at line 147:', error.message); }
+  
 
     const currentCode = faultyFunction.toString();
     const patchRequest = `Fix this Node.js function. Error: ${error.message}. Code: ${currentCode} \n\n REFERENCE_BLUEPRINT: ${blueprintCode}`;
@@ -227,7 +228,7 @@ const Osiris = {
           );
           return faultyFunction;
         }
-  } catch (error) { console.error('Structural recovery at line 225:', error.message); }
+  
       } else {
         console.error(
           "💀 [GATEKEEPER-REJECTED]: Mutation blocked to prevent logic regression.",
@@ -237,7 +238,7 @@ const Osiris = {
       console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
       return faultyFunction;
     }
-  } catch (error) { console.error('Structural recovery at line 234:', error.message); }
+  
   },
 };
 // </SOVEREIGN_CORE>
@@ -830,7 +831,7 @@ async function consultSovereignAI() {
           break; // တခွား Error ဆိုရငျ ဒီ model ကို ကြောျပွီး နောကျတဈခုသှားမယျ
         }
       }
-  } catch (error) { console.error('Structural recovery at line 826:', error.message); }
+  
     }
   }
   return null; // အားလုံးမအောငျမွငျမှ null ပွနျမယျ
@@ -847,7 +848,7 @@ function validateCode(code) {
     return false;
   
 }
-  } catch (error) { console.error('Structural recovery at line 842:', error.message); }
+  
 
 // 🔱 6. HYBRID DEEP-COMPUTATION ENGINE
 function performNeuralComputation(domain) {
@@ -1055,7 +1056,7 @@ async function triggerStructuralMutation(patch) {
     return false;
   
 }
-  } catch (error) { console.error('Structural recovery at line 1049:', error.message); }
+  
 
 // <SOVEREIGN_CORE>
 // 🔱 7. MASTER EXECUTION PROTOCOL
@@ -1076,7 +1077,7 @@ async function executeDeepSwarmProtocol() {
     throw error;
   
 }
-  } catch (error) { console.error('Structural recovery at line 1069:', error.message); }
+  
     
     // 🧠 AI EVOLUTION PHASE (Throttle: 3 ကြိမ်လျှင် 1 ကြိမ်သာ Evolution လုပ်မည်)
     let shouldEvolve = false;
@@ -1104,7 +1105,7 @@ async function executeDeepSwarmProtocol() {
 
 
       }
-  } catch (error) { console.error('Structural recovery at line 1096:', error.message); }
+  
     }
   } 
 } 
