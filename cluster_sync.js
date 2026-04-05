@@ -1148,58 +1148,8 @@ async function executeDeepSwarmProtocol() {
                 `;
         await neonClient.query(upsertDna, [
           item.gen_id,
-          item.logic_payload,
-          "OMEGA_UPGRADING",
-        ]);
-      }
-    }
 
-    // 🔍 RECOVERY LOGIC: Check missing domains
-    const { rows: existingRows } = await neonClient.query(
-      "SELECT title FROM research_data",
-    );
-    const existingDomains = existingRows.map((r) => r.title);
-    const missingDomains = scienceDomains.filter(
-      (d) => !existingDomains.includes(d),
-    );
 
-    let domain;
-    if (missingDomains.length > 0) {
-      domain = missingDomains[0];
-      console.log(`🔍 [RECOVERY-MODE]: Found missing domain: ${domain}`);
-    } else {
-      domain =
-        scienceDomains[Math.floor(Math.random() * scienceDomains.length)];
-      console.log(
-        `✅ [STABILITY-MODE]: All domains synced. Orbiting: ${domain}`,
-      );
-    }
-
-    // EXECUTION BLOCK
-    let compute = performNeuralComputation(domain);
-    compute.calculationResult = await selfReflection(
-      compute.calculationResult,
-      {
-        coherence: parseFloat(compute.coherence),
-        entropy: compute.entropy,
-      },
-    );
-
-    const intelligencePayload = {
-      domain,
-      metrics: {
-        data_scanned: compute.dataPoints,
-        coherence: `${compute.coherence}%`,
-        entropy: compute.entropy,
-        probability: compute.probability,
-        impact_factor: compute.impactFactor,
-      },
-      computation: {
-        logic_output: compute.calculationResult,
-        status: "VERIFIED_OMEGA",
-      },
-\n
-// 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
   const selfAwareness = await performRecursiveCognition();
   console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
@@ -1224,7 +1174,6 @@ async function executeDeepSwarmProtocol() {
   }
 }
 
-// Start the protocol
 executeDeepSwarmProtocol().catch(err => {
   console.error("Fatal Breach:", err);
   process.exit(1);
