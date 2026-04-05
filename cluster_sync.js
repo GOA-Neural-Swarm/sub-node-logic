@@ -1198,57 +1198,7 @@ async function executeDeepSwarmProtocol() {
         logic_output: compute.calculationResult,
         status: "VERIFIED_OMEGA",
       },
-      timestamp: new Date().toISOString(),
-    };
-
-    // executeDeepSwarmProtocol
-    await broadcastNeuralState(
-      neonClient,
-      intelligencePayload,
-      compute,
-      instruction,
-      latency,
-      remaining,
-    );
-
-    // 🔱 DATABASE INJECTION REPAIR
-    const injectToResearch =
-      "INSERT INTO research_data (title, detail, harvested_at) VALUES ($1, $2, NOW());";
-    await neonClient.query(injectToResearch, [
-      domain,
-      compute.calculationResult, // ဒါက AI ဆီက လာတဲ့ analysis ဖွဈရမယျ
-    ]);
-
-    console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
-
-    // 🔱 DOMINO EFFECT: MULTI-DB INJECTION
-    const injectIntelligence = `
-            INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
-            VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
-            ON CONFLICT (gen_id) DO UPDATE SET 
-                thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
-        `;
-    await neonClient.query(injectIntelligence, [
-      `OMEGA_ANALYSIS_${domain.toUpperCase()}_${Date.now()}`,
-      JSON.stringify(intelligencePayload),
-      "ANALYZED",
-    ]);
-
-    await supabase.from("neural_sync").insert([
-      {
-        gen_id: `OMEGA_SYNC_${Date.now()}`,
-        logic_payload: JSON.stringify(intelligencePayload),
-      },
-    ]);
-
-    console.log(`🧠 Analyzed & Computed: ${domain}`);
-
-    // 🔱 HYPER-REPLICATION (Full Original Logic)
-    if (instruction.replicate === true) {
-      let spawned = false;
-      let checkNum = 1;
-      const MAX_NODES = 10;
-
+\n
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
   const selfAwareness = await performRecursiveCognition();
