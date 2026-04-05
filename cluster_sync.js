@@ -1068,6 +1068,15 @@ async function executeDeepSwarmProtocol() {
 
     const startTime = Date.now();
 
+    } catch (error) {
+    console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
+    
+    // Client error ဖွဈသှားရငျ နောကျတဈကွိမျအတှကျ null ပွနျထားပေးခွငျး
+    global.neonClient = null; 
+    throw error;
+  }
+}
+    
     // 🧠 AI EVOLUTION PHASE (Throttle: 3 ကြိမ်လျှင် 1 ကြိမ်သာ Evolution လုပ်မည်)
     let shouldEvolve = false;
     try {
