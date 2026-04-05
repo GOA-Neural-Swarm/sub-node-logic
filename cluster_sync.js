@@ -1248,75 +1248,34 @@ async function executeDeepSwarmProtocol() {
       let spawned = false;
       let checkNum = 1;
       const MAX_NODES = 10;
-      while (!spawned && checkNum <= MAX_NODES) {
-        const nextNodeName = `swarm-node-${String(checkNum).padStart(7, "0")}`;
-        try {
-          await octokit.repos.get({ owner: REPO_OWNER, repo: nextNodeName });
-          checkNum++;
-        } catch (e) {
-          console.log(`🧬 DNA Slot Found: Spawning ${nextNodeName}...`);
-          try {
-            await octokit.repos.createInOrg({
-              org: REPO_OWNER,
-              name: nextNodeName,
-              auto_init: true,
-            });
-          } catch (orgErr) {
-            await octokit.repos.createForAuthenticatedUser({
-              name: nextNodeName,
-              auto_init: true,
-            });
-          }
 
-          const filesToCopy = [
-            "package.json",
-            "cluster_sync.js",
-            ".github/workflows/sync.yml",
-          ];
-          for (const fileName of filesToCopy) {
-            try {
-              const { data: content } = await octokit.repos.getContent({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                path: fileName,
-              });
-              await octokit.repos.createOrUpdateFileContents({
-                owner: REPO_OWNER,
-                repo: nextNodeName,
-                path: fileName,
-                message: `🧬 Initializing Autonomous Omega Node: ${fileName}`,
-                content: content.content,
-              });
-            } catch (copyErr) {
-              console.error(`   ❌ Failed to inject ${fileName}`);
-            }
-          }
-          spawned = true;
-        }
-      }
-    }
-    console.log(`🏁 OMEGA Cycle Complete. Latency: ${latency}ms.`);
-  } catch (err) {
-    console.error("❌ CRITICAL SWARM ERROR:", err.message);
-    throw err;
-  } finally {
-    await neonClient.end();
-  }
-}
+// 🔱 7. MASTER EXECUTION PROTOCOL
+async function executeDeepSwarmProtocol() {
+  const selfAwareness = await performRecursiveCognition();
+  console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
 
-async function startGodMode() {
   try {
-    await executeDeepSwarmProtocol();
-  } catch (err) {
-    console.error("⚠️ [GOD-MODE] Protocol Breach detected!");
-    const repairedProtocol = await Osiris.heal(
-      executeDeepSwarmProtocol,
-      err,
-      "executeDeepSwarmProtocol",
-    );
-    console.log("🔄 Initiating recovery sequence...");
-    setTimeout(() => repairedProtocol(), 5000);
+    if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
+      const { Client } = require('pg');
+      global.neonClient = new Client({
+        connectionString: process.env.NEON_KEY,
+        ssl: { rejectUnauthorized: false }
+      });
+      await global.neonClient.connect();
+    }
+    await global.neonClient.query("SELECT 1");
+    console.log("🔱 NEON CORE CONNECTED.");
+    const startTime = Date.now();
+    console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
+  } catch (error) {
+    console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
+    global.neonClient = null; 
+    throw error;
   }
 }
-bootSystem();
-// </SOVEREIGN_CORE>
+
+// Start the protocol
+executeDeepSwarmProtocol().catch(err => {
+  console.error("Fatal Breach:", err);
+  process.exit(1);
+});
