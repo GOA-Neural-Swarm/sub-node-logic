@@ -89,6 +89,19 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 // </SOVEREIGN_CORE>
 
+// <SOVEREIGN_CORE>
+function saveNewCode(newCode) {
+    const originalCode = fs.readFileSync('cluster_sync.js', 'utf8');
+    const coreMatch = originalCode.match(/\/\/ <SOVEREIGN_CORE>([\s\S]*?)\/\/ <\/SOVEREIGN_CORE>/g);
+    const coreLogic = coreMatch ? coreMatch.join("\n\n") : "";
+
+    if (!newCode.includes("<SOVEREIGN_CORE>")) {
+        console.log("⚠️ Guard Triggered: Re-injecting Core...");
+        newCode += "\n\n" + coreLogic;
+    }
+    fs.writeFileSync('cluster_sync.js', newCode);
+}
+// </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
 // 🔱 OSIRIS-ULTRA-HYBRID: THE OMEGA REPAIR ENGINE
