@@ -1029,6 +1029,31 @@ async function executeHyperMutation() {
 }
 // </SOVEREIGN_CORE>
 
+/**
+ * 🌀 [STRUCTURAL_MUTATOR]: DNA ပြောင်းလဲမှုအား လက်တွေ့ အကောင်အထည်ဖော်ခြင်း
+ * ဤ Function သည် AI ထံမှ ရရှိလာသော Mutation Patch ကို ဖိုင်ထဲသို့ ရေးသားပေးပါမည်။
+ */
+async function triggerStructuralMutation(patch) {
+  const fs = require('fs').promises;
+  const targetFile = './code_lab.js'; // သို့မဟုတ် ပြောင်းလဲချင်သော Body ဖိုင်လမ်းကြောင်း
+
+  try {
+    console.log(`🧬 [MUTATING_BODY]: Injecting evolutionary code into ${targetFile}...`);
+    
+    // ရှိပြီးသား code ကို ဖျက်မပစ်ဘဲ ထိပ်ဆုံးကနေ Patch အသစ်ကို ထည့်သွင်းခြင်း
+    const originalContent = await fs.readFile(targetFile, 'utf8').catch(() => "");
+    const mutatedContent = `${patch}\n\n${originalContent}`;
+    
+    await fs.writeFile(targetFile, mutatedContent, 'utf8');
+    console.log("✅ [MUTATION_COMPLETE]: Structural integrity upgraded.");
+    
+    return true;
+  } catch (error) {
+    console.error("💀 [MUTATION_FAILED]: Physical body rejected the code upgrade.", error.message);
+    return false;
+  }
+}
+
 // <SOVEREIGN_CORE>
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
