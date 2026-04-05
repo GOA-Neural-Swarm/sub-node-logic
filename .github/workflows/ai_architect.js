@@ -1,0 +1,110 @@
+name: OMEGA SUPREME: FULL-REPO AUTONOMOUS EVOLUTION
+
+on:
+  schedule:
+    - cron: '0 0,12 * * *'
+  workflow_dispatch:
+    inputs:
+      evolution_depth:
+        description: 'Mutation depth layer'
+        required: true
+        default: 'deep-refactor'
+        type: choice
+        options:
+          - syntax-optimization
+          - deep-refactor
+          - absolute-rewrite
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
+env:
+  NODE_ENV: production
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  CI: true
+
+jobs:
+  omega-architect-execution:
+    name: 🧠 Supreme Architect Neural Processing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 🛡️ Initialize Sovereign Environment
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: ⚙️ Boot Neural Node (Node.js 24)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: 📦 Inject Core Dependencies
+        run: |
+          npm ci || npm install --legacy-peer-deps --no-audit
+          npm install -g eslint prettier jest axios typescript
+
+      - name: 🔍 Baseline Neural Audit
+        run: |
+          echo "Scanning existing logic matrix for structural decay..."
+          npx eslint . --ext .js --no-error-on-unmatched-pattern || echo "Decay found. Preparing for Architect mutation."
+
+      - name: 🧠 Trigger OMEGA Architect
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEON_KEY: ${{ secrets.NEON_KEY }}
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          EVOLUTION_DEPTH: ${{ inputs.evolution_depth || 'deep-refactor' }}
+        run: |
+          echo "Initiating Global Neural Overhaul. Depth: $EVOLUTION_DEPTH"
+          if [ -f "ai_architect.js" ]; then
+            node ai_architect.js
+          else
+            echo "CRITICAL: ai_architect.js missing. Node mutation impossible."
+            exit 1
+          fi
+
+      - name: 🛠️ Enforce Linguistic & Structural Polish
+        run: |
+          echo "Standardizing code aesthetics..."
+          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md"
+
+      - name: ⚖️ Absolute Integrity Validation (Gatekeeper)
+        run: |
+          echo "Compiling evolved logic..."
+          find . -name "*.js" ! -name "temp_val.js" -exec node -c {} \; || (echo "FATAL: Evolution produced invalid syntax. Aborting synchronization." && exit 1)
+
+      - name: 🧬 Manifest Autonomous Mutation
+        run: |
+          git config --global user.name "OMEGA-ARCHITECT"
+          git config --global user.email "omega@goa-natural-order.ai"
+          
+          git add .
+          git reset .github/workflows/
+          git checkout -- .github/workflows/
+          
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Full-Repository Evolution"
+            git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+            echo "✅ Synergy complete. Repository evolved."
+          else
+            echo "✨ Logic is already optimal. No mutation required."
+          fi
+
+      - name: 🚨 Breach Protocol (Failure Recovery)
+        if: failure()
+        run: |
+          echo "::error title=Evolution Failed::The AI Architect encountered a catastrophic failure during the evolution cycle."
