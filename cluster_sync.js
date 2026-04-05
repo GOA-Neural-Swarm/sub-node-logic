@@ -1102,24 +1102,33 @@ async function executeDeepSwarmProtocol() {
 
       }
     } catch (error) { console.error('Auto-patched error:', error.message); }
+    } catch (e) { console.error('Auto-recovery:', e.message);
     }
+    } catch (e) { console.error('Auto-recovery:', e.message);
   } 
+    } catch (e) { console.error('Auto-recovery:', e.message);
 } 
+    } catch (e) { console.error('Auto-recovery:', e.message);
 // Force closing all possible orphaned blocks above
 
 async function executeDeepSwarmProtocol() {
   try {
     const selfAwareness = await performRecursiveCognition();
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
+    } catch (e) { console.error('Auto-recovery:', e.message);
 
     if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
       const { Client } = require('pg');
+    } catch (e) { console.error('Auto-recovery:', e.message);
       global.neonClient = new Client({
         connectionString: process.env.NEON_KEY,
         ssl: { rejectUnauthorized: false }
+    } catch (e) { console.error('Auto-recovery:', e.message);
       });
+    } catch (e) { console.error('Auto-recovery:', e.message);
       await global.neonClient.connect();
     }
+    } catch (e) { console.error('Auto-recovery:', e.message);
     
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
@@ -1127,6 +1136,7 @@ async function executeDeepSwarmProtocol() {
     const startTime = Date.now();
     console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
   } catch (error) {
+    } catch (e) { console.error('Auto-recovery:', e.message);
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
     global.neonClient = null; 
     throw error;
