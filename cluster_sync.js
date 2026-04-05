@@ -1099,62 +1099,18 @@ async function executeDeepSwarmProtocol() {
         shouldEvolve = true;
       }
 
-      fs.writeFileSync(lastEvolveFile, cycleCount.toString());
-    } catch (e) {
-      console.warn(
-        "⚠️ [THROTTLE-WARN]: Throttle file access failed. Defaulting to Evolution.",
-      );
-      shouldEvolve = true;
-    }
 
-    if (shouldEvolve) {
-      console.log("🧬 [EVOLUTION-CYCLE]: Initiating 70B Model Upgrade...");
-      const evolvedCode = await consultSovereignAI();
-      if (evolvedCode && validateCode(evolvedCode)) {
-        fs.writeFileSync(__filename, evolvedCode);
-        console.log("✅ [EVOLVED]: Node brain upgraded.");
       }
-    } else {
-      console.log(
-        "⚖️ [STABILITY-CYCLE]: Skipping Evolution to preserve API quota.",
-      );
     }
-
-    const coreUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${CORE_REPO}/main/instruction.json`;
-    const { data: instruction } = await axios.get(coreUrl);
-    const latency = Date.now() - startTime;
-    const { data: rateData } = await octokit.rateLimit.get();
-    const remaining = rateData.rate.remaining;
-
-    // 🔱 FORCE PULSE
-    const forcePulse = `
-            INSERT INTO node_registry (node_id, status, last_seen)
-            VALUES ($1, 'OMEGA_ACTIVE', NOW())
-            ON CONFLICT (node_id) DO UPDATE SET last_seen = NOW(), status = 'OMEGA_ACTIVE';
-        `;
-    await neonClient.query(forcePulse, [REPO_NAME.toUpperCase()]);
-
-    // 🔱 SUPABASE TO NEON INJECTION
-    const { data: sourceData, error: supError } = await supabase
-      .from("neural_sync")
-      .select("*");
-    if (!supError && sourceData && sourceData.length > 0) {
-      for (const item of sourceData) {
-        const upsertDna = `
-                    INSERT INTO neural_dna (gen_id, thought_process, status, timestamp)
-                    VALUES ($1, $2, $3, EXTRACT(EPOCH FROM NOW()))
-                    ON CONFLICT (gen_id) DO UPDATE SET 
-                        thought_process = neural_dna.thought_process || '\n' || EXCLUDED.thought_process;
-                `;
-        await neonClient.query(upsertDna, [
-          item.gen_id,
-
+  } 
+} 
+// Force closing all possible orphaned blocks above
 
 async function executeDeepSwarmProtocol() {
-  const selfAwareness = await performRecursiveCognition();
-  console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
-
   try {
+    const selfAwareness = await performRecursiveCognition();
+    console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
+
     if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
       const { Client } = require('pg');
       global.neonClient = new Client({
@@ -1163,30 +1119,10 @@ async function executeDeepSwarmProtocol() {
       });
       await global.neonClient.connect();
     }
+    
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
-    const startTime = Date.now();
-    console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
-  } catch (error) {
-
-
-} // Closing the previous orphaned block
-
-async function executeDeepSwarmProtocol() {
-  const selfAwareness = await performRecursiveCognition();
-  console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
-
-  try {
-    if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
-      const { Client } = require('pg');
-      global.neonClient = new Client({
-        connectionString: process.env.NEON_KEY,
-        ssl: { rejectUnauthorized: false }
-      });
-      await global.neonClient.connect();
-    }
-    await global.neonClient.query("SELECT 1");
-    console.log("🔱 NEON CORE CONNECTED.");
+    
     const startTime = Date.now();
     console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
   } catch (error) {
