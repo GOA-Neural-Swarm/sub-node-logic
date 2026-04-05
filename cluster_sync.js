@@ -1070,7 +1070,9 @@ async function executeDeepSwarmProtocol() {
 
     } catch (error) {
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
-    
+      if (error.message.includes('closed') || error.message.includes('terminating')) {
+      global.neonClient = null;
+      }
     // Client error ဖွဈသှားရငျ နောကျတဈကွိမျအတှကျ null ပွနျထားပေးခွငျး
     global.neonClient = null; 
     throw error;
