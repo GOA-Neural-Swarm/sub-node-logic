@@ -43,7 +43,6 @@ if (!currentContent.includes("startGodMode()")) {
     console.error(" Recovery Failed:", e.message);
   
 }
-  } catch (error) { console.error('Neural Sync Guard:', error.message); }
   
   
   
@@ -1087,7 +1086,6 @@ async function executeDeepSwarmProtocol() {
     if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
       throw new Error("Client was closed");
     }
-  } catch (error) { console.error('Neural Sync Guard:', error.message); }
   
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
@@ -1116,7 +1114,6 @@ async function executeDeepSwarmProtocol() {
           );
           cycleCount = 0;
         }
-  } catch (error) { console.error('Neural Sync Guard:', error.message); }
   
       }
 
@@ -1164,3 +1161,4 @@ executeDeepSwarmProtocol().catch(err => {
   console.error("Fatal Breach:", err);
   process.exit(1);
 );
+}}}}
