@@ -46,6 +46,7 @@ if (!currentContent.includes("startGodMode()")) {
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
   
   
+  
 // ------------------------------------------
 // </SOVEREIGN_CORE>
 
@@ -75,6 +76,7 @@ async function bootSystem() {
     startGodMode();
   } catch (err) {
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
     console.error("❌ [SYSTEM]: Initialization failed!", err.message);
     process.exit(1);
   }
@@ -88,12 +90,13 @@ if (!admin.apps.length) {
       credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)),
     });
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
     console.log("🔥 Firebase Connected.");
     console.error("❌ Firebase Auth Error:", e.message);
     process.exit(1);
   
 }
-  } catch (err) { console.error('Swarm Logic Recovery:', err.message); }
+  
   
 const db = admin.firestore();
 // </SOVEREIGN_CORE>
@@ -152,6 +155,7 @@ const Osiris = {
       }
     } catch (fsErr) {
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
       console.warn("⚠️ [OSIRIS-WARN]: DNA reference missing.");
     }
   
@@ -176,6 +180,7 @@ const Osiris = {
                 "You are the OMEGA Gene-Scribe. Use the REFERENCE_BLUEPRINT as the absolute standard. NEVER simplify logic. If the blueprint has advanced features, you MUST preserve or enhance them. Return ONLY valid JS code.",
             },
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
             { role: "user", content: patchRequest },
           ],
           temperature: 0.1,
@@ -202,6 +207,7 @@ const Osiris = {
         try {
           const script = new vm.Script(`(${patchedCode})`);
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
           // global.neonClient ကို သုံးနိုင်ရန် sandbox တွင် ထည့်သွင်းထားသည်
           const sandbox = {
             console,
@@ -777,6 +783,7 @@ async function consultSovereignAI() {
         console.log(
           `🧠 [GROQ-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`,
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
         );
 
         const response = await axios.post(
@@ -852,6 +859,7 @@ function validateCode(code) {
     fs.writeFileSync(tempPath, code);
     execSync(`node --check ${tempPath}`);
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
     fs.unlinkSync(tempPath);
     return true;
     return false;
@@ -1057,6 +1065,7 @@ async function triggerStructuralMutation(patch) {
     const originalContent = await fs.readFile(targetFile, 'utf8').catch(() => "");
     const mutatedContent = `${patch}\n\n${originalContent}`;
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
     
     await fs.writeFile(targetFile, mutatedContent, 'utf8');
     console.log("✅ [MUTATION_COMPLETE]: Structural integrity upgraded.");
@@ -1079,6 +1088,7 @@ async function executeDeepSwarmProtocol() {
       throw new Error("Client was closed");
     }
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
     const startTime = Date.now();
@@ -1107,6 +1117,7 @@ async function executeDeepSwarmProtocol() {
           cycleCount = 0;
         }
   } catch (error) { console.error('Neural Sync Guard:', error.message); }
+  
       }
 
       cycleCount = (cycleCount + 1) % 3;
