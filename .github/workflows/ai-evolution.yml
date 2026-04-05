@@ -63,21 +63,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NEON_KEY: ${{ secrets.NEON_KEY }}
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
           EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'deep-refactor' }}
         run: |
-          echo "Initiating Global Neural Overhaul. Depth: $EVOLUTION_DEPTH"
+          echo "🚀 Initializing Neural Forge..."
           
-          # Force install dependencies in the current workspace to ensure axios is present
-          npm install axios crypto-js
+          # ၁။ ရှိပြီးသား node_modules တွေကို ရှင်းထုတ်ပြီး အသစ်ပြန်သွင်းမယ်
+          rm -rf node_modules package-lock.json
+          npm install axios crypto-js crypto
           
+          # ၂။ install ဖြစ်သွားတဲ့ path ကို verify လုပ်မယ် (Debug အတွက်)
+          ls node_modules/axios || echo "Axios install failed"
+
+          # ၃။ AI Architect ကို တိုက်ရိုက်ခေါ်မယ်
           if [ -f "ai_architect.js" ]; then
             node ai_architect.js
           else
-            echo "CRITICAL: ai_architect.js missing. Node mutation impossible."
+            echo "💀 CRITICAL: ai_architect.js not found in $(pwd)"
             exit 1
           fi
 
