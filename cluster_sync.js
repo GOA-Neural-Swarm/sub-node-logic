@@ -1058,35 +1058,18 @@ async function triggerStructuralMutation(patch) {
 // 🔱 7. MASTER EXECUTION PROTOCOL
 async function executeDeepSwarmProtocol() {
   const selfAwareness = await performRecursiveCognition();
-  
-  // selfAwareness ထဲမှာ load မပါဘဲ evolutionaryPressure ပါတာမို့ ပြင်ပေးထားပါတယ်
-  console.log(
-    `🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`,
-  );
+  console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
 
   try {
-    // Database connection စစ်ဆေးခြင်း
     if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
       throw new Error("Client was closed");
     }
-
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
-
     const startTime = Date.now();
-    
-    // --- ဤနေရာတွင် မင်း၏ ကျန်ရှိသော Logic များကို ထည့်သွင်းပါ ---
-    // ------------------------------------------------------
-
+    console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
   } catch (error) {
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
-    
-    // Connection ပြဿနာဆိုလျှင် null ပြန်ထားမှသာ နောက်တစ်ကြိမ်မှာ အသစ်ပြန်ချိတ်ပါလိမ့်မည်
-    if (error.message.includes('closed') || error.message.includes('terminating')) {
-      global.neonClient = null;
-    }
-    
-    // Connection ပြတ်တောက်မှုအတွက် manual null သတ်မှတ်ချက်
     global.neonClient = null; 
     throw error;
   }
