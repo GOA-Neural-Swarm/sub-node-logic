@@ -90,6 +90,7 @@ if (!admin.apps.length) {
     process.exit(1);
   
 }
+  } catch (err) { console.error('Swarm Logic Recovery:', err.message); }
   
 const db = admin.firestore();
 // </SOVEREIGN_CORE>
