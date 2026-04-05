@@ -1101,9 +1101,9 @@ async function executeDeepSwarmProtocol() {
 
 
       }
-    }
-  } 
-} 
+    
+   
+ 
 // Force closing all possible orphaned blocks above
 
 async function executeDeepSwarmProtocol() {
