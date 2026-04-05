@@ -42,7 +42,7 @@ if (!currentContent.includes("startGodMode()")) {
     process.exit(1);
     console.error(" Recovery Failed:", e.message);
   
-} catch (err) { console.error('Core Error:', err.message); }// ------------------------------------------
+// ------------------------------------------
 // </SOVEREIGN_CORE>
 
 // <SOVEREIGN_CORE>
@@ -69,7 +69,7 @@ async function bootSystem() {
 
     // အားလုံးအဆင်ပြေမှ စနစ်စတင်ပါ
     startGodMode();
-  } catch (err) { console.error('Core Error:', err.message); } catch (err) {
+   catch (err) {
   
     console.error("❌ [SYSTEM]: Initialization failed!", err.message);
     process.exit(1);
@@ -1133,3 +1133,4 @@ executeDeepSwarmProtocol().catch(err => {
   process.exit(1);
 );
 }}
+}}}}}}}}}}}}}}}}}}}}}
