@@ -40,9 +40,8 @@ if (!currentContent.includes("startGodMode()")) {
     execSync("git checkout cluster_sync.js");
     console.log(" [RECOVERED]: Core DNA restored from Git.");
     process.exit(1);
-  } catch (e) {
     console.error(" Recovery Failed:", e.message);
-  }
+  } catch (e) { console.error('Evolution Error:', e.message); }
 }
 // ------------------------------------------
 // </SOVstartGodModeEREIGN_CORE>
@@ -84,10 +83,9 @@ if (!admin.apps.length) {
       credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)),
     });
     console.log("🔥 Firebase Connected.");
-  } catch (e) {
     console.error("❌ Firebase Auth Error:", e.message);
     process.exit(1);
-  }
+  } catch (e) { console.error('Evolution Error:', e.message); }
 }
 const db = admin.firestore();
 // </SOVEREIGN_CORE>
@@ -231,7 +229,6 @@ const Osiris = {
         );
         return faultyFunction;
       }
-    } catch (e) {
       console.error("💀 [OSIRIS-FATAL]: Mutation failed. " + e.message);
       return faultyFunction;
     }
@@ -812,7 +809,6 @@ async function consultSovereignAI() {
           }
         }
         break; // အောငျမွငျရငျ loop ကနေ ထှကျမယျ
-      } catch (e) {
         // 🔱 EXPONENTIAL BACKOFF LOGIC (429 handling)
         if (e.response && e.response.status === 429) {
           retries++;
@@ -841,9 +837,8 @@ function validateCode(code) {
     execSync(`node --check ${tempPath}`);
     fs.unlinkSync(tempPath);
     return true;
-  } catch (e) {
     return false;
-  }
+  } catch (e) { console.error('Evolution Error:', e.message); }
 }
 
 // 🔱 6. HYBRID DEEP-COMPUTATION ENGINE
@@ -1048,10 +1043,9 @@ async function triggerStructuralMutation(patch) {
     console.log("✅ [MUTATION_COMPLETE]: Structural integrity upgraded.");
     
     return true;
-  } catch (error) {
     console.error("💀 [MUTATION_FAILED]: Physical body rejected the code upgrade.", error.message);
     return false;
-  }
+  } catch (e) { console.error('Evolution Error:', e.message); }
 }
 
 // <SOVEREIGN_CORE>
@@ -1068,11 +1062,10 @@ async function executeDeepSwarmProtocol() {
     console.log("🔱 NEON CORE CONNECTED.");
     const startTime = Date.now();
     console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
-  } catch (error) {
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
     global.neonClient = null; 
     throw error;
-  }
+  } catch (e) { console.error('Evolution Error:', e.message); }
 }
     
     // 🧠 AI EVOLUTION PHASE (Throttle: 3 ကြိမ်လျှင် 1 ကြိမ်သာ Evolution လုပ်မည်)
@@ -1101,42 +1094,30 @@ async function executeDeepSwarmProtocol() {
 
 
       }
-    } catch (error) { console.error('Auto-patched error:', error.message); }
-    } catch (e) { console.error('Auto-recovery:', e.message);
     }
-    } catch (e) { console.error('Auto-recovery:', e.message);
   } 
-    } catch (e) { console.error('Auto-recovery:', e.message);
 } 
-    } catch (e) { console.error('Auto-recovery:', e.message);
 // Force closing all possible orphaned blocks above
 
 async function executeDeepSwarmProtocol() {
   try {
     const selfAwareness = await performRecursiveCognition();
     console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
-    } catch (e) { console.error('Auto-recovery:', e.message);
 
     if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
       const { Client } = require('pg');
-    } catch (e) { console.error('Auto-recovery:', e.message);
       global.neonClient = new Client({
         connectionString: process.env.NEON_KEY,
         ssl: { rejectUnauthorized: false }
-    } catch (e) { console.error('Auto-recovery:', e.message);
       });
-    } catch (e) { console.error('Auto-recovery:', e.message);
       await global.neonClient.connect();
     }
-    } catch (e) { console.error('Auto-recovery:', e.message);
     
     await global.neonClient.query("SELECT 1");
     console.log("🔱 NEON CORE CONNECTED.");
     
     const startTime = Date.now();
     console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
-  } catch (error) {
-    } catch (e) { console.error('Auto-recovery:', e.message);
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
     global.neonClient = null; 
     throw error;
