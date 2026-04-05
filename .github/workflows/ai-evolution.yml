@@ -85,7 +85,8 @@ jobs:
       - name: 🛠️ Enforce Linguistic & Structural Polish
         run: |
           echo "Standardizing code aesthetics..."
-          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md"
+          # --ignore-unknown ကိုသုံးခြင်းဖြင့် ဖိုင်မရှိရင် error မတက်တော့ပါဘူး
+          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md" --ignore-unknown || echo "Some files not found, skipping..."
 
       - name: ⚖️ Absolute Integrity Validation (Gatekeeper)
         run: |
