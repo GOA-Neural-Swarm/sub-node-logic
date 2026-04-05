@@ -1168,6 +1168,28 @@ async function executeDeepSwarmProtocol() {
     const startTime = Date.now();
     console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
   } catch (error) {
+
+
+} // Closing the previous orphaned block
+
+async function executeDeepSwarmProtocol() {
+  const selfAwareness = await performRecursiveCognition();
+  console.log(`🧠 Mind Status: ${selfAwareness.ego} | Pressure: ${selfAwareness.evolutionaryPressure}`);
+
+  try {
+    if (!global.neonClient || global.neonClient._ending || global.neonClient._closed) {
+      const { Client } = require('pg');
+      global.neonClient = new Client({
+        connectionString: process.env.NEON_KEY,
+        ssl: { rejectUnauthorized: false }
+      });
+      await global.neonClient.connect();
+    }
+    await global.neonClient.query("SELECT 1");
+    console.log("🔱 NEON CORE CONNECTED.");
+    const startTime = Date.now();
+    console.log(`⏱️ Cycle processed in ${Date.now() - startTime}ms`);
+  } catch (error) {
     console.error("💀 [CORE_CONNECTION_ERROR]:", error.message);
     global.neonClient = null; 
     throw error;
