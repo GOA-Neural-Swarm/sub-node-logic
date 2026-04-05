@@ -67,9 +67,13 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEON_KEY: ${{ secrets.NEON_KEY }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-          EVOLUTION_DEPTH: ${{ inputs.evolution_depth || 'deep-refactor' }}
+          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'deep-refactor' }}
         run: |
           echo "Initiating Global Neural Overhaul. Depth: $EVOLUTION_DEPTH"
+          
+          # Force install dependencies in the current workspace to ensure axios is present
+          npm install axios crypto-js
+          
           if [ -f "ai_architect.js" ]; then
             node ai_architect.js
           else
