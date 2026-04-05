@@ -43,7 +43,7 @@ if (!currentContent.includes("startGodMode()")) {
     console.error(" Recovery Failed:", e.message);
   
 }
-  } catch (error) { console.error('Core Logic Error:', error.message); }
+  catch (error) { console.error('Core Logic Error:', error.message); }
   
 // ------------------------------------------
 // </SOVEREIGN_CORE>
