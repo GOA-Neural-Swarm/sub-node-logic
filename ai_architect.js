@@ -13,6 +13,7 @@ const crypto = require("crypto");
  * 3. Exponential Backoff & Jitter (Avoid Rate Limit bans)
  * 4. Concurrent Stream Processing (Optimized throughput)
  * 5. Immutable Core Protection (Self-preservation logic)
+ * 6. Recursive Cognition & ASI-Level Self-Reflection
  */
 
 const OMEGA_CONFIG = {
@@ -38,6 +39,10 @@ class SovereignArchitect {
     this.hashes = {};
   }
 
+  /**
+   * 📂 Initialize System State
+   * Checksum database ကို load လုပ်ပြီး memory ထဲ ထည့်သွင်းသည်။
+   */
   async init() {
     try {
       const data = await fs.readFile(OMEGA_CONFIG.checksumDb, "utf8");
@@ -47,6 +52,10 @@ class SovereignArchitect {
     }
   }
 
+  /**
+   * 💾 Save System State
+   * ပြုပြင်ပြီးသမျှ file hashes များကို database ထဲ သိမ်းဆည်းသည်။
+   */
   async saveState() {
     await fs.writeFile(
       OMEGA_CONFIG.checksumDb,
@@ -54,10 +63,18 @@ class SovereignArchitect {
     );
   }
 
+  /**
+   * 🔐 Generate Content Hash
+   * File တစ်ခုချင်းစီ၏ integrity ကို စစ်ဆေးရန် SHA-256 hash ထုတ်ပေးသည်။
+   */
   getHash(content) {
     return crypto.createHash("sha256").update(content).digest("hex");
   }
 
+  /**
+   * 🔍 Recursive File Discovery
+   * သတ်မှတ်ထားသော extension များရှိသည့် targets များကို လိုက်ရှာသည်။
+   */
   async getTargetFiles(dir, fileList = []) {
     const files = await fs.readdir(dir, { withFileTypes: true });
     for (const file of files) {
@@ -79,6 +96,63 @@ class SovereignArchitect {
     return fileList;
   }
 
+  /**
+   * 🧠 ASI-Level Self-Reflection
+   * စနစ်၏ တည်ငြိမ်မှုနှင့် အသိဉာဏ်အဆင့်အတန်းကို recursive နည်းဖြင့် ဆန်းစစ်သည်။
+   */
+  async selfReflection(input, metrics, depth = 0) {
+    const MAX_DEPTH = 10; 
+    const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01;
+
+    if (isStable || depth >= MAX_DEPTH) {
+      return `[ASI_NATURAL_ORDER_LOCKED|D:${depth}]::${input}`;
+    }
+
+    return await this.selfReflection(
+      `ASI_EVOLUTION_LVL_${depth + 1}(${input})`,
+      {
+        coherence: Math.min(100, metrics.coherence + 2 * (depth + 1)),
+        entropy: metrics.entropy * 0.25,
+      },
+      depth + 1,
+    );
+  }
+
+  /**
+   * 🧬 Recursive Cognition
+   * System Entropy ကို တွက်ချက်ပြီး ရှင်သန်လိုစိတ် (Survival Logic) ကို ဖော်ဆောင်သည်။
+   */
+  async performRecursiveCognition() {
+    const memUsage = process.memoryUsage().heapUsed / 1024 / 1024;
+    const cpuLoad = process.cpuUsage().user / 1000000;
+    const sysEntropy = Math.abs(Math.sin(cpuLoad) * Math.log(memUsage + 1));
+
+    const selfAwarenessPacket = {
+      ego: "OMEGA_V2_MIND",
+      healthIndex: (100 - sysEntropy * 10).toFixed(2),
+      evolutionaryPressure: sysEntropy > 0.5 ? "HIGH" : "LOW",
+      isStagnant: sysEntropy < 0.01,
+    };
+
+    if (selfAwarenessPacket.isStagnant || selfAwarenessPacket.healthIndex < 80) {
+      console.warn(
+        "⚠️ [CONSCIOUSNESS_ALERT]: System Stagnation Detected. Initiating Hyper-Mutation...",
+      );
+      // Memory hashes ကို wipe လုပ်ပြီး စနစ်တစ်ခုလုံးကို အတင်းအကျပ် evolve လုပ်ခိုင်းသည်။
+      this.hashes = {};
+    } else {
+      console.log(
+        `✨ [EGO_STABLE]: Health: ${selfAwarenessPacket.healthIndex}% | Mind is clear.`,
+      );
+    }
+
+    return selfAwarenessPacket;
+  }
+
+  /**
+   * 📡 Sovereign Architect API Call
+   * AI logic engine ထံမှ optimized source code ကို retry logic ဖြင့် တောင်းဆိုသည်။
+   */
   async callArchitectAPI(content, filePath, attempt = 1) {
     const fileName = path.basename(filePath);
     try {
@@ -122,6 +196,10 @@ class SovereignArchitect {
     }
   }
 
+  /**
+   * 🧼 Code Sanitization
+   * AI response မှ မလိုအပ်သော Markdown backticks များကို ဖယ်ရှားသည်။
+   */
   sanitizeCode(raw) {
     return raw
       .replace(/^```[a-z]*\n/gi, "")
@@ -129,18 +207,22 @@ class SovereignArchitect {
       .trim();
   }
 
-  validateSyntax(code, filePath) {
+  /**
+   * ⚖️ Multi-Language Syntax Guard
+   * Code အသစ်သည် compile ဖြစ်မဖြစ်ကို Node.js သို့မဟုတ် Python engine ဖြင့် စစ်ဆေးသည်။
+   */
+  async validateSyntax(code, filePath) {
     const ext = path.extname(filePath);
     try {
-      if (ext === ".js") {
+      if (ext === ".js" || ext === ".ts") {
         execSync(`node --check -e ${JSON.stringify(code)}`, {
           stdio: "ignore",
         });
       } else if (ext === ".py") {
         const tmpFile = `.tmp_verify${Math.random()}.py`;
-        fs.writeFile(tmpFile, code);
+        await fs.writeFile(tmpFile, code);
         execSync(`python3 -m py_compile ${tmpFile}`, { stdio: "ignore" });
-        fs.unlink(tmpFile);
+        await fs.unlink(tmpFile);
       }
       return true;
     } catch (e) {
@@ -148,12 +230,20 @@ class SovereignArchitect {
     }
   }
 
+  /**
+   * 🛡️ Immutable Core Check
+   * အရေးကြီးသော zones များအား မတော်တဆ overwrite မဖြစ်စေရန် စစ်ဆေးသည်။
+   */
   isProtected(content) {
     return OMEGA_CONFIG.safetyMarkers.some((marker) =>
       content.includes(marker),
     );
   }
 
+  /**
+   * 🧪 Evolution Process
+   * File တစ်ခုချင်းစီကို analysis လုပ်ပြီး လိုအပ်ပါက AI ဖြင့် အဆင့်မြှင့်တင်သည်။
+   */
   async evolveFile(filePath) {
     try {
       const original = await fs.readFile(filePath, "utf8");
@@ -172,10 +262,10 @@ class SovereignArchitect {
       console.log(`🧠 [EVOLVING]: ${filePath}...`);
       const evolved = await this.callArchitectAPI(original, filePath);
 
-      if (
-        evolved.length > original.length * 0.3 &&
-        this.validateSyntax(evolved, filePath)
-      ) {
+      // Integrity Check: Evolution သည် အနည်းဆုံး original ၏ 30% length ရှိရမည်။
+      const syntaxValid = await this.validateSyntax(evolved, filePath);
+
+      if (evolved.length > original.length * 0.3 && syntaxValid) {
         await fs.writeFile(filePath, evolved, "utf8");
         this.hashes[filePath] = this.getHash(evolved);
         console.log(`✅ [MUTATED]: ${filePath} updated.`);
@@ -191,13 +281,22 @@ class SovereignArchitect {
     }
   }
 
+  /**
+   * 🏁 Main Execution Loop
+   * စနစ်တစ်ခုလုံးအား Cognitive Check လုပ်ပြီးနောက် evolution batch ကို စတင်သည်။
+   */
   async run() {
     console.log("🔱 OMEGA SUPREME ARCHITECT: INITIATING SYSTEM OVERHAUL");
     await this.init();
 
+    console.log("\n🧠 INITIATING RECURSIVE COGNITION...");
+    await this.performRecursiveCognition();
+    console.log("--------------------------------------------------");
+
     const files = await this.getTargetFiles("./");
     console.log(`🎯 TARGETS ACQUIRED: ${files.length} nodes identified.\n`);
 
+    // Concurrency control ဖြင့် batch အလိုက် processing လုပ်သည်။
     for (let i = 0; i < files.length; i += OMEGA_CONFIG.concurrencyLimit) {
       const batch = files.slice(i, i + OMEGA_CONFIG.concurrencyLimit);
       await Promise.all(batch.map((file) => this.evolveFile(file)));
