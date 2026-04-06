@@ -106,7 +106,7 @@ jobs:
             git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Full-Repository Evolution" 
             git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main 
             echo "✅ Synergy complete. Repository evolved." 
-          else [cite: 22]
+          else 
             echo "✨ Logic is already optimal. No mutation required." 
           fi 
 
