@@ -63,7 +63,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }} 
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }} 
-          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || [cite_start]'deep-refactor' }} 
+          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'deep-refactor' }} 
         run: |
           echo "🚀 Initializing Neural Forge..." 
           
