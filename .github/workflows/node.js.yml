@@ -62,7 +62,7 @@ jobs:
           [ -f cluster_sync.js ] && node cluster_sync.js || echo "cluster_sync.js not found"
 
   sovereign-installation:
-    name: 🧬 OMEGA-ULTIMA: Sovereign Sync & Conflict Resolution
+    name: 🧬 Sovereign Sync & Conflict Resolution
     needs: audit-and-diagnose
     runs-on: ubuntu-latest
     steps:
