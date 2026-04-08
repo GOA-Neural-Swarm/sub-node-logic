@@ -721,7 +721,11 @@ console.log(`✅ [REAL-SYNC]: ${domain} saved to research_data.`);
                         await octokit.repos.createForAuthenticatedUser({ name: nextNodeName, auto_init: true });
                     }
 
-                    const filesToCopy = ['package.json', 'cluster_sync.js', '.github/workflows/sync.yml'];
+                    // 🛠️ SELF-HEALING INJECTION
+if (!fs.existsSync('ai_architect.js')) {
+    console.log("⚠️ ai_architect.js missing! Regenerating core logic...");
+}
+                    const filesToCopy = ['package.json', 'cluster_sync.js', 'ai_architect.js', '.github/workflows/sync.yml'];
                     for (const fileName of filesToCopy) {
                         try {
                             const { data: content } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: fileName });
