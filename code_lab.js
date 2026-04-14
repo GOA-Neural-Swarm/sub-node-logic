@@ -953,7 +953,8 @@ async function executeDeepSwarmProtocol() {
 
         if (shouldEvolve) {
             console.log("🧬 [EVOLUTION-CYCLE]: Initiating 70B Model Upgrade...");
-            const evolvedCode = await consultSovereignAI();
+            console.log("🧬 [EVOLUTION]: Initiating Full-File Chunked Processing...");
+        const evolvedCode = await consultSovereignAI(currentContent);
             if (evolvedCode && validateCode(evolvedCode)) {
                 fs.writeFileSync(__filename, evolvedCode);
                 console.log("✅ [EVOLVED]: Node brain upgraded.");
