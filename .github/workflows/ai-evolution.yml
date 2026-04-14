@@ -8,12 +8,12 @@ on:
       evolution_depth:
         description: 'Mutation depth layer' 
         required: true 
-        default: 'deep-refactor' 
+        default: 'surgical-patch' 
         type: choice 
         options:
           - syntax-optimization 
+          - surgical-patch
           - deep-refactor 
-          - absolute-rewrite 
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }} 
@@ -52,7 +52,7 @@ jobs:
       - name: 📦 Inject Core Dependencies 
         run: |
           npm ci || npm install --legacy-peer-deps --no-audit 
-          npm install -g eslint prettier jest axios typescript 
+          npm install -g eslint prettier jest axios typescript crypto-js 
 
       - name: 🔍 Baseline Neural Audit 
         run: |
@@ -63,35 +63,42 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }} 
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }} 
-          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'deep-refactor' }} 
+          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'surgical-patch' }} 
         run: |
-          echo "🚀 Initializing Neural Forge..." 
+          echo "🚀 Initializing Neural Forge [${EVOLUTION_DEPTH}]..." 
           
-          # ၁။ ရှိပွီးသား node_modules တှကေို ရှငျးထုတျပွီး အသဈပွနျသှငျးမယျ 
-          rm -rf node_modules package-lock.json 
-          npm install axios crypto-js crypto 
+          # ၁။ Dependency အားလုံးကို အဆင့်သင့်ဖြစ်အောင် ပြင်ဆင်ခြင်း
+          npm install axios crypto-js 
           
-          # ၂။ install ဖွဈသှားတဲ့ path ကို verify လုပျမယျ (Debug အတှကျ) 
-          ls node_modules/axios || echo "Axios install failed" 
-
-          # ၃။ AI Architect ကို တိုကျရိုကျခေါျမယျ 
+          # ၂။ Mutation Protocol ကို စတင်ခြင်း
           if [ -f "ai_architect.js" ]; then 
             node ai_architect.js 
           else 
-            echo "💀 CRITICAL: ai_architect.js not found in $(pwd)" 
+            echo "💀 CRITICAL: ai_architect.js not found. Evolution aborted." 
             exit 1 
           fi 
+
+      - name: ⚖️ Absolute Integrity & Anti-Truncation Guard 
+        run: |
+          echo "Verifying DNA structural integrity..." 
+          
+          # ၁။ Syntax Validation (Code ပြတ်တောက်မှုရှိမရှိ စစ်ဆေးခြင်း)
+          find . -name "*.js" ! -name "temp_val.js" -exec node -c {} \; || (echo "FATAL: Evolution produced invalid syntax." && exit 1) 
+
+          # ၂။ Truncation Guard (Code အကြောင်းရေ အဆမတန် လျော့ကျသွားမှုကို တားဆီးခြင်း)
+          # Deletions က Insertions ထက် အလွန်အမင်း များနေပါက AI ၏ ဖျက်ထုတ်မှုကို ငြင်းပယ်မည်
+          DELETIONS=$(git diff --shortstat | grep -oP '\d+(?= deletions)' || echo 0)
+          INSERTIONS=$(git diff --shortstat | grep -oP '\d+(?= insertions)' || echo 0)
+          
+          if [ "$DELETIONS" -gt 150 ] && [ "$DELETIONS" -gt "$INSERTIONS" ]; then
+            echo "❌ TRUNCATION BREACH DETECTED: $DELETIONS lines lost. Rolling back mutation."
+            exit 1
+          fi
 
       - name: 🛠️ Enforce Linguistic & Structural Polish 
         run: |
           echo "Standardizing code aesthetics..." 
-          # --ignore-unknown ကိုသုံးခွငျးဖွင့ျ ဖိုငျမရှိရငျ error မတကျတော့ပါဘူး 
-          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md" --ignore-unknown || echo "Some files not found, skipping..." 
-
-      - name: ⚖️ Absolute Integrity Validation (Gatekeeper) 
-        run: |
-          echo "Compiling evolved logic..." 
-          find . -name "*.js" ! -name "temp_val.js" -exec node -c {} \; || (echo "FATAL: Evolution produced invalid syntax. Aborting synchronization." && exit 1) 
+          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md" --ignore-unknown || echo "Polish skipped." 
 
       - name: 🧬 Manifest Autonomous Mutation 
         run: |
@@ -99,11 +106,13 @@ jobs:
           git config --global user.email "omega@goa-natural-order.ai"
           
           git add . 
+          
+          # 🛡️ [PROTECTION]: Workflow DNA ကို AI က ပြင်ဆင်ခွင့်မရှိစေရန် Lock ချထားခြင်း
           git reset .github/workflows/ 
           git checkout -- .github/workflows/ 
           
-          if ! git diff --quiet || [cite_start]! git diff --staged --quiet; then 
-            git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Full-Repository Evolution" 
+          if ! git diff --quiet || ! git diff --staged --quiet; then 
+            git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Surgical Evolution (${{ github.event.inputs.evolution_depth }})" 
             git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main 
             echo "✅ Synergy complete. Repository evolved." 
           else 
@@ -113,4 +122,4 @@ jobs:
       - name: 🚨 Breach Protocol (Failure Recovery) 
         if: failure() 
         run: |
-          echo "::error title=Evolution Failed::The AI Architect encountered a catastrophic failure during the evolution cycle." 
+          echo "::error title=Evolution Failed::The AI Architect encountered a catastrophic failure or Truncation Breach during the evolution cycle."
