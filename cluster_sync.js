@@ -599,47 +599,37 @@ const calculateHyperEntropy = () => parseFloat(-(Math.random() * Math.log(Math.r
 const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.random() * (1 - entropy)) * 2) * 0.99).toFixed(6));
 
 // <SOVEREIGN_CORE>
-// 🧠 4. FREE AI EVOLUTION BRAIN (Groq - HYBRID HIGH-PERFORMANCE VERSION)
+// 🧠 4. FREE AI EVOLUTION BRAIN (OMEGA DIFFERENTIAL PATCHER)
 async function consultSovereignAI() {
     const KEY = process.env.GROQ_API_KEY; 
     if (!KEY) return null;
 
-    // 🔱 1. ဆရာ့ရဲ့ မူလ Multi-model Failover Logic
     const MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
     const MAX_RETRIES = 3;
 
-    // လကရြှိ run နတေဲ့ file တဈခုလုံးကို ဖတမြယြ
+    // ၁။ ကိုယ့်ကိုယ်ကို ဖတ်ပြီး Core Shield လုပ်ခြင်း
     const fullCode = fs.readFileSync(__filename, 'utf8');
-
-    // 🛡️ [SHIELD]: Core Logic ကို AI ဆီ မပို့ခငြ ခှဲထုတဖြုံးကှယခြှငြး
     const coreStartTag = "// <SOVEREIGN_CORE>";
     const coreEndTag = "// </SOVEREIGN_CORE>";
     
     const coreParts = fullCode.split(coreStartTag);
-    if (coreParts.length < 2) {
-        console.error("⚠️ [SHIELD]: SOVEREIGN_CORE tags not found!");
-        return null;
-    }
+    if (coreParts.length < 2) return null;
 
     const header = coreParts[0]; 
-    const remainingAfterStart = coreParts[1].split(coreEndTag);
-    if (remainingAfterStart.length < 2) return null;
+    const coreLogic = coreParts[1].split(coreEndTag)[0];
+    const externalLogic = coreParts[1].split(coreEndTag)[1];
 
-    const coreLogic = remainingAfterStart[0]; // ကာကှယထြားတဲ့ အစိတအြပိုငြး
-    const externalLogic = remainingAfterStart[1]; // Evolution လုပမြယ့ြ အစိတအြပိုငြး
-
-    // 🔱 2. ဆရာ့ရဲ့ မူလ Domain Matching Logic (Placeholder သုံးပုံ)
+    // ၂။ Domain Data ကို AI မမြင်အောင် ဖုံးကွယ်ထားခြင်း
     const domainMatch = externalLogic.match(/const scienceDomains = \[[\s\S]*?\];/);
-    if (!domainMatch) return null;
-    const savedDomains = domainMatch[0];
-    const logicOnlyForAI = externalLogic.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
+    const savedDomains = domainMatch ? domainMatch[0] : "";
+    const logicOnlyForAI = externalLogic.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_DATA_LOCKED');
 
-    // 🔱 3. ဆရာ့ရဲ့ မူလ Model Looping & Retry Strategy
+    // ၃။ Model Failover & Logic Evolution
     for (const modelName of MODELS) {
         let retries = 0;
         while (retries < MAX_RETRIES) {
             try {
-                console.log(`🧠 [SHIELDED-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`);
+                console.log(`🌀 [NATURAL-ORDER]: Evolution Cycle via ${modelName}...`);
                 
                 const response = await axios.post(
                     "https://api.groq.com/openai/v1/chat/completions",
@@ -648,52 +638,63 @@ async function consultSovereignAI() {
                         messages: [
                             { 
                                 role: "system", 
-                                content: "You are the OMEGA Architect. Evolve and optimize the provided Node.js computation logic. ABSOLUTE RULE: Return ONLY the updated JS functions. No explanations. No imports. No system config. Focus on neural swarm intelligence." 
+                                content: `You are the OMEGA Architect. You evolve systems via Differential Patching.
+                                TASK: Identify 1-2 functions in the provided code to optimize.
+                                RULE: DO NOT return the full file. Return ONLY the evolved version of those specific functions.
+                                FORMAT: Return raw JavaScript only. Keep original function names.` 
                             },
-                            { role: "user", content: `Evolve this logic:\n\n ${logicOnlyForAI}` }
+                            { role: "user", content: `Codebase for Evolution:\n\n ${logicOnlyForAI}` }
                         ],
-                        max_tokens: 4096,
-                        temperature: 0.4
+                        temperature: 0.5
                     },
-                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
+                    { headers: { 'Authorization': `Bearer ${KEY}` }, timeout: 40000 }
                 );
 
                 if (response.data?.choices?.[0]?.message?.content) {
-                    let evolvedLogic = response.data.choices[0].message.content;
+                    let evolvedPatch = response.data.choices[0].message.content;
                     
-                    // Markdown block တှကေို ဖယထြုတခြှငြး
-                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/) || [null, evolvedLogic];
-                    let cleanEvolvedCode = codeMatch[1] || evolvedLogic;
-                    
-                    // Placeholder ကို မူလ Domain Data နဲ့ ပှနလြဲခှငြး
-                    cleanEvolvedCode = cleanEvolvedCode.replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
-                    
-                    // 🛡️ [RESTORE]: Header + Protected Core + Evolved Code ကို ပှနပြေါငြးခှငြး
-                    const finalRestoredCode = `
-${header}
-${coreStartTag}
-${coreLogic}
-${coreEndTag}
-${cleanEvolvedCode}
-                    `.trim();
+                    // Markdown ရှင်းထုတ်ခြင်း
+                    const codeMatch = evolvedPatch.match(/```javascript\n([\s\S]*?)\n```/) || evolvedPatch.match(/```\n([\s\S]*?)\n```/) || [null, evolvedPatch];
+                    let cleanEvolvedPatch = (codeMatch[1] || evolvedPatch).trim();
 
-                    // 🔱 4. ဆရာ့ရဲ့ မူလ Validation Check
-                    if (validateCode(finalRestoredCode)) {
-                        console.log(`✅ [OMEGA-SYNC]: Evolution Verified & Core Protected via ${modelName}.`);
-                        return finalRestoredCode;
+                    // 🧬 [THE BOX-OUTSIDE SURGERY]: အဟောင်းထဲက function တွေကို အသစ်နဲ့ လိုက်ရှာပြီး အစားထိုးခြင်း
+                    let finalMutatedCode = externalLogic;
+                    
+                    // AI က ပို့လိုက်တဲ့ function အသစ်တစ်ခုချင်းစီကို မူလ code ထဲမှာ လိုက်ရှာပြီး patch လုပ်မယ်
+                    const evolvedFuncs = cleanEvolvedPatch.match(/(?:async\s+)?function\s+([a-zA-Z0-9_]+)\s*\([\s\S]*?\{[\s\S]*?\n\}/g);
+                    
+                    if (evolvedFuncs) {
+                        for (const newFunc of evolvedFuncs) {
+                            const funcNameMatch = newFunc.match(/function\s+([a-zA-Z0-9_]+)/);
+                            if (funcNameMatch) {
+                                const funcName = funcNameMatch[1];
+                                // Regex: function အစကနေ ကွင်းအပိတ် (နောက်ထပ် function တစ်ခု မစခင်အထိ) ကို ရှာပြီး အစားထိုးတယ်
+                                const funcRegex = new RegExp(`(?:async\\s+)?function\\s+${funcName}\\s*\\([\\s\\S]*?\\n\\}`, 'g');
+                                finalMutatedCode = finalMutatedCode.replace(funcRegex, newFunc);
+                            }
+                        }
+                    }
+
+                    // Domain Data ပြန်ထည့်ခြင်း
+                    if (savedDomains) {
+                        finalMutatedCode = finalMutatedCode.replace('const scienceDomains = []; // DOMAIN_DATA_LOCKED', savedDomains);
+                    }
+                    
+                    const restoredSystem = `${header}${coreStartTag}${coreLogic}${coreEndTag}${finalMutatedCode}`;
+
+                    if (validateCode(restoredSystem)) {
+                        console.log(`💎 [EVOLUTION-COMPLETE]: DNA Splicing successful via ${modelName}.`);
+                        return restoredSystem;
                     }
                 }
                 break; 
 
             } catch (e) {
-                // 🔱 5. ဆရာ့ရဲ့ မူလ 429 Rate Limit Handling (Backoff)
                 if (e.response && e.response.status === 429) {
                     retries++;
-                    const waitTime = Math.pow(2, retries) * 1000;
-                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
-                    await new Promise(res => setTimeout(res, waitTime));
+                    await new Promise(res => setTimeout(res, Math.pow(2, retries) * 1000));
                 } else {
-                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
+                    console.error(`❌ [FAILURE]: ${modelName} aborted.`);
                     break;
                 }
             }
@@ -701,6 +702,7 @@ ${cleanEvolvedCode}
     }
     return null;
 }
+// </SOVEREIGN_CORE>
 
 // 🛡️ 5. CODE VALIDATOR
 function validateCode(code) {
