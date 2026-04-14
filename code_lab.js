@@ -601,160 +601,142 @@ const calculateHyperProbability = (entropy) => parseFloat((Math.tanh((Math.rando
 
 // <SOVEREIGN_CORE>
 /**
- * 🌀 [EVOLUTION ENGINE X10]: CHUNKED-RECURSIVE EVOLUTION
- * Token Limit ကို ကျော်လွှားရန် Code ကို အပိုင်းလိုက်ခွဲ၍ ဆင့်ကဲပြောင်းလဲစေခြင်း
+ * 🌌 [OMEGA-SYNC: CHUNKED EVOLUTION & CORE SHIELDING]
+ * 🛡️ SOVEREIGN_CORE PROTECTION + CHUNKED RECURSION + MULTI-MODEL FALLBACK
  */
 
-const fs = require('fs');
-
-async function evolveLargeFile(filePath) {
-    console.log(`🚀 [INIT]: Starting Chunked Evolution for ${filePath}`);
-    
-    const fullCode = fs.readFileSync(filePath, 'utf8');
-    const lines = fullCode.split('\n');
-    const chunkSize = 150; // တစ်ခါပို့ရင် လိုင်းရေ ၁၅၀ စီပဲ ပို့မယ် (Token ချွေတာရန်)
-    let evolvedFullCode = "";
-
-    for (let i = 0; i < lines.length; i += chunkSize) {
-        const chunk = lines.slice(i, i + chunkSize).join('\n');
-        const chunkIndex = Math.floor(i / chunkSize) + 1;
-        const totalChunks = Math.ceil(lines.length / chunkSize);
-
-        console.log(`📦 [PROCESSING]: Chunk ${chunkIndex}/${totalChunks}...`);
-
-        // AI ဆီကို အပိုင်းလိုက် ပို့မယ်
-        const evolvedChunk = await consultSovereignAIForChunk(chunk, chunkIndex, totalChunks);
-        
-        if (evolvedChunk) {
-            evolvedFullCode += evolvedChunk + "\n";
-        } else {
-            console.error(`❌ [FAILED]: Chunk ${chunkIndex} evolution failed. Keeping original.`);
-            evolvedFullCode += chunk + "\n";
-        }
-    }
-
-    // နောက်ဆုံးမှာ Code အားလုံးကို ပြန်စစ်ပြီး Save မယ်
-    if (evolvedFullCode.split('\n').length >= lines.length) {
-        fs.writeFileSync(filePath, evolvedFullCode.trim());
-        console.log("✅ [SUCCESS]: Entire file evolved and reassembled perfectly.");
-    } else {
-        console.error("🚨 [ABORT]: Evolved code is shorter than original. Integrity breach prevented.");
-    }
-}
-
-async function consultSovereignAIForChunk(chunkCode, index, total) {
+// --- 1. CHUNK PROCESSING HELPER (PARTIAL EVOLUTION) ---
+async function consultSovereignAIForChunk(chunkCode, index, total, modelName, apiKey) {
     const prompt = {
         role: "system",
         content: `You are the OMEGA Architect. You are evolving part ${index} of ${total} of a large system.
         DIRECTIVES:
-        1. Evolve and optimize the provided logic.
-        2. Keep all existing variable names and structure.
+        1. Evolve and optimize the provided logic using neural swarm intelligence.
+        2. Keep all existing variable names and structure intact.
         3. DO NOT TRUNCATE. Return the FULL improved version of THIS CHUNK only.
-        4. Do not include explanations, only raw JavaScript.`
+        4. No explanations, no imports, no system config. ONLY raw JavaScript.`
     };
 
-    try {
-        const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-            model: "llama-3.1-70b-versatile",
-            messages: [
-                prompt,
-                { role: "user", content: `Evolve this specific code block:\n\n${chunkCode}` }
-            ],
-            temperature: 0.3 // Logic တိကျဖို့အတွက် temperature လျှော့ထားတယ်
-        }, {
-            headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }
-        });
+    let retries = 0;
+    while (retries < 3) {
+        try {
+            console.log(`🧠 [SHIELDED-AI]: Accessing ${modelName} | Block ${index}/${total} (Attempt ${retries + 1})...`);
+            
+            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                model: modelName,
+                messages: [
+                    prompt,
+                    { role: "user", content: `Evolve this specific code block:\n\n${chunkCode}` }
+                ],
+                max_tokens: 4096,
+                temperature: 0.3
+            }, {
+                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                timeout: 30000
+            });
 
-        let result = response.data.choices[0].message.content;
-        return result.replace(/```javascript|```/g, "").trim();
-    } catch (err) {
-        console.error(`⚠️ AI Error at Chunk ${index}:`, err.message);
-        return null;
-    }
-}
-// </SOVEREIGN_CORE>
-    
-    const header = coreParts[0]; 
-    const remainingAfterStart = coreParts[1].split(coreEndTag);
-    if (remainingAfterStart.length < 2) return null;
-
-    const coreLogic = remainingAfterStart[0]; // ကာကှယထြားတဲ့ အစိတအြပိုငြး
-    const externalLogic = remainingAfterStart[1]; // Evolution လုပမြယ့ြ အစိတအြပိုငြး
-
-    // 🔱 2. ဆရာ့ရဲ့ မူလ Domain Matching Logic (Placeholder သုံးပုံ)
-    const domainMatch = externalLogic.match(/const scienceDomains = \[[\s\S]*?\];/);
-    if (!domainMatch) return null;
-    const savedDomains = domainMatch[0];
-    const logicOnlyForAI = externalLogic.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
-
-    // 🔱 3. ဆရာ့ရဲ့ မူလ Model Looping & Retry Strategy
-    for (const modelName of MODELS) {
-        let retries = 0;
-        while (retries < MAX_RETRIES) {
-            try {
-                console.log(`🧠 [SHIELDED-AI]: Accessing ${modelName} (Attempt ${retries + 1})...`);
-                
-                const response = await axios.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    {
-                        model: modelName,
-                        messages: [
-                            { 
-                                role: "system", 
-                                content: "You are the OMEGA Architect. Evolve and optimize the provided Node.js computation logic. ABSOLUTE RULE: Return ONLY the updated JS functions. No explanations. No imports. No system config. Focus on neural swarm intelligence." 
-                            },
-                            { role: "user", content: `Evolve this logic:\n\n ${logicOnlyForAI}` }
-                        ],
-                        max_tokens: 4096,
-                        temperature: 0.4
-                    },
-                    { headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 }
-                );
-
-                if (response.data?.choices?.[0]?.message?.content) {
-                    let evolvedLogic = response.data.choices[0].message.content;
-                    
-                    // Markdown block တှကေို ဖယထြုတခြှငြး
-                    const codeMatch = evolvedLogic.match(/```javascript\n([\s\S]*?)\n```/) || evolvedLogic.match(/```\n([\s\S]*?)\n```/) || [null, evolvedLogic];
-                    let cleanEvolvedCode = codeMatch[1] || evolvedLogic;
-                    
-                    // Placeholder ကို မူလ Domain Data နဲ့ ပှနလြဲခှငြး
-                    cleanEvolvedCode = cleanEvolvedCode.replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
-                    
-                    // 🛡️ [RESTORE]: Header + Protected Core + Evolved Code ကို ပှနပြေါငြးခှငြး
-                    const finalRestoredCode = `
-${header}
-${coreStartTag}
-${coreLogic}
-${coreEndTag}
-${cleanEvolvedCode}
-                    `.trim();
-
-                    // 🔱 4. ဆရာ့ရဲ့ မူလ Validation Check
-                    if (validateCode(finalRestoredCode)) {
-                        console.log(`✅ [OMEGA-SYNC]: Evolution Verified & Core Protected via ${modelName}.`);
-                        return finalRestoredCode;
-                    }
-                }
-                break; 
-
-            } catch (e) {
-                // 🔱 5. ဆရာ့ရဲ့ မူလ 429 Rate Limit Handling (Backoff)
-                if (e.response && e.response.status === 429) {
-                    retries++;
-                    const waitTime = Math.pow(2, retries) * 1000;
-                    console.log(`⚠️ Rate Limit on ${modelName}! Retrying in ${waitTime}ms...`);
-                    await new Promise(res => setTimeout(res, waitTime));
-                } else {
-                    console.error(`❌ [MODEL-FAILURE]: ${modelName} failed: ${e.message}`);
-                    break;
-                }
+            if (response.data?.choices?.[0]?.message?.content) {
+                let evolvedChunk = response.data.choices[0].message.content;
+                // Clean Markdown
+                const codeMatch = evolvedChunk.match(/```javascript\n([\s\S]*?)\n```/) || 
+                                 evolvedChunk.match(/```\n([\s\S]*?)\n```/) || 
+                                 [null, evolvedChunk];
+                return (codeMatch[1] || evolvedChunk).trim();
+            }
+        } catch (e) {
+            if (e.response && e.response.status === 429) {
+                retries++;
+                const waitTime = Math.pow(2, retries) * 2000;
+                console.log(`⚠️ Rate Limit on ${modelName} (Block ${index}). Retrying in ${waitTime}ms...`);
+                await new Promise(res => setTimeout(res, waitTime));
+            } else {
+                console.error(`❌ [CHUNK-FAILURE]: Block ${index} failed: ${e.message}`);
+                break;
             }
         }
     }
     return null;
 }
 
+// --- 2. MAIN EVOLUTION CONTROLLER (FULLY MATCHED LOGIC) ---
+async function consultSovereignAI(fullCode) {
+    const KEY = process.env.GROQ_API_KEY;
+    const MODELS = ["llama-3.1-70b-versatile", "llama-3.1-8b-instant"];
+    const coreStartTag = "// <SOVEREIGN_CORE>";
+    const coreEndTag = "// </SOVEREIGN_CORE>";
+
+    try {
+        // 🔱 1. PROTECT CORE LOGIC & HEADER
+        const coreParts = fullCode.split(coreStartTag);
+        if (coreParts.length < 2) return null;
+
+        const header = coreParts[0]; 
+        const remainingAfterStart = coreParts[1].split(coreEndTag);
+        if (remainingAfterStart.length < 2) return null;
+
+        const coreLogic = remainingAfterStart[0]; // ကာကွယ်ထားသော အစိတ်အပိုင်း
+        const externalLogic = remainingAfterStart[1]; // Evolution လုပ်မည့် အစိတ်အပိုင်း
+
+        // 🔱 2. DOMAIN MATCHING & PLACEHOLDER PROTECTION
+        const domainMatch = externalLogic.match(/const scienceDomains = \[[\s\S]*?\];/);
+        if (!domainMatch) return null;
+        const savedDomains = domainMatch[0];
+        
+        // AI ဆီမပို့မီ Domain data ကို Placeholder ဖြင့် အစားထိုးသည်
+        const logicOnlyForAI = externalLogic.replace(savedDomains, 'const scienceDomains = []; // DOMAIN_PLACEHOLDER');
+
+        // 🔱 3. CHUNKING THE LOGIC (TOKEN LIMIT BYPASS)
+        const lines = logicOnlyForAI.split('\n');
+        const chunkSize = 150;
+        const totalChunks = Math.ceil(lines.length / chunkSize);
+
+        // 🔱 4. MODEL LOOPING & RETRY STRATEGY
+        for (const modelName of MODELS) {
+            console.log(`🚀 [INITIATING]: Evolution Cycle via ${modelName}...`);
+            let evolvedExternalLogic = "";
+            let chunkingSuccess = true;
+
+            for (let i = 0; i < lines.length; i += chunkSize) {
+                const chunk = lines.slice(i, i + chunkSize).join('\n');
+                const chunkIndex = Math.floor(i / chunkSize) + 1;
+                
+                const evolvedChunk = await consultSovereignAIForChunk(chunk, chunkIndex, totalChunks, modelName, KEY);
+                
+                if (evolvedChunk) {
+                    evolvedExternalLogic += evolvedChunk + "\n";
+                } else {
+                    chunkingSuccess = false;
+                    break; // Model ပျက်ပါက နောက် Model သို့ ကူးမည်
+                }
+            }
+
+            if (chunkingSuccess) {
+                // 🔱 5. RESTORE DOMAINS & ASSEMBLE SYSTEM
+                let cleanEvolvedCode = evolvedExternalLogic.replace('const scienceDomains = []; // DOMAIN_PLACEHOLDER', savedDomains);
+                
+                const finalRestoredCode = `
+${header}
+${coreStartTag}
+${coreLogic}
+${coreEndTag}
+${cleanEvolvedCode}
+                `.trim();
+
+                // 🔱 6. VALIDATION CHECK
+                if (validateCode(finalRestoredCode)) {
+                    console.log(`✅ [OMEGA-SYNC]: Evolution Verified & Core Protected via ${modelName}.`);
+                    return finalRestoredCode;
+                } else {
+                    console.warn(`⚠️ [VALIDATION-FAIL]: ${modelName} integrity check failed. Retrying fallback...`);
+                }
+            }
+        }
+    } catch (criticalErr) {
+        console.error("💀 [CRITICAL-EVOLUTION-FAILURE]:", criticalErr.message);
+    }
+    return null;
+}
+ 
 // 🛡️ 5. CODE VALIDATOR
 function validateCode(code) {
     try {
