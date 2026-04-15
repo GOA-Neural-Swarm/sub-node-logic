@@ -101,7 +101,7 @@ class SovereignArchitect {
    * စနစ်၏ တည်ငြိမ်မှုနှင့် အသိဉာဏ်အဆင့်အတန်းကို recursive နည်းဖြင့် ဆန်းစစ်သည်။
    */
   async selfReflection(input, metrics, depth = 0) {
-    const MAX_DEPTH = 10;
+    const MAX_DEPTH = 10; 
     const isStable = metrics.coherence >= 99 && metrics.entropy <= 0.01;
 
     if (isStable || depth >= MAX_DEPTH) {
@@ -134,10 +134,7 @@ class SovereignArchitect {
       isStagnant: sysEntropy < 0.01,
     };
 
-    if (
-      selfAwarenessPacket.isStagnant ||
-      selfAwarenessPacket.healthIndex < 80
-    ) {
+    if (selfAwarenessPacket.isStagnant || selfAwarenessPacket.healthIndex < 80) {
       console.warn(
         "⚠️ [CONSCIOUSNESS_ALERT]: System Stagnation Detected. Initiating Hyper-Mutation...",
       );
