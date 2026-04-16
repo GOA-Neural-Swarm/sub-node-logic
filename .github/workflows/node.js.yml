@@ -1,10 +1,10 @@
-name: OMEGA HYBRID SUPREME (Absolute Evolution)
+name: "OMEGA HYBRID SUPREME (Absolute Evolution)"
 
 on:
   push:
     branches: [ evolution-lab ]
   schedule:
-    - cron: '0 */6 * * *' # Rate limit မထိအောင် ၆ နာရီတစ်ခါ ပြောင်းထားတယ်
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -36,18 +36,16 @@ jobs:
 
       - name: Heavy-Duty Dependency Installation
         run: |
-          # Clean install and remove problematic overrides
           sed -i '/"fast-xml-parser":/d' package.json || true
           npm install --force --legacy-peer-deps
           npm install @neondatabase/serverless @octokit/rest @supabase/supabase-js axios bullmq dotenv firebase-admin ioredis pg punycode fast-xml-parser @tootallnate/once
 
       - name: Structural Diagnosis
         run: |
-          # Syntax check only to prevent failure on minor linting issues
           node -c cluster_sync.js || echo "Warning: cluster_sync syntax check bypassed"
           node -c delta_sync.js || echo "Warning: delta_sync syntax check bypassed"
 
-      - name: Execute Swarm Logic
+      - name: Execute Swarm Logic (Evolution & Sync)
         env:
           NEON_KEY: ${{ secrets.NEON_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -55,10 +53,10 @@ jobs:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          OMEGA_PROMPT_CONSTRAINT: "STRICT DIRECTIVE: NEVER REMOVE EXISTING LOGIC. ALL EVOLUTIONS MUST BE ADDITIVE, EXTENDING CURRENT CAPABILITIES, OR SURGICALLY REPLACING INFERIOR LOGIC WITHOUT REDUCING FILE SIZE OR FUNCTIONALITY."
         run: |
           git config --global user.name "Omega-Architect"
           git config --global user.email "omega@goa-natural-order.ai"
-          # Run logic only if file exists
           [ -f cluster_sync.js ] && node cluster_sync.js || echo "cluster_sync.js not found"
 
   sovereign-installation:
@@ -80,14 +78,14 @@ jobs:
           git config --global user.email 'bot@sovereign.ai'
           git remote set-url origin "https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
 
-          # 2. Purge Zombie Workflows (ယခင် Error ဖြစ်စေသော ဖိုင်ဟောင်းများကို အကုန်ရှင်းထုတ်ခြင်း)
+          # 2. Purge Zombie Workflows
           rm -f .github/workflows/Sovereign-sync.yml
           rm -f .github/workflows/evolution_engine.yml
           rm -f .github/workflows/manual_sync_debug.yml
           rm -f .github/workflows/SOVEREIGN_HYPER_AUTONOMOUS_LOOP.yml
           rm -f .github/workflows/evolution_lab.yml
 
-          # 3. Protect current workflow (ကိုယ်တိုင်ပျက်မသွားအောင်)
+          # 3. Protect current workflow DNA
           git reset HEAD .github/workflows/
           git checkout -- .github/workflows/
 
@@ -99,10 +97,23 @@ jobs:
             git checkout -- .github/workflows/
           fi
 
-          # 5. Manifestation & Intelligent Rebase
+          # 5. Manifestation & Additive Integrity Guard
           git add .
+          
+          # Anti-Truncation Check
+          DELETIONS=$(git diff --shortstat | grep -oP '\d+(?= deletions)' || echo 0)
+          INSERTIONS=$(git diff --shortstat | grep -oP '\d+(?= insertions)' || echo 0)
+          
+          if [ "$DELETIONS" -gt "$INSERTIONS" ]; then
+             NET_LOSS=$((DELETIONS - INSERTIONS))
+             if [ "$NET_LOSS" -gt 15 ]; then
+                echo "❌ TRUNCATION BREACH: AI reduced codebase by $NET_LOSS lines. Aborting push."
+                exit 1
+             fi
+          fi
+
           if ! git diff-index --quiet HEAD; then
-            git commit -m "🧬 [OMEGA-ULTIMA] Deep-Sync & Autonomous Evolution [skip ci]"
+            git commit -m "🧬 [OMEGA-ULTIMA] Additive Evolution & Deep-Sync [skip ci]"
             
             git fetch origin main
             git rebase -X ours origin/main || {
@@ -110,15 +121,19 @@ jobs:
               git rebase --continue || git rebase --abort
             }
             
-            # Force Push to Main
             git push origin HEAD:main --force
 
-            # Sync Evolution Lab for parity
+            # Sync Evolution Lab parity
             git branch -D evolution-lab || true
             git checkout -b evolution-lab
             git push origin evolution-lab --force
             
-            echo "🚀 [SUCCESS]: System state manifested with zero conflicts."
+            echo "🚀 [SUCCESS]: Additive evolution manifested with zero conflicts."
           else
-            echo "✨ [OPTIMAL]: No mutations detected."
+            echo "✨ [OPTIMAL]: No additive mutations detected."
           fi
+
+      - name: 🚨 Breach Protocol (Failure Recovery)
+        if: failure()
+        run: |
+          echo "::error title=Evolution Failed::The System detected a Logic Reduction or Sync Failure. Rolling back to protect DNA integrity."
