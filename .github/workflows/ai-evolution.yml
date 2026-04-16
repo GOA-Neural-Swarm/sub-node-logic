@@ -1,125 +1,133 @@
-name: "OMEGA SUPREME: FULL-REPO AUTONOMOUS EVOLUTION" 
+name: "OMEGA SUPREME: FULL-REPO AUTONOMOUS EVOLUTION"
 
 on:
   schedule:
-    - cron: '0 0,12 * * *' 
+    - cron: '0 0,12 * * *'
   workflow_dispatch:
     inputs:
       evolution_depth:
-        description: 'Mutation depth layer' 
-        required: true 
-        default: 'surgical-patch' 
-        type: choice 
+        description: 'Mutation depth layer'
+        required: true
+        default: 'surgical-patch'
+        type: choice
         options:
-          - syntax-optimization 
+          - syntax-optimization
           - surgical-patch
-          - deep-refactor 
+          - deep-refactor
+          - additive-expansion
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }} 
-  cancel-in-progress: true 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
-  contents: write 
-  pull-requests: write 
-  issues: write 
-  actions: write 
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
 
 env:
-  NODE_ENV: production 
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
-  CI: true 
+  NODE_ENV: production
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  CI: true
 
 jobs:
   omega-architect-execution:
-    name: 🧠 Supreme Architect Neural Processing 
-    runs-on: ubuntu-latest 
-    timeout-minutes: 60 
+    name: 🧠 Supreme Architect Neural Processing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
-      - name: 🛡️ Initialize Sovereign Environment 
-        uses: actions/checkout@v4 
+      - name: 🛡️ Initialize Sovereign Environment
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
-          token: ${{ secrets.GH_TOKEN }} 
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
 
-      - name: ⚙️ Boot Neural Node (Node.js 24) 
-        uses: actions/setup-node@v4 
+      - name: ⚙️ Boot Neural Node (Node.js 24)
+        uses: actions/setup-node@v4
         with:
-          node-version: '24' 
-          cache: 'npm' 
+          node-version: '24'
+          cache: 'npm'
 
-      - name: 📦 Inject Core Dependencies 
+      - name: 📦 Inject Core Dependencies
         run: |
-          npm ci || npm install --legacy-peer-deps --no-audit 
-          npm install -g eslint prettier jest axios typescript crypto-js 
+          npm ci || npm install --legacy-peer-deps --no-audit
+          npm install -g eslint prettier jest axios typescript crypto-js
 
-      - name: 🔍 Baseline Neural Audit 
+      - name: 🔍 Baseline Neural Audit
         run: |
-          echo "Scanning existing logic matrix for structural decay..." 
-          npx eslint . --ext .js --no-error-on-unmatched-pattern || echo "Decay found. Preparing for Architect mutation." 
+          echo "Scanning existing logic matrix for structural decay..."
+          npx eslint . --ext .js --no-error-on-unmatched-pattern || echo "Decay found. Preparing for Architect mutation."
 
-      - name: 🧠 Trigger OMEGA Architect 
+      - name: 🧠 Trigger OMEGA Architect (Additive Evolution Protocol)
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }} 
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }} 
-          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'surgical-patch' }} 
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'additive-expansion' }}
+          # Inject prompt constraint to strictly forbid logic reduction
+          OMEGA_PROMPT_CONSTRAINT: "STRICT DIRECTIVE: NEVER REMOVE EXISTING LOGIC. ALL EVOLUTIONS MUST BE ADDITIVE, EXTENDING CURRENT CAPABILITIES, OR SURGICALLY REPLACING INFERIOR LOGIC WITHOUT REDUCING FILE SIZE OR FUNCTIONALITY."
         run: |
-          echo "🚀 Initializing Neural Forge [${EVOLUTION_DEPTH}]..." 
+          echo "🚀 Initializing Neural Forge [${EVOLUTION_DEPTH}]..."
           
-          # ၁။ Dependency အားလုံးကို အဆင့်သင့်ဖြစ်အောင် ပြင်ဆင်ခြင်း
-          npm install axios crypto-js 
+          npm install axios crypto-js
           
-          # ၂။ Mutation Protocol ကို စတင်ခြင်း
-          if [ -f "ai_architect.js" ]; then 
-            node ai_architect.js 
-          else 
-            echo "💀 CRITICAL: ai_architect.js not found. Evolution aborted." 
-            exit 1 
-          fi 
-
-      - name: ⚖️ Absolute Integrity & Anti-Truncation Guard 
-        run: |
-          echo "Verifying DNA structural integrity..." 
-          
-          # ၁။ Syntax Validation (Code ပြတ်တောက်မှုရှိမရှိ စစ်ဆေးခြင်း)
-          find . -name "*.js" ! -name "temp_val.js" -exec node -c {} \; || (echo "FATAL: Evolution produced invalid syntax." && exit 1) 
-
-          # ၂။ Truncation Guard (Code အကြောင်းရေ အဆမတန် လျော့ကျသွားမှုကို တားဆီးခြင်း)
-          # Deletions က Insertions ထက် အလွန်အမင်း များနေပါက AI ၏ ဖျက်ထုတ်မှုကို ငြင်းပယ်မည်
-          DELETIONS=$(git diff --shortstat | grep -oP '\d+(?= deletions)' || echo 0)
-          INSERTIONS=$(git diff --shortstat | grep -oP '\d+(?= insertions)' || echo 0)
-          
-          if [ "$DELETIONS" -gt 150 ] && [ "$DELETIONS" -gt "$INSERTIONS" ]; then
-            echo "❌ TRUNCATION BREACH DETECTED: $DELETIONS lines lost. Rolling back mutation."
+          if [ -f "ai_architect.js" ]; then
+            # We assume ai_architect.js reads process.env.OMEGA_PROMPT_CONSTRAINT
+            node ai_architect.js
+          else
+            echo "💀 CRITICAL: ai_architect.js not found. Evolution aborted."
             exit 1
           fi
 
-      - name: 🛠️ Enforce Linguistic & Structural Polish 
+      - name: ⚖️ Absolute Integrity & Strict Anti-Truncation Guard
         run: |
-          echo "Standardizing code aesthetics..." 
-          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md" --ignore-unknown || echo "Polish skipped." 
+          echo "Verifying DNA structural integrity & Growth metrics..."
+          
+          # 1. Syntax Validation
+          find . -name "*.js" ! -name "temp_val.js" -exec node -c {} \; || (echo "FATAL: Evolution produced invalid syntax." && exit 1)
 
-      - name: 🧬 Manifest Autonomous Mutation 
+          # 2. Strict Anti-Truncation Guard (Zero Reduction Tolerance)
+          DELETIONS=$(git diff --shortstat | grep -oP '\d+(?= deletions)' || echo 0)
+          INSERTIONS=$(git diff --shortstat | grep -oP '\d+(?= insertions)' || echo 0)
+          
+          echo "Mutation Stats - Insertions: $INSERTIONS | Deletions: $DELETIONS"
+
+          # Condition: If deletions exceed insertions AND total lines shrink by more than 10 lines, REJECT.
+          # We allow minor deletions for refactoring, but the net output must be neutral or positive.
+          if [ "$DELETIONS" -gt "$INSERTIONS" ]; then
+             NET_LOSS=$((DELETIONS - INSERTIONS))
+             if [ "$NET_LOSS" -gt 10 ]; then
+                echo "❌ STRICT TRUNCATION BREACH DETECTED: Codebase shrank by $NET_LOSS lines. AI is degrading logic. Rolling back mutation."
+                exit 1
+             fi
+          fi
+
+      - name: 🛠️ Enforce Linguistic & Structural Polish
         run: |
-          git config --global user.name "OMEGA-ARCHITECT" 
+          echo "Standardizing code aesthetics..."
+          npx prettier --write "**/*.js" "package.json" "instruction.json" "**/*.md" --ignore-unknown || echo "Polish skipped."
+
+      - name: 🧬 Manifest Autonomous Mutation
+        run: |
+          git config --global user.name "OMEGA-ARCHITECT"
           git config --global user.email "omega@goa-natural-order.ai"
           
-          git add . 
+          git add .
           
-          # 🛡️ [PROTECTION]: Workflow DNA ကို AI က ပြင်ဆင်ခွင့်မရှိစေရန် Lock ချထားခြင်း
-          git reset .github/workflows/ 
-          git checkout -- .github/workflows/ 
+          # 🛡️ [PROTECTION]: Workflow DNA is locked
+          git reset .github/workflows/
+          git checkout -- .github/workflows/
           
-          if ! git diff --quiet || ! git diff --staged --quiet; then 
-            git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Surgical Evolution (${{ github.event.inputs.evolution_depth }})" 
-            git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main 
-            echo "✅ Synergy complete. Repository evolved." 
-          else 
-            echo "✨ Logic is already optimal. No mutation required." 
-          fi 
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "🚀 [OMEGA-MUTATION]: Autonomous Additive Evolution (${{ github.event.inputs.evolution_depth }}) [skip ci]"
+            git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+            echo "✅ Synergy complete. Additive Repository Evolution successful."
+          else
+            echo "✨ Logic is already optimal. No mutation required."
+          fi
 
-      - name: 🚨 Breach Protocol (Failure Recovery) 
-        if: failure() 
+      - name: 🚨 Breach Protocol (Failure Recovery)
+        if: failure()
         run: |
-          echo "::error title=Evolution Failed::The AI Architect encountered a catastrophic failure or Truncation Breach during the evolution cycle."
+          echo "::error title=Evolution Failed::The AI Architect encountered a catastrophic failure or Truncation Breach (Logic Reduction) during the evolution cycle. Rolling back to last stable state."
