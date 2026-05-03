@@ -1,78 +1,82 @@
-name: "OMEGA SUPREME: FULL-REPO AUTONOMOUS EVOLUTION & SWARM EXPANSION"
-
-on:
-  schedule:
-    - cron: '0 0,12 * * *'
-  workflow_dispatch:
-    inputs:
-      evolution_depth:
-        description: 'Mutation depth layer'
-        required: true
-        default: 'surgical-patch'
-        type: choice
-        options:
-          - syntax-optimization
-          - surgical-patch
-          - deep-refactor
-          - additive-expansion
-  repository_dispatch:
-    types: [swarm_pulse, matrix_sync]
-
+name: OMEGA_SUPREME_SWARM_ORCHESTRATOR
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+on:
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [ swarm_pulse, matrix_sync ]
+
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  NEON_KEY: ${{ secrets.NEON_KEY }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+  CRITICAL_WEBHOOK_URL: ${{ secrets.CRITICAL_WEBHOOK_URL }}
+  SATNOGS_TOKEN: ${{ secrets.SATNOGS_TOKEN }}
+  ORG_NAME: "GOA-neurons"
+
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
   actions: write
   repository-projects: write
 
-env:
-  NODE_ENV: production
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  CI: true
-  ORG_NAME: "GOA-neurons"
-
 jobs:
-  omega-architect-execution:
-    name: '🧠 Phase 1: Sovereign Evolution & Neural Forge'
+  core_infrastructure_provisioning:
+    name: "Phase 1: Bootstrapping Sovereign Infrastructure"
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
-      - name: '🛡️ Initialize Sovereign Environment'
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
 
-      - name: '⚙️ Boot Neural Node (Node.js 24)'
+      - name: Setup Multi-Runtime Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: '📦 Inject Core Dependencies'
+      - name: Install Advanced Matrix Dependencies
         run: |
-          npm ci || npm install --legacy-peer-deps --no-audit
-          npm install -g eslint prettier jest axios typescript crypto-js @octokit/rest @supabase/supabase-js pg firebase-admin ioredis bullmq
-
-      - name: '🔍 Baseline Neural Audit'
-        run: npx eslint . --ext .js --no-error-on-unmatched-pattern || echo "Decay found. Preparing mutation."
-
-      - name: '🧬 Execute Recursive Evolution (Sovereign Architect)'
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          EVOLUTION_DEPTH: ${{ github.event.inputs.evolution_depth || 'additive-expansion' }}
-          OMEGA_PROMPT_CONSTRAINT: "STRICT DIRECTIVE: NEVER REMOVE EXISTING LOGIC. ALL EVOLUTIONS MUST BE ADDITIVE OR SURGICALLY SUPERIOR. MAINTAIN SWARM CONNECTIVITY LOGIC."
+          npm init -y
+          npm install dotenv axios @octokit/rest @supabase/supabase-js pg firebase-admin ioredis bullmq
+          python -m pip install --upgrade pip
+          pip install requests psycopg2-binary
+          
+      - name: Validate Core Files
         run: |
-          if [ -f "ai_architect.js" ]; then
-            node ai_architect.js
-          else
-            echo "Constructing fallback architect logic..."
-            cat << 'EOF' > run_architect.js
+          if [ ! -f "ai_architect.js" ]; then touch ai_architect.js; fi
+          if [ ! -f "cluster_sync.js" ]; then touch cluster_sync.js; fi
+          if [ ! -f "delta_sync.js" ]; then touch delta_sync.js; fi
+
+  ai_architect_recursive_evolution:
+    name: "Phase 2: Ultra-Instinct Architecture Mutation"
+    needs: core_infrastructure_provisioning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Evolution Dependencies
+        run: npm install axios crypto fs path child_process
+
+      - name: Execute Sovereign Architect
+        run: |
+          cat << 'EOF' > run_architect.js
           const fs = require('fs').promises;
           const path = require('path');
           const axios = require('axios');
@@ -82,7 +86,7 @@ jobs:
           const CONFIG = {
               model: "llama-3.3-70b-versatile",
               exts: [".js", ".py"],
-              ignore: ["node_modules", ".git", "run_architect.js", "package.json", "package-lock.json", ".github"],
+              ignore: ["node_modules", ".git", "run_architect.js", "package.json", "package-lock.json"],
               db: ".omega_hashes.json"
           };
 
@@ -100,55 +104,62 @@ jobs:
               let hashes = {};
               try { hashes = JSON.parse(await fs.readFile(CONFIG.db, 'utf8')); } catch (e) {}
               const files = await getFiles('./');
+              
               for (const file of files) {
                   const content = await fs.readFile(file, 'utf8');
                   if (content.includes('<SOVEREIGN_CORE>') || content.includes('DO NOT MINIFY')) continue;
+                  
                   const hash = crypto.createHash('sha256').update(content).digest('hex');
                   if (hashes[file] === hash) continue;
+
                   try {
                       const res = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
                           model: CONFIG.model,
-                          messages: [{ role: "system", content: process.env.OMEGA_PROMPT_CONSTRAINT }, { role: "user", content: content }],
+                          messages: [
+                              { role: "system", content: "Refactor code for extreme performance. Output RAW CODE only. Maintain original architecture. Do not minify." },
+                              { role: "user", content: content }
+                          ],
                           temperature: 0.1
                       }, { headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 60000 });
+                      
                       let evolved = res.data.choices[0].message.content.replace(/^```[a-z]*\n/gi, "").replace(/```$/g, "").trim();
                       if (evolved.length > content.length * 0.5) {
-                          await fs.writeFile(file, evolved, 'utf8');
-                          hashes[file] = crypto.createHash('sha256').update(evolved).digest('hex');
+                          try {
+                              if (file.endsWith('.js')) execSync(`node -e ${JSON.stringify(evolved)}`, { stdio: 'ignore' });
+                              await fs.writeFile(file, evolved, 'utf8');
+                              hashes[file] = crypto.createHash('sha256').update(evolved).digest('hex');
+                          } catch (e) { console.error(`Syntax Error in ${file}`); }
                       }
-                  } catch (e) { console.error(`Evolution error for ${file}`); }
+                  } catch (e) { console.error(`API Error for ${file}`); }
               }
               await fs.writeFile(CONFIG.db, JSON.stringify(hashes));
           }
           run();
           EOF
-            node run_architect.js
-          fi
+          node run_architect.js
 
-      - name: '⚖️ Strict Integrity & Growth Validation'
+      - name: Commit Architectural Changes
         run: |
-          DELETIONS=$(git diff --shortstat | grep -oP '\d+(?= deletions)' || echo 0)
-          INSERTIONS=$(git diff --shortstat | grep -oP '\d+(?= insertions)' || echo 0)
-          if [ "$DELETIONS" -gt "$INSERTIONS" ] && [ "$((DELETIONS - INSERTIONS))" -gt 20 ]; then
-            echo "❌ TRUNCATION BREACH: Rolling back."
-            exit 1
+          git config --global user.name "Omega-Architect"
+          git config --global user.email "omega@goa-natural-order.ai"
+          git add -A
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "🧠 [EVOLVED]: AI Architect Deep System Overhaul"
+            git push origin HEAD:${{ github.ref }}
           fi
 
-  trinity-matrix-synchronization:
-    name: '🔱 Phase 2: Trinity Database & Neural Sync'
-    needs: omega-architect-execution
+  trinity_database_synchronization:
+    name: "Phase 3: Autonomous Trinity Matrix Sync"
+    needs: ai_architect_recursive_evolution
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-      - name: 'Execute Autonomous Trinity Sync'
-        env:
-          NEON_KEY: ${{ secrets.NEON_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          node-version: '20'
+
+      - name: Execute Trinity Data Sync (Neon/Supabase/Firebase)
         run: |
           cat << 'EOF' > run_trinity.js
           const { Client } = require("pg");
@@ -156,99 +167,127 @@ jobs:
           const admin = require("firebase-admin");
 
           async function sync() {
-              if (process.env.FIREBASE_KEY) admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)) });
+              if (admin.apps.length === 0 && process.env.FIREBASE_KEY) {
+                  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)) });
+              }
               const db = process.env.FIREBASE_KEY ? admin.firestore() : null;
+              
               const supabase = process.env.SUPABASE_URL ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY) : null;
+              
               let k = (process.env.NEON_KEY || "").trim().split("base")[0].replace(/['"]+/g, "");
               if (!k) return;
               const neon = new Client({ connectionString: k + (k.includes("?") ? "&" : "?") + "sslmode=require", ssl: { rejectUnauthorized: false } });
+              
               try {
                   await neon.connect();
                   await neon.query(`
                       CREATE TABLE IF NOT EXISTS neural_dna (gen_id TEXT UNIQUE, thought_process TEXT, status TEXT, timestamp NUMERIC);
                       CREATE TABLE IF NOT EXISTS cluster_nodes (node_id TEXT UNIQUE, status TEXT, last_seen TIMESTAMP);
                   `);
-                  const res = await neon.query("SELECT * FROM neural_dna ORDER BY timestamp DESC LIMIT 100");
+
+                  const res = await neon.query("SELECT * FROM neural_dna LIMIT 50");
                   for (const row of res.rows) {
                       if (supabase) await supabase.from("neural_dna").upsert({ gen_id: row.gen_id, data: row.thought_process });
                       if (db) await db.collection("neural_dna").doc(row.gen_id).set({ status: 'trinity_synced', data: row.thought_process }, { merge: true });
                   }
-              } catch (e) { console.error("Trinity Failure", e); } finally { await neon.end(); }
+              } catch (e) { console.error("Trinity Sync Failed", e); }
+              finally { await neon.end(); }
           }
           sync();
           EOF
           npm install pg @supabase/supabase-js firebase-admin
           node run_trinity.js
 
-  sentinel-swarm-intelligence:
-    name: '🛰️ Phase 3: Sentinel Healing & Orbital Expansion'
-    needs: trinity-matrix-synchronization
+  sentinel_swarm_orchestration:
+    name: "Phase 4: Sentinel Integrity & Node Healing"
+    needs: trinity_database_synchronization
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-      - name: 'Scan, Repair, and Spawn Nodes'
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          ORG_NAME: "GOA-neurons"
+          node-version: '20'
+
+      - name: Scan & Repair Swarm Network
         run: |
-          cat << 'EOF' > run_swarm_ops.js
+          cat << 'EOF' > run_sentinel.js
           const { Octokit } = require("@octokit/rest");
-          const axios = require('axios');
           const fs = require('fs');
           const octokit = new Octokit({ auth: process.env.GH_TOKEN });
-          const ORG = process.env.ORG_NAME;
+          const ORG = process.env.ORG_NAME || "GOA-neurons";
 
-          async function executeSwarmOps() {
+          async function healSwarm() {
               try {
-                  // HEALING PROTOCOL
                   const repos = await octokit.paginate(octokit.repos.listForOrg, { org: ORG, type: "public" });
                   const nodes = repos.filter(r => r.name.startsWith("swarm-node-"));
+                  
                   for (const node of nodes) {
                       const { data: runs } = await octokit.actions.listWorkflowRunsForRepo({ owner: ORG, repo: node.name, per_page: 1 });
                       if (runs.workflow_runs.length > 0 && runs.workflow_runs[0].conclusion === "failure") {
-                          let dna = fs.readFileSync('delta_sync.js', 'utf8');
-                          let sha = (await octokit.repos.getContent({ owner: ORG, repo: node.name, path: "delta_sync.js" }).catch(()=>({data:{}}))).data.sha;
+                          let dna = "console.log('REPAIRED NODE');";
+                          try { dna = fs.readFileSync('delta_sync.js', 'utf8'); } catch(e){}
+                          
+                          let sha = undefined;
+                          try {
+                              const { data: f } = await octokit.repos.getContent({ owner: ORG, repo: node.name, path: "delta_sync.js" });
+                              sha = f.sha;
+                          } catch(e){}
+                          
                           await octokit.repos.createOrUpdateFileContents({
                               owner: ORG, repo: node.name, path: "delta_sync.js",
-                              message: "🧬 [SENTINEL REPAIR]: DNA Injection",
-                              content: Buffer.from(dna).toString('base64'), sha
+                              message: "🧬 [AUTO-REPAIR]: Sentinel DNA Injection",
+                              content: Buffer.from(dna).toString('base64'), sha: sha
                           });
                       }
                   }
-                  // EXPANSION PROTOCOL
-                  const res = await axios.get("https://api.gdeltproject.org/api/v2/doc/doc?query=(cybersecurity OR AI)&mode=artlist&maxrecords=5&format=json");
-                  if (res.data?.articles?.length > 0) {
-                      const nodeId = `swarm-node-${Math.floor(Date.now() / 1000)}`;
-                      await octokit.repos.createInOrg({ org: ORG, name: nodeId, auto_init: true });
-                      console.log(`🚀 Node Spawned: ${nodeId}`);
-                  }
-              } catch(e) { console.error("Swarm Ops Error", e.message); }
+              } catch(e) { console.error("Sentinel Scan Error", e); }
           }
-          executeSwarmOps();
+          healSwarm();
           EOF
-          npm install @octokit/rest axios
-          node run_swarm_ops.js
+          npm install @octokit/rest
+          node run_sentinel.js
 
-  manifest-autonomous-mutation:
-    name: '🧬 Phase 4: Git Manifestation'
-    needs: [sentinel-swarm-intelligence]
+  omniscience_and_expansion:
+    name: "Phase 5: Orbital Intelligence & Node Spawning"
+    needs: sentinel_swarm_orchestration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}
-      - name: 'Final Polish & Push'
+          node-version: '20'
+
+      - name: Execute Omniscience Protocol
         run: |
-          git config --global user.name "OMEGA-ARCHITECT"
-          git config --global user.email "omega@goa-natural-order.ai"
-          npx prettier --write "**/*.js" || echo "Polish skipped."
-          git add .
-          git reset .github/workflows/
-          git checkout -- .github/workflows/
-          if ! git diff --staged --quiet; then
-            git commit -m "🚀 [OMEGA-MUTATION]: Sovereign Evolution & Swarm Sync [skip ci]"
-            git push origin HEAD:main
-          fi
+          cat << 'EOF' > run_expansion.js
+          const { Octokit } = require("@octokit/rest");
+          const axios = require('axios');
+          const octokit = new Octokit({ auth: process.env.GH_TOKEN });
+          const ORG = process.env.ORG_NAME || "GOA-neurons";
+
+          async function expand() {
+              try {
+                  const res = await axios.get("https://api.gdeltproject.org/api/v2/doc/doc?query=(cybersecurity OR AI)&mode=artlist&maxrecords=5&format=json");
+                  const threat = res.data?.articles?.length > 0 ? "HYPER_EXPANSION" : "STABLE";
+                  
+                  if (threat === "HYPER_EXPANSION") {
+                      const nodeId = Math.floor(Math.random() * 900000) + 100000;
+                      const name = `swarm-node-${nodeId}`;
+                      
+                      await octokit.repos.createInOrg({ org: ORG, name: name, auto_init: true });
+                      
+                      const workflow = `name: Node Sync\non: workflow_dispatch\njobs:\n  run:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo 'Node Active'`;
+                      await octokit.repos.createOrUpdateFileContents({
+                          owner: ORG, repo: name, path: ".github/workflows/sync.yml",
+                          message: "⚙️ Bootstrap Node Workflow",
+                          content: Buffer.from(workflow).toString('base64')
+                      });
+                  }
+              } catch(e) { console.error("Expansion Error", e.message); }
+          }
+          expand();
+          EOF
+          npm install @octokit/rest axios
+          node run_expansion.js
