@@ -37,7 +37,7 @@ env:
 
 jobs:
   omega-architect-execution:
-    name: 🧠 Phase 1: Sovereign Evolution & Neural Forge
+    name:Phase 1: Sovereign Evolution & Neural Forge
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -135,7 +135,7 @@ jobs:
           fi
 
   trinity-matrix-synchronization:
-    name: 🔱 Phase 2: Trinity Database & Neural Sync
+    name:Phase 2: Trinity Database & Neural Sync
     needs: omega-architect-execution
     runs-on: ubuntu-latest
     steps:
@@ -181,7 +181,7 @@ jobs:
           node run_trinity.js
 
   sentinel-swarm-intelligence:
-    name: 🛰️ Phase 3: Sentinel Healing & Orbital Expansion
+    name: ️Phase 3: Sentinel Healing & Orbital Expansion
     needs: trinity-matrix-synchronization
     runs-on: ubuntu-latest
     steps:
@@ -233,7 +233,7 @@ jobs:
           node run_swarm_ops.js
 
   manifest-autonomous-mutation:
-    name: 🧬 Phase 4: Git Manifestation
+    name:Phase 4: Git Manifestation
     needs: [sentinel-swarm-intelligence]
     runs-on: ubuntu-latest
     steps:
