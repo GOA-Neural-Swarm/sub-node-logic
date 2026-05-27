@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # ⚡ အမြန်ဆုံးနှင့် အငြိမ်ဆုံး Version 20 ကို သုံးမည်
-          cache: 'npm'
 
       - name: 📦 Install Swarm Dependencies
         run: |
@@ -85,10 +84,12 @@ jobs:
             git add .
             git commit -m "🧬 [AUTO-EVOLUTION]: ASI Logic Upgraded via Stage 10 Agent Cycle"
             
-            # API Limits သို့မဟုတ် Network ကြောင့် Push Fail ဖြစ်လျှင် ပြန်ကြိုးစားမည့် Loop
+            # API Limits သို့မဟုတ် Network ကြောင့် Push Fail ဖြစ်လျှင် သို့မဟုတ် အခြား Node တစ်ခုက ဉာဏ်ဦးသွားလျှင် Rebase လုပ်ပြီး ပြန်ကြိုးစားမည့် Loop
             n=0
             until [ "$n" -ge 3 ]
             do
+               echo "🔄 Syncing with remote repository (Rebase)..."
+               git pull --rebase origin main
                git push origin main && echo "✅ Push Successful." && break
                n=$((n+1)) 
                echo "⏳ Retrying push ($n/3)..."
