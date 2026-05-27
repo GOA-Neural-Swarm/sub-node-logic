@@ -33,7 +33,7 @@ jobs:
       - name: 🛠️ Initialize Node.js Super-Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # ⚡ အမြန်ဆုံးနှင့် အငြိမ်ဆုံး Version 20 ကို သုံးမည်
+          node-version: '22' # ⚡ အမြန်ဆုံးနှင့် အငြိမ်ဆုံး Version 20 ကို သုံးမည်
 
       - name: 📦 Install Swarm Dependencies
         run: |
