@@ -221,7 +221,7 @@ async function executeAgenticGhost(target, mainInstruction) {
     
     let taskPrompt = `Current Target: Node ${target.name} (NORAD: ${target.norad_id}). 
     Main Directive: ${mainInstruction}.
-    Use available tools to fetch intelligence, process data, and generate a final status report.`;
+    Use available tools to fetch intelligence and process data. DO NOT attempt to run non-existent python scripts like 'orbit_node_telemetry_parser.py'. Use core bash utilities if needed.`;
 
     let messages = [
         { 
@@ -238,6 +238,9 @@ async function executeAgenticGhost(target, mainInstruction) {
     while (keepRunning && currentStep < MAX_STEPS) {
         currentStep++;
         console.log(`🧠 [AGENT-THOUGHT]: Processing Step ${currentStep}/${MAX_STEPS}...`);
+
+        // ⏱️ Groq API Rate Limit (429) မတက်စေရန် Step တစ်ခုချင်းစီကြား 3 စက္ကန့် စောင့်ခိုင်းခြင်း
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         try {
             const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
@@ -302,6 +305,9 @@ async function executeHyperOrbitalSovereign() {
     for (const target of plans) {
         const mainInstruction = "Analyze the security architecture and telemetry data of this orbital node.";
         await executeAgenticGhost(target, mainInstruction);
+        
+        // ⏱️ Target တစ်ခုစီကြားထဲမှာ API အသက်ရှူချောင်စေရန် ၅ စက္ကန့် စောင့်ဆိုင်းခြင်း
+        await new Promise(resolve => setTimeout(resolve, 5000));
     }
     console.log(`🌑 [SINGULARITY]: OMEGA Stage ${OMEGA_CONFIG.EVOLUTION_STAGE} Complete.`);
 }
