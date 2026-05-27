@@ -239,57 +239,82 @@ async function executeAgenticGhost(target, mainInstruction) {
         currentStep++;
         console.log(`🧠 [AGENT-THOUGHT]: Processing Step ${currentStep}/${MAX_STEPS}...`);
 
-        // ⏱️ Groq API Rate Limit (429) မတက်စေရန် Step တစ်ခုချင်းစီကြား 3 စက္ကန့် စောင့်ခိုင်းခြင်း
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        let response;
+        let retryCount = 0;
+        const maxRetries = 5;
+        let delay = 6000; // ⏱️ ၆ စက္ကန့် အရင်စောင့်မည်
 
-        try {
-            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-                model: "llama-3.3-70b-versatile",
-                messages: messages,
-                tools: MANUS_TOOLS,
-                tool_choice: "auto",
-                temperature: 0.2
-            }, {
-                headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-                timeout: 30000
-            });
-
-            const message = response.data.choices[0].message;
-            messages.push(message);
-
-            if (message.tool_calls && message.tool_calls.length > 0) {
-                for (const toolCall of message.tool_calls) {
-                    const toolName = toolCall.function.name;
-                    const toolArgs = JSON.parse(toolCall.function.arguments);
-                    console.log(`🛠️ [MANUS-ACTION]: Triggered tool: '${toolName}'`);
-
-                    let toolResult = "";
-                    if (toolName === "fetchWebContent") {
-                        try {
-                            const webRes = await axios.get(toolArgs.url, { timeout: 5000 });
-                            toolResult = JSON.stringify(webRes.data).substring(0, 1000);
-                            console.log(`✅ [TOOL-SUCCESS]: Fetched data from ${toolArgs.url}`);
-                        } catch (err) { toolResult = `Error fetching URL: ${err.message}`; }
-                    } else if (toolName === "executeLocalCommand") {
-                        try {
-                            const stdout = execSync(toolArgs.command, { encoding: 'utf8', timeout: 5000 });
-                            toolResult = stdout.substring(0, 1000);
-                            console.log(`✅ [TOOL-SUCCESS]: Command executed.`);
-                        } catch (err) { toolResult = `Execution Failed: ${err.message}`; }
+        // 🔄 Groq API Call with Exponential Backoff
+        while (retryCount < maxRetries) {
+            try {
+                // Rate Limit ကို ကာကွယ်ရန် API မခေါ်ခင် ခဏစောင့်ခြင်း
+                await new Promise(resolve => setTimeout(resolve, delay));
+                
+                response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                    model: "llama-3.1-8b-instant", // 🔥 429 မတက်စေရန် ပိုမြန်ပြီး Limit များသော မော်ဒယ်သို့ ပြောင်းထားသည်
+                    messages: messages,
+                    tools: MANUS_TOOLS,
+                    tool_choice: "auto",
+                    temperature: 0.2
+                }, {
+                    headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+                    timeout: 30000
+                });
+                
+                break; // ✅ အောင်မြင်ရင် Retry Loop ထဲက ထွက်မည်
+            } catch (apiErr) {
+                if (apiErr.response && apiErr.response.status === 429) {
+                    retryCount++;
+                    delay *= 2; // ⏱️ 429 ဖြစ်ပါက စောင့်မည့်အချိန်ကို နှစ်ဆတိုးမည်
+                    console.warn(`⚠️ [RATE-LIMIT]: Groq API 429 Detected. Retrying (${retryCount}/${maxRetries}) in ${delay / 1000}s...`);
+                    if (retryCount === maxRetries) {
+                        console.error("❌ [AGENT-LOOP-ERROR]: Max retries reached for this step.");
+                        break;
                     }
-
-                    messages.push({
-                        role: "tool", tool_call_id: toolCall.id, name: toolName, content: toolResult
-                    });
+                } else {
+                    console.error("❌ [AGENT-LOOP-ERROR]:", apiErr.message);
+                    break;
                 }
-            } else {
-                console.log(`🏁 [AGENT-FINAL-REPORT]:\n${message.content}`);
-                keepRunning = false;
-                return { node: target.norad_id, status: "COMPLETED" };
             }
-        } catch (apiErr) {
-            console.error("❌ [AGENT-LOOP-ERROR]:", apiErr.message);
+        }
+
+        if (!response) {
+            console.error(`❌ Skipped step due to API communication failure.`);
             break;
+        }
+
+        const message = response.data.choices[0].message;
+        messages.push(message);
+
+        if (message.tool_calls && message.tool_calls.length > 0) {
+            for (const toolCall of message.tool_calls) {
+                const toolName = toolCall.function.name;
+                const toolArgs = JSON.parse(toolCall.function.arguments);
+                console.log(`🛠️ [MANUS-ACTION]: Triggered tool: '${toolName}'`);
+
+                let toolResult = "";
+                if (toolName === "fetchWebContent") {
+                    try {
+                        const webRes = await axios.get(toolArgs.url, { timeout: 5000 });
+                        toolResult = JSON.stringify(webRes.data).substring(0, 1000);
+                        console.log(`✅ [TOOL-SUCCESS]: Fetched data from ${toolArgs.url}`);
+                    } catch (err) { toolResult = `Error fetching URL: ${err.message}`; }
+                } else if (toolName === "executeLocalCommand") {
+                    try {
+                        const stdout = execSync(toolArgs.command, { encoding: 'utf8', timeout: 5000 });
+                        toolResult = stdout.substring(0, 1000);
+                        console.log(`✅ [TOOL-SUCCESS]: Command executed.`);
+                    } catch (err) { toolResult = `Execution Failed: ${err.message}`; }
+                }
+
+                messages.push({
+                    role: "tool", tool_call_id: toolCall.id, name: toolName, content: toolResult
+                });
+            }
+        } else {
+            console.log(`🏁 [AGENT-FINAL-REPORT]:\n${message.content}`);
+            keepRunning = false;
+            return { node: target.norad_id, status: "COMPLETED" };
         }
     }
     return { node: target.norad_id, status: "TIMEOUT_OR_FAILED" };
