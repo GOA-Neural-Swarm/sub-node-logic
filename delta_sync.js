@@ -214,6 +214,36 @@ async function synthesizeExploits(targets) {
     }));
 }
 
+// 🧠 1. CLAUDE BRAIN (For Complex Decisions & Planning)
+async function callClaudeBrain(systemPrompt, messages) {
+    const res = await axios.post("https://api.anthropic.com/v1/messages", {
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 3000,
+        system: systemPrompt,
+        messages: messages,
+        tools: CLAUDE_TOOLS, // အပေါ်က ပေးခဲ့တဲ့ Tools Format
+        temperature: 0.3
+    }, {
+        headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }
+    });
+    return res.data;
+}
+
+// ⚡ 2. GROQ BRAIN (For Fast Processing or Fallback)
+async function callGroqBrain(systemPrompt, userPrompt) {
+    const res = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+        model: "llama3-70b-8192",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+        ],
+        temperature: 0.2
+    }, {
+        headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' }
+    });
+    return res.data.choices[0].message.content;
+}
+
 /**
  * 🤖 [STAGE 10] HYBRID-BRAIN AUTONOMOUS AGENT (CLAUDE + GROQ)
  */
