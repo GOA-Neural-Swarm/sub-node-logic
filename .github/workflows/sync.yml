@@ -21,19 +21,23 @@ jobs:
   agentic_execution:
     name: 🤖 Execute Swarm Agent Logic
     runs-on: ubuntu-latest
-    timeout-minutes: 15 # ⏳ Loop တွေ အပတ်လွန်ပြီး API လောင်သွားတာမျိုး မဖြစ်အောင် 15 မိနစ် Limit ထားခြင်း
+    timeout-minutes: 15
+    
+    # 👈 [အသစ်ထည့်ထားသည်] AI က ကုဒ်အသစ်တွေကို GitHub ပေါ် ပြန်တင်ခွင့်ရအောင် Write Permission ပေးခြင်း
+    permissions:
+      contents: write 
 
     steps:
       - name: 📥 Clone Neural Repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }} # 🔑 ကုဒ်ကို အလိုအလျောက် Update (Push) လုပ်နိုင်ရန် Token
+          token: ${{ secrets.GH_TOKEN }}
           fetch-depth: 0
 
       - name: 🛠️ Initialize Node.js Super-Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # ⚡ အမြန်ဆုံးနှင့် အငြိမ်ဆုံး Version 20 ကို သုံးမည်
+          node-version: '22'
 
       - name: 📦 Install Swarm Dependencies
         run: |
@@ -50,9 +54,9 @@ jobs:
 
       - name: 🧠 Activate OMEGA Sovereign Logic (Execution)
         env:
-          # 🔐 API Keys & Connections ကို GitHub Secrets ထဲမှ ဆွဲယူခြင်း
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          # 👈 [ပြင်ဆင်ထားသည်] ကုဒ်ထဲက နာမည်နဲ့ ကိုက်ညီအောင် ANTHROPIC_API_KEY လို့ ပြောင်းထားသည်
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} 
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -63,7 +67,6 @@ jobs:
         run: |
           echo "🚀 Initiating Stage 10 Agentic Protocol..."
           
-          # 🔀 delta_sync.js ရှိပါက ၎င်းကို အရင် Run မည်။ မရှိပါက cluster_sync.js ကို Run မည်။
           if [ -f "delta_sync.js" ]; then
             echo "🌌 Detected delta_sync.js (Agentic Core). Booting..."
             node delta_sync.js
@@ -79,13 +82,11 @@ jobs:
           git config --global user.name "Sovereign-Omega-Bot"
           git config --global user.email "omega-bot@goa-neurons.local"
           
-          # ကုဒ်အပြောင်းအလဲ (Self-Evolution) ရှိမရှိ စစ်ဆေးခြင်း
           if [[ -n $(git status -s) ]]; then
             echo "⚠️ Structural changes detected. Uploading evolved DNA..."
             git add .
             git commit -m "🧬 [AUTO-EVOLUTION]: ASI Logic Upgraded via Stage 10 Agent Cycle"
             
-            # API Limits သို့မဟုတ် Network ကြောင့် Push Fail ဖြစ်လျှင် သို့မဟုတ် အခြား Node တစ်ခုက ဉာဏ်ဦးသွားလျှင် Rebase လုပ်ပြီး ပြန်ကြိုးစားမည့် Loop
             n=0
             until [ "$n" -ge 3 ]
             do
