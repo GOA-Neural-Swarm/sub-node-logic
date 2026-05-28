@@ -16,7 +16,6 @@ const { Queue, Worker: BullWorker } = require('bullmq');
 // 🔱 1. Configuration & Auth
 const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 const API_KEY = process.env.GROQ_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const REPO_OWNER = "GOA-neurons";
 const CORE_REPO = "delta-brain-sync";
 const REPO_NAME = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : "unknown-node";
@@ -214,126 +213,87 @@ async function synthesizeExploits(targets) {
     }));
 }
 
-// 🧠 1. CLAUDE BRAIN (For Complex Decisions & Planning)
-async function callClaudeBrain(systemPrompt, messages) {
-    const res = await axios.post("https://api.anthropic.com/v1/messages", {
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 3000,
-        system: systemPrompt,
-        messages: messages,
-        tools: CLAUDE_TOOLS, // အပေါ်က ပေးခဲ့တဲ့ Tools Format
-        temperature: 0.3
-    }, {
-        headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }
-    });
-    return res.data;
-}
-
-// ⚡ 2. GROQ BRAIN (For Fast Processing or Fallback)
-async function callGroqBrain(systemPrompt, userPrompt) {
-    const res = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-        model: "llama3-70b-8192",
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
-        ],
-        temperature: 0.2
-    }, {
-        headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' }
-    });
-    return res.data.choices[0].message.content;
-}
-
 /**
- * 🤖 [STAGE 10] HYBRID-BRAIN AUTONOMOUS AGENT (CLAUDE + GROQ)
+ * 🤖 [STAGE 10] MANUS-STYLE AUTONOMOUS AGENT EXECUTION ENGINE
  */
 async function executeAgenticGhost(target, mainInstruction) {
-    console.log(`🤖 [HYBRID-AGENT]: Activating Dual-Brain Agent for Target: [${target.norad_id}]`);
+    console.log(`🤖 [MANUS-AGENT]: Activating Swarm-Node Agent for Target: [${target.norad_id}]`);
     
     let taskPrompt = `Current Target: Node ${target.name} (NORAD: ${target.norad_id}). 
-    Main Directive: ${mainInstruction}. Use available tools to fetch intelligence.`;
+    Main Directive: ${mainInstruction}.
+    Use available tools to fetch intelligence and process data. DO NOT attempt to run non-existent python scripts like 'orbit_node_telemetry_parser.py'. Use core bash utilities if needed.`;
 
-    let messages = [{ role: "user", content: taskPrompt }];
+    let messages = [
+        { 
+            role: "system", 
+            content: "You are an autonomous Manus-style AI agent acting as a Swarm Node. Accomplish the task by calling available tools step-by-step. Analyze outputs and decide the next move. Provide a final verification report." 
+        },
+        { role: "user", content: taskPrompt }
+    ];
+
     const MAX_STEPS = 4;
     let currentStep = 0;
+    let keepRunning = true;
 
-    while (currentStep < MAX_STEPS) {
+    while (keepRunning && currentStep < MAX_STEPS) {
         currentStep++;
-        console.log(`🧠 [BRAIN 1 - CLAUDE]: Planning Step ${currentStep}/${MAX_STEPS}...`);
+        console.log(`🧠 [AGENT-THOUGHT]: Processing Step ${currentStep}/${MAX_STEPS}...`);
+
+        // ⏱️ Groq API Rate Limit (429) မတက်စေရန် Step တစ်ခုချင်းစီကြား 3 စက္ကန့် စောင့်ခိုင်းခြင်း
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         try {
-            // 1. Claude Brain ကို Planner အဖြစ် သုံးပြီး ဆုံးဖြတ်ချက်ချခိုင်းခြင်း
-            const response = await axios.post("https://api.anthropic.com/v1/messages", {
-                model: "claude-3-5-sonnet-20241022",
-                max_tokens: 2000,
-                system: "You are an autonomous agent framework coordinator. Use tools step-by-step.",
+            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                model: "llama-3.3-70b-versatile",
                 messages: messages,
-                tools: MANUS_TOOLS.map(t => ({ name: t.function.name, description: t.function.description, input_schema: t.function.parameters })), 
+                tools: MANUS_TOOLS,
+                tool_choice: "auto",
                 temperature: 0.2
             }, {
-                headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }
+                headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+                timeout: 30000
             });
 
-            const responseData = response.data;
-            messages.push({ role: "assistant", content: responseData.content });
+            const message = response.data.choices[0].message;
+            messages.push(message);
 
-            const toolCalls = responseData.content.filter(block => block.type === "tool_use");
+            if (message.tool_calls && message.tool_calls.length > 0) {
+                for (const toolCall of message.tool_calls) {
+                    const toolName = toolCall.function.name;
+                    const toolArgs = JSON.parse(toolCall.function.arguments);
+                    console.log(`🛠️ [MANUS-ACTION]: Triggered tool: '${toolName}'`);
 
-            if (toolCalls.length > 0) {
-                let toolResultsBlocks = [];
-
-                for (const toolCall of toolCalls) {
-                    console.log(`🛠️ [MANUS-ACTION]: Triggered tool: '${toolCall.name}'`);
                     let toolResult = "";
-
-                    if (toolCall.name === "fetchWebContent") {
+                    if (toolName === "fetchWebContent") {
                         try {
-                            const webRes = await axios.get(toolCall.input.url, { timeout: 5000 });
-                            toolResult = JSON.stringify(webRes.data);
-                        } catch (err) { toolResult = `Error: ${err.message}`; }
-                    } else if (toolCall.name === "executeLocalCommand") {
+                            const webRes = await axios.get(toolArgs.url, { timeout: 5000 });
+                            toolResult = JSON.stringify(webRes.data).substring(0, 1000);
+                            console.log(`✅ [TOOL-SUCCESS]: Fetched data from ${toolArgs.url}`);
+                        } catch (err) { toolResult = `Error fetching URL: ${err.message}`; }
+                    } else if (toolName === "executeLocalCommand") {
                         try {
-                            toolResult = execSync(toolCall.input.command, { encoding: 'utf8', timeout: 5000 });
-                        } catch (err) { toolResult = `Failed: ${err.message}`; }
+                            const stdout = execSync(toolArgs.command, { encoding: 'utf8', timeout: 5000 });
+                            toolResult = stdout.substring(0, 1000);
+                            console.log(`✅ [TOOL-SUCCESS]: Command executed.`);
+                        } catch (err) { toolResult = `Execution Failed: ${err.message}`; }
                     }
 
-                    // ⚡ [GROQ RE-ROUTING]: ရလာတဲ့ ဒေတာ အရမ်းရှည်ရင် ကုန်ကျစရိတ်သက်သာအောင် Groq နဲ့ အနှစ်ချုပ်ခိုင်းမယ်
-                    if (toolResult.length > 1200) {
-                        console.log(`⚡ [BRAIN 2 - GROQ]: Data heavy. Routing to Groq for rapid compression...`);
-                        const groqRes = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-                            model: "llama-3.3-70b-versatile",
-                            messages: [
-                                { role: "system", content: "Compress and extract key intelligence from this raw data summary." },
-                                { role: "user", content: toolResult.substring(0, 4000) }
-                            ]
-                        }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` } });
-                        toolResult = groqRes.data.choices[0].message.content;
-                    }
-
-                    toolResultsBlocks.push({ type: "tool_result", tool_use_id: toolCall.id, content: toolResult });
+                    messages.push({
+                        role: "tool", tool_call_id: toolCall.id, name: toolName, content: toolResult
+                    });
                 }
-                messages.push({ role: "user", content: toolResultsBlocks });
-
             } else {
-                const finalReport = responseData.content.find(block => block.type === "text")?.text || "Done";
-                console.log(`🏁 [AGENT-FINAL-REPORT]:\n${finalReport}`);
+                console.log(`🏁 [AGENT-FINAL-REPORT]:\n${message.content}`);
+                keepRunning = false;
                 return { node: target.norad_id, status: "COMPLETED" };
             }
-
         } catch (apiErr) {
-            console.error("⚠️ [CLAUDE ERROR]: Brain 1 failed. Switched to Emergency Groq Brain!");
-            // Fallback Logic: Claude အလုပ်မလုပ်ရင် စနစ်မရပ်အောင် Groq နဲ့ အပြီးသတ်ခိုင်းခြင်း
-            const groqFallback = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
-                model: "llama-3.3-70b-versatile",
-                messages: [{ role: "user", content: `Finish this task immediately: ${mainInstruction} for ${target.name}` }]
-            }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` } });
-            
-            console.log(`🏁 [EMERGENCY REPORT VIA GROQ]:\n${groqFallback.data.choices[0].message.content}`);
-            return { node: target.norad_id, status: "EMERGENCY_COMPLETED" };
+            console.error("❌ [AGENT-LOOP-ERROR]:", apiErr.message);
+            break;
         }
     }
-    return { node: target.norad_id, status: "TIMEOUT" };
-                        }
+    return { node: target.norad_id, status: "TIMEOUT_OR_FAILED" };
+}
 
 async function executeHyperOrbitalSovereign() {
     console.log(`🔱 [OMEGA-HYPER-MASTER]: Initiating Agentic Stage ${OMEGA_CONFIG.EVOLUTION_STAGE}.`);
