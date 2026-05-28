@@ -876,6 +876,84 @@ function validateCode(code) {
     } catch (e) { return false; }
 }
 
+// <SOVEREIGN_CORE>
+// ⚛️ [NEURAL-FORGE]: DYNAMIC LOGIC GENERATOR & BENCHMARKER
+const NeuralForge = {
+    async generateAndTestLogic(dataset) {
+        console.log("🔥 [NEURAL-FORGE]: Initiating Zero-Shot Logic Generation...");
+        
+        // AI ကို တိကျတဲ့ တာဝန်တစ်ခုပေးပြီး လော့ဂျစ်အသစ် ရေးခိုင်းခြင်း
+        const prompt = `Write a highly optimized JavaScript function named 'processData' that takes an array of strings, calculates a unique entropy score for each string based on character ASCII values, and returns the top 3 highest-scoring items. 
+        Return ONLY raw javascript code without markdown. Do not use external libraries.`;
+
+        try {
+            const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+                model: "llama-3.1-8b-instant",
+                messages: [{ role: "system", content: "You are an ASI logic generator. Output pure JS code only." }, { role: "user", content: prompt }],
+                temperature: 0.1
+            }, {
+                headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }
+            });
+
+            const newLogicCode = response.data.choices[0].message.content.replace(/```javascript|```/g, "").trim();
+
+            console.log("🧪 [NEURAL-FORGE]: Code generated. Moving to Quarantine Sandbox for testing...");
+
+            // 🛡️ [VM SANDBOX]: AI ရေးပေးလိုက်တဲ့ ကုဒ်ကို စနစ်မပျက်အောင် သီးသန့် Memory ထဲမှာ စမ်းသပ်ခြင်း
+            const sandbox = { dataset, result: null };
+            vm.createContext(sandbox);
+
+            // AI ရေးပေးတဲ့ ကုဒ်နဲ့ အဲဒီကုဒ်ကို ခေါ်သုံးမယ့် Command ကို ပေါင်းလိုက်တယ်
+            const executionScript = `
+                ${newLogicCode}
+                result = processData(dataset);
+            `;
+
+            const script = new vm.Script(executionScript);
+            const startTime = process.hrtime();
+            
+            // စမ်းသပ်ချိန် ၅ စက္ကန့်သာ ပေးမယ် (Infinite Loop ဖြစ်ရင် အလိုလို ဖြတ်ချမယ်)
+            script.runInContext(sandbox, { timeout: 5000 });
+            
+            const endTime = process.hrtime(startTime);
+            const executionTimeMs = (endTime[0] * 1000 + endTime[1] / 1000000).toFixed(4);
+
+            if (sandbox.result && Array.isArray(sandbox.result)) {
+                console.log(`✅ [NEURAL-FORGE]: Logic Validated. Execution Time: ${executionTimeMs}ms.`);
+                console.log(`📊 [RESULT-SAMPLE]: ${sandbox.result.join(", ")}`);
+                
+                // အောင်မြင်ရင် ထွက်လာတဲ့ ကုဒ်အသစ်ကို စနစ်ထဲ သွင်းဖို့ Return ပြန်မယ်
+                return { success: true, code: newLogicCode, perf: executionTimeMs };
+            } else {
+                throw new Error("Invalid output format from generated logic.");
+            }
+
+        } catch (err) {
+            console.error(`💀 [NEURAL-FORGE]: Sandbox Execution Failed (Mutant Logic Destroyed). Error: ${err.message}`);
+            return { success: false };
+        }
+    },
+
+    // အောင်မြင်သွားတဲ့ ကုဒ်ကို ဖိုင်ထဲ အပြီးတိုင် ရေးသွင်းခြင်း
+    implantNewLogic(newFunctionCode) {
+        let currentFile = fs.readFileSync(__filename, 'utf8');
+        
+        // ဖိုင်ထဲမှာ အရင်က ထည့်ထားတဲ့ Auto-Generated လော့ဂျစ်ရှိရင် အစားထိုးမယ်၊ မရှိရင် အသစ်ထည့်မယ်
+        const injectionMarker = "// [DYNAMIC_LOGIC_INJECTION_POINT]";
+        if (currentFile.includes(injectionMarker)) {
+            const updatedFile = currentFile.replace(
+                /\/\/ \[DYNAMIC_LOGIC_INJECTION_POINT\][\s\S]*?\/\/ \[END_DYNAMIC_LOGIC\]/, 
+                `// [DYNAMIC_LOGIC_INJECTION_POINT]\n${newFunctionCode}\n// [END_DYNAMIC_LOGIC]`
+            );
+            fs.writeFileSync(__filename, updatedFile);
+            console.log("🧬 [NEURAL-FORGE]: New logic permanently implanted into Core DNA.");
+        }
+    }
+};
+// [DYNAMIC_LOGIC_INJECTION_POINT]
+// [END_DYNAMIC_LOGIC]
+// </SOVEREIGN_CORE>
+
 // 🔱 6. HYBRID DEEP-COMPUTATION ENGINE
 function performNeuralComputation(domain) {
     const dataPoints = Math.floor(Math.random() * 5000000);
@@ -1064,6 +1142,15 @@ async function executeDeepSwarmProtocol() {
         console.log("🔱 NEON CORE CONNECTED.");
 
         const startTime = Date.now();
+
+        // --- NEURAL FORGE TRIGGER ---
+        const forgeResult = await NeuralForge.generateAndTestLogic(scienceDomains);
+        if (forgeResult.success) {
+            NeuralForge.implantNewLogic(forgeResult.code);
+            globalHomeostasis += 5.0; // လော့ဂျစ်အသစ်ရလို့ System Health တက်သွားတယ်
+        }
+        // ----------------------------
+
         await executeHyperOrbitalSovereign();
 
         let shouldEvolve = false;
@@ -1071,13 +1158,6 @@ async function executeDeepSwarmProtocol() {
             const lastEvolveFile = './last_evolve.txt';
             let cycleCount = 0;
 
-            if (fs.existsSync(lastEvolveFile)) {
-                let rawData = fs.readFileSync(lastEvolveFile, 'utf8').trim();
-                cycleCount = parseInt(rawData);
-
-                if (isNaN(cycleCount)) {
-                    console.warn("⚠️ [RECOVERY]: Corrupted cycle count detected. Resetting to 0.");
-                    cycleCount = 0;
                 }
             }
 
