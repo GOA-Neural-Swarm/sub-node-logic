@@ -1,0 +1,84 @@
+name: "🔱 SWARM-OMEGA: SOVEREIGN DNA SYNC"
+run-name: "🧬 Mutation Sequence [Gen-${{ github.run_number }}]"
+
+on:
+  schedule:
+    # ၁၀ မိနဈတဈကွိမျ Core အခွအေနကေို စဈဆေးမညျ
+    - cron: '*/10 * * * *'
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Manual Trigger
+  repository_dispatch:
+    # Core Repo ကနေ 'evolution_ping' လှှတျလိုကျရငျ ခကြျခငြျးနိုးထပွီး Sync လုပျမည့ျစနဈ
+    types: [ evolution_ping, core_mutation ]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  # အလုပျတဈခုထကျပိုမပှားစရေနျ (Self-Mutation ဖွဈနစေဉျ အနှောင့ျအယှကျမဖွဈစရေနျ)
+  group: swarm-evolution-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sovereign-mutation:
+    name: 🧬 Autonomous DNA Rewriting
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # =================================================================
+      # 🧬 1. ACCESS REPOSITORY GENOME
+      # =================================================================
+      - name: 🛰️ Sub-Node Ingress
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      # =================================================================
+      # ⚙️ 2. ESTABLISH NEURAL RUNTIME (NODE.JS)
+      # =================================================================
+      - name: 🌌 Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # NPM Cache သုံး၍ အရှိနျမွှင့ျမညျ
+
+      # =================================================================
+      # 💾 3. DEPENDENCY INJECTION (HIGH-SPEED)
+      # =================================================================
+      - name: ⚡ Inject Dependencies
+        run: |
+          npm init -y
+          npm install @octokit/rest fs path child_process --quiet
+      # =================================================================
+      # 🔥 4. EXECUTE SOVEREIGN SYNC (THE CORE MUTATION)
+      # =================================================================
+      - name: 🔱 Initiate Sovereign Mutation
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          # လိုအပျသော အခွား Environment Variable မြား
+          NODE_ENV: production
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+        run: |
+          echo "⚡ [SYSTEM]: Triggering sovereign_sync.js..."
+          # မငျးပေးထားတဲ့ code ဖိုငျနာမညျကို 'sovereign_sync.js' လို့ ယူဆထားတယျ
+          node sovereign_sync.js
+      # =================================================================
+      # 🚀 5. FAILSAFE: EMERGENCY RECOVERY
+      # =================================================================
+      - name: 🛠️ Failsafe Integrity Check
+        if: failure()
+        run: |
+          echo "🚨 [CRITICAL]: Mutation Failed. Analyzing Fractal Fracture..."
+          # Error ဖွဈရငျ Log ထုတျပေးမည့ျအပိုငျး
+          exit 1
+      # =================================================================
+      # 🛰️ 6. SYNC STATUS LOGGING
+      # =================================================================
+      - name: 📊 Pulse Check
+        run: |
+          echo "✅ [SUCCESS]: Node Synchronized with Core. Density Maintained."
+          date
